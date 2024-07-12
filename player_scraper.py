@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import requests
 import time
+import os
+import psycopg2
+from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -70,6 +73,10 @@ def get_player_info(player_list):
 def get_player_stats(player_df, driver):
     player_stats_url = 'https://www.nba.com/stats/player/'
 
+    player_stats_all_df = pd.DataFrame()
+
+    column_headers = []
+
     for index, row in player_df.iterrows():
 
         print(f"Getting player stats for {row['first_name']} {row['last_name']} in row {index}")
@@ -83,7 +90,7 @@ def get_player_stats(player_df, driver):
         # Wait until the table is present and visible
         try:
             table_xpath = "//div[@class='Crom_container__C45Ti crom-container']/table"
-            table = WebDriverWait(driver, 10).until(
+            table = WebDriverWait(driver, 2).until(
                 EC.visibility_of_element_located((By.XPATH, table_xpath))
             )
         except:
@@ -99,13 +106,12 @@ def get_player_stats(player_df, driver):
 
         column_list = soup.find('tr', class_='Crom_headers__mzI_m').find_all('th')
 
-        column_headers = []
+        if not column_headers:
+            for column in column_list:
+                text = column.text.replace('"', '').strip().lower()
+                column_headers.append(text)
 
-        for column in column_list:
-            text = column.text.replace('"', '').strip()
-            column_headers.append(text)
-
-        print(column_headers)
+            print(column_headers)
 
         player_stats_list = soup.find('tbody', class_='Crom_body__UYOcU').find_all('tr')
 
@@ -123,13 +129,18 @@ def get_player_stats(player_df, driver):
             player_stats_data.append(stats_dict)
 
         player_stats_df = pd.DataFrame(player_stats_data)
-        player_stats_df.to_csv(f'./player_stats/player_stats_{player_id}.csv', index=False)
+        player_stats_df['player_id'] = player_id
+        player_stats_df.rename(columns={'by year': 'year'}, inplace=True)
 
-        print(player_stats_df.head())
+        player_stats_all_df = pd.concat([player_stats_all_df, player_stats_df], axis=0, ignore_index=True)
+
+    print(player_stats_all_df.head())
+
+    player_stats_all_df.to_csv('player_stats_all.csv', index=False)
+
+
 
 def player_scraper():
-    
-
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
@@ -175,7 +186,9 @@ def player_scraper():
     driver.quit()
 
 def main():
+
     player_scraper()
+
 
 if __name__ == '__main__':
     main()
