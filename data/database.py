@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import requests
 import time
 import os
@@ -25,12 +23,22 @@ class PlayerDatabase():
         data = dataframe.copy()
         print(f"Dropping {len(data) - len(data.dropna(subset=['id', 'number', 'position', 'height', 'weight']))} rows with missing values")
         data = data.dropna(subset=['id', 'number', 'position', 'height', 'weight'])
-        data['feet'], data['inches'] = zip(*data['height'].map(self.split_height))
+
+        # Apply split_height function directly to each element of 'height' column
+        heights = data['height'].apply(self.split_height)
+        data['feet'], data['inches'] = zip(*heights)
+
         data.drop('height', axis=1, inplace=True)
+
         data['number'] = data['number'].astype(int).astype(str)
+
+        data['feet'] = data['feet'].apply(int)
+        data['inches'] = data['inches'].apply(int)
+
         data['team_full_name'] = data['team_url'].apply(lambda x: x.split('/')[-2].strip())
         data['team_id'] = data['team_url'].apply(lambda x: x.split('/')[-3].strip())
         data['position'] = data['position'].apply(lambda x: x.replace('-', '/'))
+        
         print(data.head())
         return data
     
@@ -197,7 +205,7 @@ def main():
         if conn:
             print('Connected to database')
 
-        player_df = pd.read_csv('player_data.csv')
+        player_df = pd.read_csv('../player_data.csv')
         player_list = player_df.to_dict('records')
 
         player_db = PlayerDatabase(conn, player_df)
