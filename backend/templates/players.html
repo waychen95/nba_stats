@@ -14,7 +14,7 @@
         {% for player in players %}
             <tr>
                 <td><a href="/player/{{ player.id }}">{{ player.first_name }} {{ player.last_name }}</a></td>
-                <td>{{ player.team }}</td>
+                <td>{{ player.team_name }}</td>
                 <td>{{ player.position }}</td>
                 <td>{{ player.feet }} {{ player.inches }}</td>
                 <td>{{ player.weight }} lbs</td>

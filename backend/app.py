@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, redirect, url_for, render_template
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import psycopg2
 import psycopg2.extras
 
 app = Flask(__name__)
+CORS(app)
 
 # Load environment variables
 load_dotenv()
@@ -33,20 +35,67 @@ except Exception as e:
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return "Hello, World!"
 
-@app.route('/player/<player_id>', methods=['GET'])
-def player(player_id):
+@app.route('/teams/<team_id>', methods=['GET'])
+def get_team(team_id):
+    team_id = int(team_id)
+    query = """
+    SELECT * FROM nba_teams WHERE id = %s;
+    """
+    cursor.execute(query, (team_id,))
+    team = cursor.fetchone()
+    team = dict(team)
+    return jsonify({'team': team})
+
+@app.route('/teams', methods=['GET'])
+def teams():
+    query = """
+    SELECT * FROM nba_teams;
+    """
+    cursor.execute(query)
+    teams = cursor.fetchall()
+    teams = [dict(team) for team in teams]
+    return jsonify({'teams': teams})
+
+@app.route('/players/<player_id>', methods=['GET'])
+def get_player(player_id):
     player_id = int(player_id)
-    cursor.execute("SELECT * FROM nba_players WHERE id = %s", (player_id,))
+    query = """
+    SELECT
+        p.*,
+        t.name AS team_name
+    FROM
+        nba_players p
+    JOIN
+        nba_teams t
+    ON
+        p.team_id = t.id
+    WHERE
+        p.id = %s;
+    """
+    cursor.execute(query, (player_id,))
     player = cursor.fetchone()
-    return render_template('player.html', player=player)
+    player = dict(player)
+    return jsonify({'player': player})
 
 @app.route('/players', methods=['GET'])
 def players():
-    cursor.execute("SELECT * FROM nba_players")
+    query = """
+    SELECT 
+        p.*, 
+        t.name AS team_name
+    FROM 
+        nba_players p
+    JOIN 
+        nba_teams t 
+    ON 
+        p.team_id = t.id;
+    """
+    cursor.execute(query)
     players = cursor.fetchall()
-    return render_template('players.html', players=players)
+    players = [dict(player) for player in players]
+    return jsonify({'players': players})
 
 if __name__ == '__main__':
     app.run(debug=True)
