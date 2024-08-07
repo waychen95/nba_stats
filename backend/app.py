@@ -37,6 +37,16 @@ except Exception as e:
 def home():
     return "Hello, World!"
 
+@app.route('/teams', methods=['GET'])
+def teams():
+    query = """
+    SELECT * FROM nba_teams;
+    """
+    cursor.execute(query)
+    teams = cursor.fetchall()
+    teams = [dict(team) for team in teams]
+    return jsonify({'teams': teams})
+
 @app.route('/teams/<team_id>', methods=['GET'])
 def get_team(team_id):
     team_id = int(team_id)
@@ -48,15 +58,26 @@ def get_team(team_id):
     team = dict(team)
     return jsonify({'team': team})
 
-@app.route('/teams', methods=['GET'])
-def teams():
+@app.route('/teams/<team_id>/players', methods=['GET'])
+def get_team_players(team_id):
+    team_id = int(team_id)
     query = """
-    SELECT * FROM nba_teams;
+    SELECT
+        p.*,
+        t.name AS team_name
+    FROM
+        nba_players p
+    JOIN
+        nba_teams t
+    ON
+        p.team_id = t.id
+    WHERE
+        p.team_id = %s;
     """
-    cursor.execute(query)
-    teams = cursor.fetchall()
-    teams = [dict(team) for team in teams]
-    return jsonify({'teams': teams})
+    cursor.execute(query, (team_id,))
+    players = cursor.fetchall()
+    players = [dict(player) for player in players]
+    return jsonify({'players': players})
 
 @app.route('/players/<player_id>', methods=['GET'])
 def get_player(player_id):

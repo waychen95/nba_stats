@@ -64,6 +64,8 @@ def get_player_info(player_list):
 
         player_data.append(player_dict)
 
+        time.sleep(1)
+
     player_df = pd.DataFrame(player_data)
     print(player_df.head())
     player_df.to_csv('player_data.csv', index=False)
@@ -185,9 +187,109 @@ def player_scraper():
 
     driver.quit()
 
-def main():
+def get_team_url(player_csv):
+    player_df = pd.read_csv(player_csv)
 
-    player_scraper()
+    team_urls = player_df['team_url'].unique()
+
+    print(team_urls)
+
+    return team_urls
+
+def team_scraper():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
+
+    driver = webdriver.Chrome(options=options)
+
+    team_urls = get_team_url('player_data.csv')
+
+    teams = []
+
+    for team_url in team_urls:
+        print(f"Getting team info for {team_url}")
+
+        driver.get(team_url)
+
+        page_source = driver.page_source
+
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        team_logo_div = soup.find('div', class_='TeamLogo_block__rSWmO')
+
+        if team_logo_div:
+            team_logo_url = team_logo_div.find('img').get('src')
+
+        id = team_url.split('/')[-2]
+        
+        team_name_divs = soup.find('div', class_='TeamHeader_name__MmHlP')
+
+        team_city = ''
+        team_name = ''
+        team_full_name = ''
+
+        if team_name_divs:
+            team_name_divs = team_name_divs.find_all('div')
+
+            team_city = team_name_divs[0].text.strip()
+
+            team_name = team_name_divs[1].text.strip()
+
+            team_full_name = f"{team_city} {team_name}"
+
+        coaching_staff_divs = soup.find('div', class_='TeamProfile_sectionCoaches__e66bL').find('div', class_='Block_titleContainerBetween__0GYet').find_next_sibling().find_all('div')
+
+        head_coach = ''
+        associate_head_coach = []
+        assistant_coach = []
+
+        if len(coaching_staff_divs) >= 3:
+
+            head_coach_div = coaching_staff_divs[0]
+            head_coach = head_coach_div.find('ul', class_='TeamCoaches_list__xqA2i').find('li').text.strip()
+
+            associate_head_coach_list = coaching_staff_divs[1].find('ul', class_='TeamCoaches_list__xqA2i').find_all('li')
+
+            assistant_coach_list = coaching_staff_divs[2].find('ul', class_='TeamCoaches_list__xqA2i').find_all('li')
+        elif len(coaching_staff_divs) == 2:
+            head_coach_div = coaching_staff_divs[0]
+            head_coach = head_coach_div.find('ul', class_='TeamCoaches_list__xqA2i').find('li').text.strip()
+
+            assistant_coach_list = coaching_staff_divs[1].find('ul', class_='TeamCoaches_list__xqA2i').find_all('li')
+        elif len(coaching_staff_divs) == 1:
+            head_coach_div = coaching_staff_divs[0]
+            head_coach = head_coach_div.find('ul', class_='TeamCoaches_list__xqA2i').find('li').text.strip()
+
+        associate_head_coach = [coach.text.strip() for coach in associate_head_coach_list]
+
+        assistant_coach = [coach.text.strip() for coach in assistant_coach_list]
+
+        team_dict = {
+            'id': id,
+            'name': team_name,
+            "city": team_city,
+            'full_name': team_full_name,
+            'url': team_url,
+            'logo_url': team_logo_url,
+            'head_coach': head_coach,
+            'associate_head_coach': associate_head_coach,
+            'assistant_coach': assistant_coach
+        }
+
+        teams.append(team_dict)
+
+    team_df = pd.DataFrame(teams)
+
+    print(team_df.head())
+
+    team_df.to_csv('team_data.csv', index=False)
+
+    driver.quit()
+
+def main():
+    team_scraper()
+    # player_scraper()
 
 
 if __name__ == '__main__':

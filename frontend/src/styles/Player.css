@@ -1,0 +1,22 @@
+.player-container {
+    display: flex;
+    flex-direction: column;
+    margin: 2rem 1rem 0 1rem;
+}
+
+.player {
+    color: white;
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.player img {
+    width: 20%;
+    border: 1px solid white;
+    border-radius: 30px;
+}
+
+.player-info {
+    font-size: 3rem;
+}

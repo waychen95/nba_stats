@@ -181,6 +181,17 @@ class PlayerDatabase():
     def __del__(self):
         self.cursor.close()
 
+class TeamDatabase():
+    def __init__(self, connection, dataframe):
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+        self.dataframe = self._reformat_data(dataframe)
+    
+    def _reformat_data(self, dataframe):
+        team_data = dataframe.copy()
+
+
+
 def main():
     # Load environment variables
     load_dotenv()

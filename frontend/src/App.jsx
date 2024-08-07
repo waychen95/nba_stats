@@ -2,16 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import TeamList from './pages/TeamList';
+import Team from './pages/Team';
 import PlayerList from './pages/PlayerList';
 import Player from './pages/Player';
-import Games from './pages/Games';
+import Login from './pages/Login';
 
 function App() {
   return (
     <Router>
       <div>
+        <div id='banner'></div>
         <nav>
-          <ul>
+          <ul id='nav-bar'>
             <li>
               <Link to="/">Home</Link>
             </li>
@@ -22,18 +24,21 @@ function App() {
               <Link to="/players">Players</Link>
             </li>
             <li>
-              <Link to="/games">Games</Link>
+              <Link to="/login">Login</Link>
             </li>
           </ul>
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/teams" element={<TeamList />} />
+          <Route path="/teams">
+            <Route index element={<TeamList />} />
+            <Route path=":teamId" element={<Team />} />
+          </Route>
           <Route path="/players" >
             <Route index element={<PlayerList />} />
             <Route path=":id" element={<Player />} />
           </Route>
-          <Route path="/games" element={<Games />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </Router>

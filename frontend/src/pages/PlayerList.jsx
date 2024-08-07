@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Player from './Player';
+import '../styles/PlayerList.css';
 
 function PlayerList() {
   const [players, setPlayers] = useState([]);
@@ -18,19 +19,20 @@ function PlayerList() {
   }, []);
 
   return (
-      <div>
-      <h1>Players</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {players.map((player) => (
-            <li key={player.id}>
-              <Link to={`/players/${player.id}`}>{player.first_name} {player.last_name} {player.id}</Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className='player-list-container'>
+        <h1>Players</h1>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul className='player-list'>
+            {players.map((player) => (
+              <Link to={`/players/${player.id}`} key={player.id} className='player-card'>
+                <img src={player.image_url}></img>
+                <p>{player.first_name} {player.last_name}</p>
+              </Link>
+            ))}
+          </ul>
+        )}
       </div>
 
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import '../styles/Player.css';
 
 
 function Player() {
@@ -21,15 +22,20 @@ function Player() {
     }, [id]);
 
     return (
-        <div>
-            <h1>Player</h1>
+        <div className='player-container'>
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div>
+                <div className='player'>
                     <h2>{player.first_name} {player.last_name}</h2>
-                    <p>Team: {player.team_name}</p>
-                    <p>Position: {player.position}</p>
+                    <img src={player.image_url} alt={`${player.first_name} ${player.last_name}`} ></img>
+                    <div className='player-info'>
+                        <p>Team: {player.team_name}</p>
+                        <p>Position: {player.position}</p>
+                        <p>Height: {player.feet}'{player.inches}</p>
+                        <p>Weight (lbs): {player.weight}</p>
+                        <p>Country: {player.country}</p>
+                    </div>
                 </div>
             )}
         </div>
