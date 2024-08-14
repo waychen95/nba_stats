@@ -1,0 +1,61 @@
+.player-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #496880;
+    color: white;
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 1500px;
+    height: 200px;
+}
+
+.player-card img {
+    width: 20%
+}
+
+.player-card p {
+    color: white;
+    font-size: 2.5rem;
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+.player-guess-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #496880;
+    height: 60%;
+    width: 20%;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 0 1rem;
+}
+
+.incorrect {
+    background-color: red;
+}
+
+.correct-team {
+    background-color: green;
+}
+
+.correct-position {
+    background-color: green;
+}
+
+.correct-height {
+    background-color: green;
+}
+
+.correct-weight {
+    background-color: green;
+}
+
+.correct-country {
+    background-color: green;
+}

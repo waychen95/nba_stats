@@ -47,3 +47,47 @@
 .player-card:hover {
     background-color: #304758;
 }
+
+.player-list-dropdowns {
+    font-size: 1.5rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: #496880;
+    color: white;
+    width: 60%;
+    margin: 2rem auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+.player-list-dropdowns div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.player-list-dropdowns label {
+    margin-right: 1rem;
+    flex-wrap: nowrap;
+}
+
+.player-list-dropdowns select {
+    font-size: 1.5rem;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 1rem;
+    background-color: #496880;
+    color: white;
+    width: 100%;
+}
+
+.player-list-dropdowns input {
+    font-size: 1.5rem;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 1rem;
+    background-color: #496880;
+    color: white;
+    width: 100%;
+}

@@ -20,3 +20,69 @@
 .team-info {
     font-size: 3rem;
 }
+
+.team-profile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 1rem;
+    font-size: 2.5rem;
+}
+
+.team-player-list-container {
+    display: flex;
+    flex-direction: column;
+    margin: 2rem 1rem 0 1rem;
+}
+
+.team-player-list {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.team-player-list a {
+    text-decoration: none;
+}
+
+.team-player-list-container h3 {
+    color: white;
+    font-size: 2rem;
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+.team-player-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #496880;
+    color: white;
+    padding: 1rem;
+    border-radius: 1rem;
+    width: 850px;
+    height: 200px;
+}
+
+.team-player-card:hover {
+    background-color: #304758;
+}
+
+.team-player-card img {
+    width: 25%
+}
+
+.team-player-card p {
+    color: white;
+    font-size: 2.5rem;
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 700;
+}

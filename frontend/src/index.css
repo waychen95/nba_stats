@@ -48,3 +48,8 @@ html, body {
 #nav-bar a:hover {
   color: #727272;
 }
+
+.loading {
+  color: white;
+  font-size: 2rem;
+}

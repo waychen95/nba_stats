@@ -6,6 +6,7 @@ import Team from './pages/Team';
 import PlayerList from './pages/PlayerList';
 import Player from './pages/Player';
 import Login from './pages/Login';
+import Guess from './pages/Guess';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/guess" element={<Guess />} />
           <Route path="/teams">
             <Route index element={<TeamList />} />
             <Route path=":teamId" element={<Team />} />

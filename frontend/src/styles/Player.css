@@ -20,3 +20,32 @@
 .player-info {
     font-size: 3rem;
 }
+
+.player-info a {
+    text-decoration: none;
+    color: white;
+}
+
+.player-info-team {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.player-info-team a {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+.player-info-team a:hover {
+    text-decoration: underline;
+    background-color: #304758;
+}
+
+.player-info-team img {
+    border: none;
+}
