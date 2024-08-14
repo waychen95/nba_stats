@@ -4,7 +4,6 @@ import PlayerCard from '../components/PlayerCard';
 
 function Guess() {
     const [correctPlayer, setCorrectPlayer] = useState({});
-    const [guessPlayer, setGuessPlayer] = useState('');
     const [allPlayers, setAllPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -12,6 +11,8 @@ function Guess() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [correct, setCorrect] = useState(false);
     const [incorrectPlayers, setIncorrectPlayers] = useState([]);
+    const [brightness, setBrightness] = useState(0);
+    const [tries, setTries] = useState(0);
 
     useEffect(() => {
         async function fetchPlayers() {
@@ -34,9 +35,10 @@ function Guess() {
 
     useEffect(() => {
         if (search) {
-            const filteredResults = allPlayers.filter(player =>
-                player.first_name.toLowerCase().includes(search.toLowerCase()) ||
-                player.last_name.toLowerCase().includes(search.toLowerCase())
+            const filteredResults = allPlayers.filter(player => 
+                (player.first_name.toLowerCase().includes(search.toLowerCase()) ||
+                player.last_name.toLowerCase().includes(search.toLowerCase())) &&
+                !incorrectPlayers.some(incorrectPlayer => incorrectPlayer.id === player.id) // Exclude guessed players
             );
             setSearchResults(filteredResults);
             setShowDropdown(true);
@@ -45,9 +47,7 @@ function Guess() {
             setShowDropdown(false);
         }
 
-        console.log(correctPlayer);
-
-    }, [search, allPlayers, guessPlayer]);
+    }, [search, allPlayers, incorrectPlayers]);
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
@@ -60,13 +60,26 @@ function Guess() {
 
     const compareGuessPlayer = () => {
         let guessPlayer = allPlayers.find(player => player.first_name + ' ' + player.last_name === search);
+        if (!guessPlayer) {
+            alert('Please enter a valid player name.');
+            return;
+        }
+
         if (guessPlayer.id === correctPlayer.id) {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
+            setBrightness(1);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
+            if (brightness < 1) {
+                setBrightness(brightness + 0.1);
+            }
+
+            setTries((tries) => tries + 1);
         }
+
+        console.log(tries);
 
         setSearch('');
 
@@ -81,9 +94,10 @@ function Guess() {
                 </div>
             ) : (
                 <div className='player'>
-                    <img src={correctPlayer.image_url} alt={`${correctPlayer.first_name} ${correctPlayer.last_name}`} className={`silhouette${correct ? 'correct' : ''}`} />
+                    <img src={correctPlayer.image_url} alt={`${correctPlayer.first_name} ${correctPlayer.last_name}`} style={{ filter: `brightness(${brightness}) contrast(100%)` }} className={correct ? 'correct-image' : 'incorrect-image'} />
                     <div className='player-info'>
-                        <h2>Who is this player?</h2>
+                        <h2>{correct ? `Number of tries: ${tries}` : 'Who is this player?'}</h2>
+                        <button className='button' onClick={() => window.location.reload()} style={{display: `${correct ? 'block' : 'none'}`}}>Player Again!</button>
                     </div>
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>
@@ -108,7 +122,7 @@ function Guess() {
                                 </ul>
                             )}
                         </div>
-                        <button className='button' onClick={compareGuessPlayer}>Guess</button>
+                        <button className='guess-button' onClick={compareGuessPlayer} disabled={correct}>Guess</button>
                     </div>
                 </div>
             )}

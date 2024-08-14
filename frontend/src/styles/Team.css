@@ -12,9 +12,10 @@
 }
 
 .team img {
-    width: 30%;
+    width: 20%;
     border: 1px solid white;
     border-radius: 30px;
+    margin-bottom: 1rem;
 }
 
 .team-info {

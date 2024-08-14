@@ -107,7 +107,8 @@ def get_player(player_id):
     query = """
     SELECT
         p.*,
-        t.name AS team_name
+        t.name AS team_name,
+        t.conference AS team_conference
     FROM
         nba_players p
     JOIN
@@ -131,7 +132,8 @@ def players():
     query = """
     SELECT 
         p.*, 
-        t.name AS team_name
+        t.name AS team_name,
+        t.conference AS team_conference
     FROM 
         nba_players p
     JOIN 
@@ -167,7 +169,8 @@ def random_player():
     query = """
     SELECT 
         p.*, 
-        t.name AS team_name
+        t.name AS team_name,
+        t.conference AS team_conference
     FROM 
         nba_players p
     JOIN 

@@ -1,4 +1,12 @@
-.player-card {
+.guessed-player-cards-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem;
+}
+
+.guessed-player-cards {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -11,16 +19,23 @@
     height: 200px;
 }
 
-.player-card img {
-    width: 20%
+.guessed-player-cards label {
+    font-size: 1.2rem;
+    color: #ffffff;
+    text-align: center;
+    z-index: 2;
 }
 
-.player-card p {
+.guessed-player-cards img {
+    width: 20%;
+}
+
+.guessed-player-cards p {
     color: white;
-    font-size: 2.5rem;
-    margin-top: 1rem;
+    font-size: 2rem;
     text-align: center;
-    font-weight: 700;
+    font-weight: 600;
+    margin-bottom: 3rem;
 }
 
 .player-guess-info {
@@ -32,8 +47,42 @@
     height: 60%;
     width: 20%;
     border-radius: 1rem;
-    padding: 1rem;
     margin: 0 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.info-1 {
+    animation-delay: 0.3s;
+}
+
+.info-2 {
+    animation-delay: 0.6s;
+}
+
+.info-3 {
+    animation-delay: 0.9s;
+}
+
+.info-4 {
+    animation-delay: 1.2s;
+}
+
+.info-5 {
+    animation-delay: 1.5s;
+}
+
+.info-6 {
+    animation-delay: 1.8s;
+}
+
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .incorrect {
@@ -52,10 +101,14 @@
     background-color: green;
 }
 
-.correct-weight {
+.correct-conference {
     background-color: green;
 }
 
 .correct-country {
+    background-color: green;
+}
+
+.correct-guess {
     background-color: green;
 }
