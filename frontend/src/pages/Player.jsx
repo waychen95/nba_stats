@@ -12,6 +12,10 @@ function Player() {
 
     const [team, setTeam] = useState({});
 
+    const [profile, setProfile] = useState(true);
+    const [stats, setStats] = useState(false);
+    const [bio, setBio] = useState(false);
+
     const { id } = useParams();
 
     useEffect(() => {
@@ -38,21 +42,33 @@ function Player() {
                 </div>
             ) : (
                 <div className='player'>
-                    <h2>{player.first_name} {player.last_name}</h2>
+                    <h2>{player.first_name} {player.last_name} #{player.number}</h2>
                     <img src={player.image_url} alt={`${player.first_name} ${player.last_name}`} ></img>
-                    <div className='player-info'>
-                        <div className='player-info-team'>
-                            <Link to={`/teams/${player.team_id}`}>
-                                <p>Team: {player.team_name}</p>
-                                <img src={team.logo_url} alt={team.name} />
-                            </Link>
-                        </div>
-                        <p>Position: {player.position}</p>
-                        <p>Height: {player.feet}'{player.inches}</p>
-                        <p>Weight (lbs): {player.weight}</p>
-                        <p>Country: {player.country}</p>
+                    <div className='player-info-buttons'>
+                        <button className='button' onClick={() => { setProfile(true); setStats(false); setBio(false); }}>Profile</button>
+                        <button className='button' onClick={() => { setProfile(false); setStats(true); setBio(false); }}>Stats</button>
+                        <button className='button' onClick={() => { setProfile(false); setStats(false); setBio(true); }}>Bio</button>
                     </div>
-                    <PlayerStats playerId={id} />
+                    {profile && (
+                        <div className='player-info'>
+                            <div className='player-info-team'>
+                                <Link to={`/teams/${player.team_id}`}>
+                                    <p>Team: {player.team_name}</p>
+                                    <img src={team.logo_url} alt={team.name} />
+                                </Link>
+                            </div>
+                            <p>Position: {player.position}</p>
+                            <p>Height: {player.feet}'{player.inches}</p>
+                            <p>Weight (lbs): {player.weight}</p>
+                            <p>Country: {player.country}</p>
+                        </div>
+                    )}
+                    {stats && <PlayerStats playerId={id} />}
+                    {bio && (
+                        <div className='player-bio'>
+                            <p>{player.bio}</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

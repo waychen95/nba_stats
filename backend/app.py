@@ -57,13 +57,16 @@ def teams():
     if conference:
         query = base_query + """
         WHERE conference = %s
-        ORDER BY name {}
+        ORDER BY full_name
         """.format(order)
+
         cursor.execute(query, (conference,))
 
     else:
-        query = base_query + "ORDER BY name {}".format(order)
+        query = base_query + f"ORDER BY full_name {order};"
         cursor.execute(query)
+
+    print(query)
 
     teams = cursor.fetchall()
     teams = [dict(team) for team in teams]
@@ -191,13 +194,18 @@ def player_stats(player_id):
     SELECT 
         ps.*,
         p.first_name,
-        p.last_name
+        p.last_name,
+        t.name AS team_name
     FROM 
         nba_player_stats ps
     JOIN 
         nba_players p 
     ON 
         ps.player_id = p.id
+    JOIN
+        nba_teams t
+    ON
+        ps.team_id = t.id
     WHERE
         ps.player_id = %s;
     """

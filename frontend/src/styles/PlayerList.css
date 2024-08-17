@@ -88,6 +88,12 @@
     margin: 1rem;
     border-radius: 1rem;
     background-color: #496880;
-    color: white;
+    color: rgb(0, 0, 0);
     width: 100%;
+}
+
+.search-bar label {
+    font-size: 1.5rem;
+    color: white;
+    margin-right: 1rem;
 }

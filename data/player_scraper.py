@@ -289,6 +289,128 @@ def player_scraper():
 
     driver.quit()
 
+def player_number_age_scraper(player_df):
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
+
+    driver = webdriver.Chrome(options=options)
+
+    player_number_age_df = pd.DataFrame()
+
+    for index, row in player_df.iterrows():
+        print(f"Getting player number and age for {row['first_name']} {row['last_name']} in row {index} for {row['url']}")
+
+        player_url = row['url']
+
+        driver.get(player_url)
+
+        page_source = driver.page_source
+
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        player_number = ''
+        player_age = ''
+
+        player_number_div = soup.find('div', class_='PlayerSummary_mainInnerPlayer__YGffe')
+
+        if player_number_div:
+            player_number_p = player_number_div.find('p', class_='PlayerSummary_mainInnerInfo__jv3LO')
+            if player_number_p:
+                player_number_p_text = player_number_p.text.strip()
+                player_number = player_number_p_text.split(' | ')[1].strip().replace('#', '').strip()
+
+        print(player_number)
+
+        player_age_div = soup.find_all('div', class_='PlayerSummary_playerInfo__om2G4')
+
+        for div in player_age_div:
+            label_div = div.find('p', class_='PlayerSummary_playerInfoLabel__hb5fs')
+            if label_div:
+                if label_div.text.strip() == 'AGE':
+                    player_age_container = div
+
+        if player_age_container:
+            player_age_p = player_age_container.find('p', class_='PlayerSummary_playerInfoValue__JS8_v')
+            if player_age_p:
+                player_age = player_age_p.text.strip().split(' ')[0]
+
+        print(player_age)
+
+        player_number_age_dict = {
+            'id': row['id'],
+            'number': player_number,
+            'age': player_age
+        }
+
+        player_number_age_df = pd.concat([player_number_age_df, pd.DataFrame([player_number_age_dict])], ignore_index=True)
+
+    player_number_age_df.to_csv('player_number_age.csv', index=False)
+
+    driver.quit()
+
+def player_bio_scraper(player_df):
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
+
+    driver = webdriver.Chrome(options=options)
+
+    player_bio_df = pd.DataFrame()
+
+    for index, row in player_df.iterrows():
+
+        player_url = row['url']
+
+        url = f"{player_url}rotowire"
+
+        print(f"Getting player bio for {row['first_name']} {row['last_name']} in row {index} for {url}")
+
+        driver.get(url)
+
+        page_source = driver.page_source
+
+        soup = BeautifulSoup(page_source, 'html.parser')
+
+        player_bio_exist = False
+
+        player_bio = 'No bio available'
+
+        player_bio_title = soup.find_all('h1', class_='Block_blockTitleText__tX1TF')
+
+        for title in player_bio_title:
+            if title.text.strip().lower() == 'player bio':
+                print(f"Player bio found for {row['first_name']} {row['last_name']}")
+                player_bio_exist = True
+                break
+
+        if not player_bio_exist:
+            print(f"No player bio found for {row['first_name']} {row['last_name']}")
+        else:
+            player_bio_div = soup.find('div', class_='PlayerBio_player_bio__kIsc_')
+
+            if player_bio_div:
+                player_bio_container = player_bio_div.find('div', class_='cplayer-bio__container')
+                if player_bio_container:
+                    player_bio_content = player_bio_container.find('div', class_='cplayer-bio__content')
+
+            if player_bio_content:
+                player_bio = player_bio_content.text.strip()
+
+            print(player_bio)
+
+        player_bio_dict = {
+            'id': row['id'],
+            'bio': player_bio,
+            'url': url
+        }
+
+        player_bio_df = pd.concat([player_bio_df, pd.DataFrame([player_bio_dict])], ignore_index=True)
+
+    player_bio_df.to_csv('player_bio.csv', index=False)
+
+    driver.quit()
+
 def get_team_url(player_csv):
     player_df = pd.read_csv(player_csv)
 
@@ -419,17 +541,28 @@ def team_scraper():
 
     driver.quit()
 
+def team_bio_text_checker(bio_text, first_name, last_name):
+    bio_text_lower = bio_text.lower()
+
+    first_name_lower = first_name.lower()
+    last_name_lower = last_name.lower()
+
+    if first_name_lower not in bio_text_lower and last_name_lower not in bio_text_lower:
+        return "No bio text found"
+    
+    return bio_text
+
+
 def main():
-    # team_scraper()
 
-    options = webdriver.ChromeOptions()
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--ignore-ssl-errors')
+    # options = webdriver.ChromeOptions()
+    # options.add_argument('--ignore-certificate-errors')
+    # options.add_argument('--ignore-ssl-errors')
 
-    driver = webdriver.Chrome(options=options)
-    player_df = pd.read_csv('player_data_3.csv')
-    player = player_df[player_df['id'] == 204001].iloc[0]
-    get_player_stats(player, driver)
+    # driver = webdriver.Chrome(options=options)
+    player_df = pd.read_csv('player_data_new.csv')
+    player_bio_scraper(player_df)
+    # player_number_age_scraper(player_df)
 
 
 if __name__ == '__main__':

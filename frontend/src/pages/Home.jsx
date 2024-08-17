@@ -6,7 +6,7 @@ function Home() {
     <div id="container">
       <img src="../public/nba_logo.png" alt="NBA Logo" />
       <div id='button-container'>
-        <Link to="/guess" className='button'>Guess The Player</Link>
+        <Link to="/guessImage" className='button'>Guess The Player</Link>
         <Link to="/teams" className='button'>Teams</Link>
         <Link to="/players" className='button'>Players</Link>
       </div>

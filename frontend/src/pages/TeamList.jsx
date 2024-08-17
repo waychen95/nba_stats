@@ -60,7 +60,7 @@ function TeamList() {
                 {teams.map((team) => (
                     <Link to={`/teams/${team.id}`} key={team.id} className='team-card'>
                         <img src={`${image_base_url}${team.id}/global/L/logo.svg`} alt={team.name} />
-                        <p>{team.name}</p>
+                        <p>{team.full_name}</p>
                     </Link>
                 ))}
                 </ul>

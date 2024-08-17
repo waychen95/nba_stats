@@ -85,7 +85,7 @@ function PlayerList() {
           <label>Filter by team:</label>
           <select value={team} onChange={(e) => setTeam(e.target.value)}>
             <option value=''>All Teams</option>
-            {team_list.map((team) => (
+            {team_list.sort().map((team) => (
               <option key={team} value={team}>
                 {team}
               </option>

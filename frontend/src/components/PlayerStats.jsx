@@ -35,6 +35,7 @@ function PlayerStats({ playerId }) {
                         <thead>
                             <tr>
                                 <th>Season</th>
+                                <th>Team</th>
                                 <th>Games</th>
                                 <th>Minutes</th>
                                 <th>Points</th>
@@ -48,6 +49,7 @@ function PlayerStats({ playerId }) {
                             {stats.map((stat) => (
                                 <tr key={stat.year} className="player-stats">
                                     <td>{stat.year}</td>
+                                    <td>{stat.team_name}</td>
                                     <td>{stat.gp}</td>
                                     <td>{stat.min}</td>
                                     <td>{stat.pts}</td>

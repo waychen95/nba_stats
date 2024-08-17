@@ -9,6 +9,7 @@ function Guess() {
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [dropdownLocked, setDropdownLocked] = useState(false); // New state to control dropdown visibility
     const [correct, setCorrect] = useState(false);
     const [incorrectPlayers, setIncorrectPlayers] = useState([]);
     const [brightness, setBrightness] = useState(0);
@@ -35,31 +36,39 @@ function Guess() {
 
     useEffect(() => {
         if (search) {
-            const filteredResults = allPlayers.filter(player => 
-                (player.first_name.toLowerCase().includes(search.toLowerCase()) ||
-                player.last_name.toLowerCase().includes(search.toLowerCase())) &&
-                !incorrectPlayers.some(incorrectPlayer => incorrectPlayer.id === player.id) // Exclude guessed players
-            );
+            const filteredResults = allPlayers.filter(player => {
+                const fullName = `${player.first_name.toLowerCase()} ${player.last_name.toLowerCase()}`;
+                return (
+                    fullName.includes(search.toLowerCase()) &&
+                    !incorrectPlayers.some(incorrectPlayer => incorrectPlayer.id === player.id) // Exclude guessed players
+                );
+            });
             setSearchResults(filteredResults);
-            setShowDropdown(true);
+            if (!dropdownLocked) {
+                setShowDropdown(true); // Show the dropdown only if it's not locked
+            }
         } else {
             setSearchResults([]);
             setShowDropdown(false);
         }
 
-    }, [search, allPlayers, incorrectPlayers]);
+    }, [search, allPlayers, incorrectPlayers, dropdownLocked]);
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
+        setDropdownLocked(false); // Unlock dropdown when the input changes
     };
 
     const handlePlayerSelect = (player) => {
         setSearch(player.first_name + ' ' + player.last_name);
-        setShowDropdown(false);
+        setShowDropdown(false); // Close the dropdown
+        setDropdownLocked(true); // Lock the dropdown to prevent it from showing immediately after selection
     };
 
     const compareGuessPlayer = () => {
-        let guessPlayer = allPlayers.find(player => player.first_name + ' ' + player.last_name === search);
+        const guessPlayer = allPlayers.find(player => 
+            `${player.first_name.toLowerCase()} ${player.last_name.toLowerCase()}` === search.toLowerCase()
+        );
         if (!guessPlayer) {
             alert('Please enter a valid player name.');
             return;
@@ -69,22 +78,20 @@ function Guess() {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
             setBrightness(1);
+            setTries((tries) => tries + 1);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
-            if (brightness < 1) {
-                setBrightness(brightness + 0.1);
+            if (brightness < 0.8) {
+                setBrightness(brightness + 0.05);
             }
 
             setTries((tries) => tries + 1);
         }
 
-        console.log(tries);
-
         setSearch('');
-
+        setDropdownLocked(false); // Unlock dropdown after guessing
     };
-
 
     return (
         <div className='guess-container'>
@@ -106,7 +113,7 @@ function Guess() {
                                 placeholder='Enter player name...'
                                 value={search}
                                 onChange={handleSearchChange}
-                                onClick={() => setShowDropdown(true)}
+                                onClick={() => !dropdownLocked && setShowDropdown(true)} // Prevent dropdown from showing if locked
                                 disabled={correct}
                             />
                             {showDropdown && searchResults.length > 0 && (

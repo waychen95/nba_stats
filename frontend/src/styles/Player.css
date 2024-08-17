@@ -19,6 +19,7 @@
 
 .player-info {
     font-size: 3rem;
+    margin: 3rem auto;
 }
 
 .player-info a {
@@ -48,4 +49,16 @@
 
 .player-info-team img {
     border: none;
+}
+
+.player-bio {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    padding: 2rem;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 60%;
+    background-color: #304758;
+    margin: 3rem auto;
+    text-align: left;
 }

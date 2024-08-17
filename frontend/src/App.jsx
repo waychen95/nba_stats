@@ -31,7 +31,7 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/guess" element={<Guess />} />
+          <Route path="/guessImage" element={<Guess />} />
           <Route path="/teams">
             <Route index element={<TeamList />} />
             <Route path=":teamId" element={<Team />} />
