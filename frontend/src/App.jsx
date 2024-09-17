@@ -7,6 +7,8 @@ import PlayerList from './pages/PlayerList';
 import Player from './pages/Player';
 import Login from './pages/Login';
 import Guess from './pages/Guess';
+import Games from './pages/Games';
+import GuessTeamLogo from './pages/GuessTeamLogo';
 
 function App() {
   return (
@@ -31,7 +33,11 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/guessImage" element={<Guess />} />
+          <Route path="/games">
+            <Route index element={<Games />} />
+            <Route path="image" element={<Guess />} />
+            <Route path='team' element={<GuessTeamLogo />} />
+          </Route>
           <Route path="/teams">
             <Route index element={<TeamList />} />
             <Route path=":teamId" element={<Team />} />

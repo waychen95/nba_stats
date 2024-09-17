@@ -1,39 +1,77 @@
 import '../styles/Guess.css';
 import { useState, useEffect } from 'react';
-import PlayerCard from '../components/PlayerCard';
+import TeamLogoPlayerCard from '../components/TeamLogoPlayerCard';
 import { Link } from 'react-router-dom';
+import '../styles/GuessTeamLogo.css';
 
-function Guess() {
+function GuessTeamLogo() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
+    const [pastTeams, setPastTeams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [dropdownLocked, setDropdownLocked] = useState(false); // New state to control dropdown visibility
+    const [dropdownLocked, setDropdownLocked] = useState(false);
     const [correct, setCorrect] = useState(false);
     const [incorrectPlayers, setIncorrectPlayers] = useState([]);
-    const [brightness, setBrightness] = useState(0);
     const [tries, setTries] = useState(0);
 
     useEffect(() => {
+        async function fetchTeam(abbr) {
+            try {
+                const response = await fetch(`http://localhost:5000/teams/abbr/${abbr}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch team: ${response.statusText}`);
+                }
+                const data = await response.json();
+                return data.team;
+            } catch (error) {
+                console.error('Error fetching team:', error);
+                return null; // Handle the error gracefully
+            }
+        }
+
         async function fetchPlayers() {
-            const response = await fetch('http://localhost:5000/players');
-            const data = await response.json();
-            const playerList = data.players;
+            try {
+                const response = await fetch('http://localhost:5000/players');
+                const data = await response.json();
+                const playerList = data.players;
 
-            setAllPlayers(playerList);
+                setAllPlayers(playerList);
 
-            // Pick a random player for the guessing game
-            const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
-            setCorrectPlayer(randomPlayer);
-            setLoading(false);
+                // Pick a random player for the guessing game
+                const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
+                setCorrectPlayer(randomPlayer);
+
+                console.log('Random player:', randomPlayer);
+
+                const playerPastTeams = randomPlayer.past_teams;
+
+                // Fetch logos for each team in the player's past teams
+                const teams = [];
+                for (let i = 0; i < playerPastTeams.length; i++) {
+                    const current = playerPastTeams[i];
+                    if (current === 'TOT') {
+                        continue;
+                    }
+                    const team = await fetchTeam(current);
+                    if (!team) {
+                        continue;
+                    }
+                    teams.push(team); // Add each team to the array
+                }
+
+                setPastTeams(teams); // Set all teams at once after the loop ends
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching players:', error);
+            }
         }
 
         setCorrect(false);
-
-        fetchPlayers();
-    }, []);
+        fetchPlayers();  // Ensure this only runs once by having an empty dependency array
+    }, []); // Empty array to ensure this runs only once on component mount
 
     useEffect(() => {
         if (search) {
@@ -52,13 +90,12 @@ function Guess() {
             setSearchResults([]);
             setShowDropdown(false);
         }
-
     }, [search, allPlayers, incorrectPlayers, dropdownLocked]);
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
         setDropdownLocked(false); // Unlock dropdown when the input changes
-    };
+    }
 
     const handlePlayerSelect = (player) => {
         setSearch(player.first_name + ' ' + player.last_name);
@@ -67,7 +104,7 @@ function Guess() {
     };
 
     const compareGuessPlayer = () => {
-        const guessPlayer = allPlayers.find(player => 
+        const guessPlayer = allPlayers.find(player =>
             `${player.first_name.toLowerCase()} ${player.last_name.toLowerCase()}` === search.toLowerCase()
         );
 
@@ -79,20 +116,14 @@ function Guess() {
         if (guessPlayer.id === correctPlayer.id) {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
-            setBrightness(1);
             setTries((tries) => tries + 1);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
-            if (brightness < 0.8) {
-                setBrightness(brightness + 0.05);
-            }
-
-            setTries((tries) => tries + 1);
         }
 
         setSearch('');
-        setDropdownLocked(false); // Unlock dropdown after guessing
+        setDropdownLocked(false); // Unlock the dropdown after a guess
     };
 
     return (
@@ -103,10 +134,11 @@ function Guess() {
                 </div>
             ) : (
                 <div className='player'>
-                    <img src={correctPlayer.image_url} alt={`${correctPlayer.first_name} ${correctPlayer.last_name}`} style={{ filter: `brightness(${brightness}) contrast(100%)` }} className={correct ? 'correct-image' : 'incorrect-image'} />
-                    <div className='player-info'>
-                        <h2>{correct ? `Number of tries: ${tries}` : 'Who is this player?'}</h2>
-                        <Link to={`/players/${correctPlayer.id}`}/>
+                    <h2>Guess the Player</h2>
+                    <div className='past-teams'>
+                        {pastTeams.map((team) => (
+                            <img key={team.id} src={team.logo_url} alt={team.name} />
+                        ))}
                     </div>
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>
@@ -137,11 +169,11 @@ function Guess() {
             )}
             <div className='incorrect-players'>
                 {incorrectPlayers.slice().reverse().map((player) => (
-                    <PlayerCard key={player.id} player={player} correctPlayer={correctPlayer} />
+                    <TeamLogoPlayerCard key={player.id} player={player} correctPlayer={correctPlayer} />
                 ))}
             </div>
         </div>
     );
 }
 
-export default Guess;
+export default GuessTeamLogo;

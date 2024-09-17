@@ -46,10 +46,13 @@ function PlayerCard( { player, correctPlayer } ) {
             setCorrectConference(true);
         }
 
-        if (player.number === correctPlayer.number) {
+        const playerNumber = Number(player.number);
+        const correctPlayerNumber = Number(correctPlayer.number);
+
+        if (playerNumber === correctPlayerNumber) {
             setcorrectNumber(true);
             setNumberHigh('');
-        } else if (player.number > correctPlayer.number) {
+        } else if (playerNumber > correctPlayerNumber) {
             setNumberHigh('arrow_downward');
         } else {
             setNumberHigh('arrow_upward');
@@ -72,7 +75,7 @@ function PlayerCard( { player, correctPlayer } ) {
                     <p>{player.position}</p>
                 </div>
                 <div className={`player-guess-info info-4 ${correctHeight ? 'correct-height' : 'incorrect'}`}>
-                    <label>Height <span class="material-symbols-outlined">{heightHigh}</span></label>
+                    <label>Height <span className="material-symbols-outlined">{heightHigh}</span></label>
                     <p>{player.feet}'{player.inches}"</p>
                 </div>
                 <div className={`player-guess-info info-5 ${correctConference ? 'correct-conference' : 'incorrect'}`}>
@@ -80,7 +83,7 @@ function PlayerCard( { player, correctPlayer } ) {
                     <p>{player.team_conference}</p>
                 </div>
                 <div className={`player-guess-info info-6 ${correctNumber ? 'correct-number' : 'incorrect'}`}>
-                    <label>Jersey Number <span class="material-symbols-outlined">{numberHigh}</span></label>
+                    <label>Jersey Number <span className="material-symbols-outlined">{numberHigh}</span></label>
                     <p>{player.number}</p>
                 </div>
             </div>

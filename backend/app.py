@@ -11,7 +11,7 @@ import requests
 import random
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, origins=["http://localhost:5173"])
 
 # Load environment variables
 load_dotenv()
@@ -36,7 +36,7 @@ try:
     connection = connection
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 except Exception as e:
-    print(f"Error: {e.with_traceback()}")
+    print(f"Error: {str(e)}")
 
 @app.route('/')
 def home():
@@ -57,7 +57,7 @@ def teams():
     if conference:
         query = base_query + """
         WHERE conference = %s
-        ORDER BY full_name
+        ORDER BY full_name {};
         """.format(order)
 
         cursor.execute(query, (conference,))
@@ -79,6 +79,18 @@ def get_team(team_id):
     SELECT * FROM nba_teams WHERE id = %s;
     """
     cursor.execute(query, (team_id,))
+    team = cursor.fetchone()
+    team = dict(team)
+    return jsonify({'team': team})
+
+@app.route('/teams/abbr/<team_abbr>', methods=['GET'])
+def get_team_by_abbr(team_abbr):
+    team_abbr = team_abbr.upper()
+    print(team_abbr)
+    query = """
+    SELECT * FROM nba_teams WHERE name = %s;
+    """
+    cursor.execute(query, (team_abbr,))
     team = cursor.fetchone()
     team = dict(team)
     return jsonify({'team': team})
@@ -207,7 +219,8 @@ def player_stats(player_id):
     ON
         ps.team_id = t.id
     WHERE
-        ps.player_id = %s;
+        ps.player_id = %s
+    ORDER BY ps.year ASC;
     """
     cursor.execute(query, (player_id,))
     stats = cursor.fetchall()
