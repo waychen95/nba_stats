@@ -15,7 +15,7 @@ html, body {
 }
 
 #banner {
-  background-image: url('../public/background_image.png');
+  background-image: url('/background_image.png');
   background-position: center;
   background-size: cover;
   position: fixed;

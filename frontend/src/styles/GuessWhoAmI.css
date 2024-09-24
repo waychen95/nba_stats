@@ -1,0 +1,19 @@
+.guess-whoami-player {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    padding: 2rem;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 60%;
+    background-color: #304758;
+    margin: 3rem auto;
+    text-align: left;
+}
+
+.hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    margin: auto
+}

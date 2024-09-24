@@ -6,9 +6,11 @@ import Team from './pages/Team';
 import PlayerList from './pages/PlayerList';
 import Player from './pages/Player';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Guess from './pages/Guess';
 import Games from './pages/Games';
 import GuessTeamLogo from './pages/GuessTeamLogo';
+import GuessWhoAmI from './pages/GuessWhoAmI.jsx';
 
 function App() {
   return (
@@ -19,6 +21,9 @@ function App() {
           <ul id='nav-bar'>
             <li>
               <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/games">Games</Link>
             </li>
             <li>
               <Link to="/teams">Teams</Link>
@@ -37,6 +42,7 @@ function App() {
             <Route index element={<Games />} />
             <Route path="image" element={<Guess />} />
             <Route path='team' element={<GuessTeamLogo />} />
+            <Route path='whoami' element={<GuessWhoAmI />} />
           </Route>
           <Route path="/teams">
             <Route index element={<TeamList />} />
@@ -47,6 +53,7 @@ function App() {
             <Route path=":id" element={<Player />} />
           </Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </Router>

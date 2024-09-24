@@ -1,10 +1,10 @@
-import '../styles/Login.css';
+import '../styles/Signup.css';
 
-function Login() {
+function Signup() {
   return (
-    <div className="login-container">
-      <h1>Login</h1>
-      <form id="login-form">
+    <div className="signup-container">
+      <h1>Sign Up</h1>
+      <form id="signup-form">
         <label class="form-label">
             Email:
             <input type="text" name="email" class="form-input" />
@@ -13,10 +13,10 @@ function Login() {
             Password:
             <input type="password" name="password" class="form-input" />
         </label>
-        <button type="submit" class="login-button">Login</button>
+        <button type="submit" class="signup-button">Sign Up</button>
         </form>
     </div>
   );
 }
 
-export default Login;
+export default Signup;
