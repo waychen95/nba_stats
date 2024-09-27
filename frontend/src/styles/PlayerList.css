@@ -1,3 +1,4 @@
+/* General styles for larger screens */
 .player-list-container {
     display: flex;
     flex-direction: column;
@@ -55,7 +56,7 @@
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    width: 60%;
+    width: 80%;
     margin: 2rem auto;
     display: flex;
     justify-content: space-around;
@@ -97,4 +98,114 @@
     font-size: 1.5rem;
     color: white;
     margin-right: 1rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.page-button {
+    background-color: #496880;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.page-button:hover {
+    background-color: #304758;
+}
+
+.page-button.active {
+    background-color: #304758;
+    font-weight: bold;
+    cursor: default;
+}
+
+.page-button:disabled {
+    background-color: #304758;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Responsive styles for mobile screens */
+@media (max-width: 768px) {
+    .player-list-container h1 {
+        font-size: 3rem;
+    }
+
+    .player-card {
+        width: 200px;
+        height: 200px;
+        padding: 0.75rem;
+    }
+
+    .player-card p {
+        font-size: 1.2rem;
+    }
+
+    .search-bar {
+        width: 100% !important;
+        padding: 0;
+    }
+
+    .player-list-dropdowns {
+        flex-direction: column;
+        width: 80%;
+        font-size: 1.2rem;
+        padding: 1.5rem;
+    }
+
+    .player-list-dropdowns select,
+    .player-list-dropdowns input {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+    }
+
+    .pagination {
+        gap: 0.5rem;
+    }
+
+    .page-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .player-list-container h1 {
+        font-size: 2.5rem;
+    }
+
+    .player-card {
+        width: 150px;
+        height: 150px;
+        padding: 0.5rem;
+    }
+
+    .player-card p {
+        font-size: 1rem;
+    }
+
+    .player-list-dropdowns {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    .player-list-dropdowns select,
+    .player-list-dropdowns input {
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+
+    .page-button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
 }

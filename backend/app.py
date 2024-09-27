@@ -143,7 +143,11 @@ def players():
     order = request.args.get('order', 'asc')
     team = request.args.get('team', None)
     search = request.args.get('search', None)
+    page = int(request.args.get('page', 1))  # Default to page 1
+    limit = int(request.args.get('limit', 10))  # Default to 10 players per page
+    offset = (page - 1) * limit
 
+    # Base query
     query = """
     SELECT 
         p.*, 
@@ -157,26 +161,66 @@ def players():
         p.team_id = t.id
     """
     
-    if team:
-        query += " WHERE t.name = %s"
-        params = [team.upper()]
-    else:
+    if page and limit:
+        # Parameters for query filtering
         params = []
+        
+        # Add filtering by team if provided
+        if team:
+            query += " WHERE t.name = %s"
+            params.append(team.upper())
+        
+        # Add search filter if provided
+        if search:
+            if team:
+                query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+            else:
+                query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+            params.extend([f'%{search}%', f'%{search}%'])
+        
+        # Add ordering and pagination
+        query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s;"
+        params.extend([limit, offset])
+        
+        # Execute the query to get paginated players
+        cursor.execute(query, tuple(params))
+        players = cursor.fetchall()
+
+    # Query to get the total number of players without LIMIT and OFFSET for pagination calculation
+    count_query = """
+    SELECT COUNT(*)
+    FROM nba_players p
+    JOIN nba_teams t ON p.team_id = t.id
+    """
     
+    if team:
+        count_query += " WHERE t.name = %s"
+        count_params = [team.upper()]
+    else:
+        count_params = []
+
     if search:
         if team:
-            query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            params.extend([f'%{search}%', f'%{search}%'])
+            count_query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+            count_params.extend([f'%{search}%', f'%{search}%'])
         else:
-            query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            params.extend([f'%{search}%', f'%{search}%'])
+            count_query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+            count_params.extend([f'%{search}%', f'%{search}%'])
+
+    # Execute the count query to get the total number of players
+    cursor.execute(count_query, tuple(count_params))
+    total_players = cursor.fetchone()[0]  # Total count of players
     
-    query += f" ORDER BY p.last_name {order};"
-    
-    cursor.execute(query, tuple(params))
-    players = cursor.fetchall()
+    # Convert fetched players to a dictionary
     players = [dict(player) for player in players]
-    return jsonify({'players': players})
+
+    # Return players and total number for pagination
+    return jsonify({
+        'players': players,
+        'total': total_players,
+        'page': page,
+        'limit': limit
+    })
 
 
 @app.route('/players/random', methods=['GET'])
