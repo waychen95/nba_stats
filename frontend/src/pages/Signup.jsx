@@ -7,7 +7,11 @@ function Signup() {
       <form id="signup-form">
         <label class="form-label">
             Email:
-            <input type="text" name="email" class="form-input" />
+            <input type="text" name="email" class="form-input" required />
+        </label>
+        <label class="form-label">
+            Username:
+            <input type="text" name="username" class="form-input" />
         </label>
         <label class="form-label">
             Password:

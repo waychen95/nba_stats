@@ -161,30 +161,29 @@ def players():
         p.team_id = t.id
     """
     
-    if page and limit:
-        # Parameters for query filtering
-        params = []
-        
-        # Add filtering by team if provided
+    # Parameters for query filtering
+    params = []
+    
+    # Add filtering by team if provided
+    if team:
+        query += " WHERE t.name = %s"
+        params.append(team.upper())
+    
+    # Add search filter if provided
+    if search:
         if team:
-            query += " WHERE t.name = %s"
-            params.append(team.upper())
-        
-        # Add search filter if provided
-        if search:
-            if team:
-                query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            else:
-                query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            params.extend([f'%{search}%', f'%{search}%'])
-        
-        # Add ordering and pagination
-        query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s;"
-        params.extend([limit, offset])
-        
-        # Execute the query to get paginated players
-        cursor.execute(query, tuple(params))
-        players = cursor.fetchall()
+            query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+        else:
+            query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+        params.extend([f'%{search}%', f'%{search}%'])
+    
+    # Add ordering and pagination
+    query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s;"
+    params.extend([limit, offset])
+    
+    # Execute the query to get paginated players
+    cursor.execute(query, tuple(params))
+    players = cursor.fetchall()
 
     # Query to get the total number of players without LIMIT and OFFSET for pagination calculation
     count_query = """

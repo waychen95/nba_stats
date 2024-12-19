@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 import numpy as np
 import requests
@@ -15,7 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from fake_useragent import UserAgent
 
-def get_player_info(player_list):
+def get_player_info(player_list, value):
     player_data = []
 
     domain = 'https://www.nba.com'
@@ -33,8 +34,16 @@ def get_player_info(player_list):
         player_first_name = player_first_name_p.text.strip()
         player_last_name = player_first_name_p.next_sibling.text.strip()
 
-        player_team = player_info_list[1].find('a').text.strip()
-        player_team_url = f"{domain}{player_info_list[1].find('a').get('href')}"
+        print(f"Getting player info for {player_first_name} {player_last_name}")
+
+        player_team_a_tag = player_info_list[1].find('a')
+        if player_team_a_tag:
+            player_team = player_team_a_tag.text.strip()
+            player_team_url = f"{domain}{player_team_a_tag.get('href')}"
+        else:
+            player_team = player_info_list[1].text.strip()
+            player_team_url = ''
+            print(f"Player {player_first_name} {player_last_name} is not currently on a team, using {player_team} as the team name")
 
         player_number = player_info_list[1].next_sibling.text.strip()
 
@@ -70,107 +79,115 @@ def get_player_info(player_list):
 
     player_df = pd.DataFrame(player_data)
     print(player_df.head())
-    player_df.to_csv('player_data_3.csv', index=False)
+    player_df.to_csv(f"player_data_{value}.csv", index=False)
 
     return player_df
 
-def get_players_stats(player_df, driver):
+def get_players_stats(player_df, driver, value):
+
+    # Base URL for player stats
     player_stats_url = 'https://www.nba.com/stats/player/'
 
-    player_stats_all_df = pd.DataFrame()
+    # List to store all player stats dictionaries
+    all_player_stats = []
 
-    column_headers = []
-
+    # List to store missing player IDs
     missing_data = []
 
-    for index, row in player_df.iterrows():
+    required_columns = [
+        'year', 'team', 'gp', 'min', 'pts', 'fgm', 'fga', 'fg%', '3pm', '3pa', '3p%', 
+        'ftm', 'fta', 'ft%', 'oreb', 'dreb', 'reb', 'ast', 'tov', 'stl', 'blk', 'pf', 
+        'fp', 'dd2', 'td3', '+/-', 'player_id'
+    ]
 
-        print(f"Getting player stats for {row['first_name']} {row['last_name']} in row {index}")
+    for index, row in player_df.iterrows():
+        print(f"Getting player stats for {row['first_name']} {row['last_name']} (Row {index})")
 
         player_id = row['id']
         player_url = f"{player_stats_url}{player_id}?SeasonType=Regular%20Season"
 
-        print(player_url)
-        page_source = driver.get(player_url)
+        driver.get(player_url)
 
+        # Check if "No data available" appears
         try:
             no_message_xpath = '/html/body/div[1]/div[2]/div[2]/section/div[4]/section[3]/div/div[2]'
             no_message = WebDriverWait(driver, 2).until(
                 EC.visibility_of_element_located((By.XPATH, no_message_xpath))
             )
-
             if no_message.text.strip().lower() == 'no data available':
                 print(f"No data available for {row['first_name']} {row['last_name']}")
                 continue
-            else:
-                print(f"Data available for {row['first_name']} {row['last_name']}")
         except:
-            pass
+            pass  # Proceed if "No data available" does not show up
 
+        # Attempt to locate stats table
         retries = 3
-
-        # Wait until the table is present and visible
         while retries > 0:
             try:
                 table_xpath = "//div[@class='Crom_container__C45Ti crom-container']/table"
-                table = WebDriverWait(driver, 2).until(
+                table = WebDriverWait(driver, 3).until(
                     EC.visibility_of_element_located((By.XPATH, table_xpath))
                 )
+                print(f"Stats table found for {row['first_name']} {row['last_name']}")
                 break
             except:
-                print('Table not found, retrying...')
+                print(f"Retrying for table... ({3 - retries} attempts left)")
                 retries -= 1
                 time.sleep(random.randint(1, 3))
-                continue
 
         if retries == 0:
-            print(f"Table not found for {row['first_name']} {row['last_name']}")
+            print(f"Stats table not found for {row['first_name']} {row['last_name']}")
             missing_data.append(player_id)
             continue
 
-        # Scroll the table into view
-        driver.execute_script("arguments[0].scrollIntoView(true);", table)
+        # Get updated page source and parse with BeautifulSoup
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        # Get the updated page source
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
+        # Extract table headers dynamically
+        column_headers = [
+            th.text.strip().lower()
+            .replace('by year', 'year')
+            .replace('season', 'year')
+            for th in soup.find('tr', class_='Crom_headers__mzI_m').find_all('th')
+        ]
 
-        column_list = soup.find('tr', class_='Crom_headers__mzI_m').find_all('th')
 
-        if not column_headers:
-            for column in column_list:
-                text = column.text.replace('"', '').strip().lower()
-                column_headers.append(text)
-
-            print(column_headers)
-
+        # Extract stats rows
         player_stats_list = soup.find('tbody', class_='Crom_body__UYOcU').find_all('tr')
-
-        player_stats_data = []
 
         for player_stats in player_stats_list:
             stats = player_stats.find_all('td')
 
-            stats_dict = {}
+            # Map stats to their respective headers
+            stats_dict = {
+                column_headers[i]: (stat.text.strip() if stat.text.strip() != '-' else '')
+                for i, stat in enumerate(stats)
+            }
 
-            for i, stat in enumerate(stats):
-                stat = stat.text.replace('"', '').strip()
-                stats_dict[column_headers[i]] = stat
 
-            player_stats_data.append(stats_dict)
+            # Add player_id to the stats
+            stats_dict['player_id'] = player_id
 
-        player_stats_df = pd.DataFrame(player_stats_data)
-        player_stats_df['player_id'] = player_id
-        player_stats_df.rename(columns={'by year': 'year'}, inplace=True)
+            # Append to overall stats list
+            all_player_stats.append(stats_dict)
 
-        player_stats_all_df = pd.concat([player_stats_all_df, player_stats_df], axis=0, ignore_index=True)
+    # Convert the list of stats dictionaries into a DataFrame
+    all_stats_df = pd.DataFrame(all_player_stats)
 
-    print(player_stats_all_df.head())
+    all_stats_df.to_csv(f'player_stats_all_{value}.csv', index=False)
 
-    player_stats_all_df.to_csv('player_stats_all_3.csv', index=False)
+    # Keep only the required columns
+    final_stats_df = all_stats_df[required_columns]
 
+    # Export final data to CSV
+    final_stats_df.to_csv(f'player_stats/player_stats_{value}.csv', index=False)
+    print(f"Player stats saved to 'player_stats_{value}.csv'")
+
+    # Save missing player IDs to a separate CSV
     missing_data_df = pd.DataFrame(missing_data, columns=['player_id'])
-    missing_data_df.to_csv('missing_data_3.csv', index=False)
+    missing_data_df.to_csv(f'missing_stats_data_{value}.csv', index=False)
+    print(f"Missing data saved to 'missing_data_{value}.csv'")
+
 
 def get_player_stats(row, driver):
     player_stats_url = 'https://www.nba.com/stats/player/'
@@ -244,20 +261,20 @@ def get_player_stats(row, driver):
 
     player_stats_all_df.to_csv(f"player_stats_{player_id}.csv", index=False)
 
-def player_scraper():
+def player_scraper(value):
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
 
-    start_year = 2020
-    end_year = 2021
+    # start_year = 2020
+    # end_year = 2021
 
-    years = []
+    # years = []
 
-    for year in range(start_year, end_year):
-        year_end = year + 1
-        year_end = str(year_end)[-2:]
-        years.append(f'{year}-{year_end}')
+    # for year in range(start_year, end_year):
+    #     year_end = year + 1
+    #     year_end = str(year_end)[-2:]
+    #     years.append(f'{year}-{year_end}')
 
     type = 'Regular Season'
 
@@ -265,31 +282,52 @@ def player_scraper():
 
     driver.get('https://www.nba.com/players')
 
-    dropdown = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/main/div[2]/section/div/div[2]/div[1]/div[7]/div/div[3]/div/label/div/select')
+    toggle = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/main/div[2]/section/div/div[2]/div[1]/div[6]/label/div/span')
+    if not toggle.is_selected():
+        toggle.click()
 
-    # Print all options in the dropdown for debugging
-    select = Select(dropdown)
-    select.select_by_visible_text("All")
+    # change the dropdown value to the desired value
+    dropdown_name = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/main/div[2]/section/div/div[2]/div[1]/div[1]/label/div/select')
 
-    # toggle = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/main/div[2]/section/div/div[2]/div[1]/div[6]/label/div/span')
-    # if not toggle.is_selected():
-    #     toggle.click()
+    # Use the Select class to interact with the dropdown
+    select_dropdown = Select(dropdown_name)
+
+    # Select the option with the value "A"
+
+    select_dropdown.select_by_value(value)
+
+    print(f"Dropdown value: {select_dropdown.first_selected_option.text}")
+
+    # Set dropdown to "All"
+    dropdown_row = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/main/div[2]/section/div/div[2]/div[1]/div[7]/div/div[3]/div/label/div/select')
+    select_row = Select(dropdown_row)
+    select_row.select_by_visible_text("1")
+    time.sleep(1)
+    select_row.select_by_visible_text("All")
+
+    # Wait for rows to load
+    time.sleep(5)
+
+    print(f"Selected option: {select_row.first_selected_option.text}")
 
     page_source = driver.page_source
 
     soup = BeautifulSoup(page_source, 'html.parser')
 
+    # with open('output.html', 'w', encoding='utf-8') as file:
+    #     file.write(soup.prettify())
+
     player_list = soup.find('table', class_='players-list').find('tbody').find_all('tr')
 
-    print(len(player_list))
+    print(f"Total players: {len(player_list)}")
 
-    player_df = get_player_info(player_list)
+    player_df = get_player_info(player_list, value)
 
-    get_players_stats(player_df, driver)
+    get_players_stats(player_df, driver, value)
 
     driver.quit()
 
-def player_number_age_scraper(player_df):
+def player_number_age_scraper(player_df, value):
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
@@ -318,38 +356,66 @@ def player_number_age_scraper(player_df):
             player_number_p = player_number_div.find('p', class_='PlayerSummary_mainInnerInfo__jv3LO')
             if player_number_p:
                 player_number_p_text = player_number_p.text.strip()
-                player_number = player_number_p_text.split(' | ')[1].strip().replace('#', '').strip()
+                player_number_split = player_number_p_text.split(' | ')
+                if len(player_number_split) > 1:
+                    player_number = player_number_split[1].strip().replace('#', '').strip()
+                else:
+                    print(f"No player number found for {row['first_name']} {row['last_name']}")
 
-        print(player_number)
+        print(f"Player number: {player_number}")
 
         player_age_div = soup.find_all('div', class_='PlayerSummary_playerInfo__om2G4')
+
+        player_age_container = None
+        player_birthdate_container = None
 
         for div in player_age_div:
             label_div = div.find('p', class_='PlayerSummary_playerInfoLabel__hb5fs')
             if label_div:
                 if label_div.text.strip() == 'AGE':
                     player_age_container = div
+                elif label_div.text.strip() == 'BIRTHDATE':
+                    player_birthdate_container = div
 
         if player_age_container:
             player_age_p = player_age_container.find('p', class_='PlayerSummary_playerInfoValue__JS8_v')
             if player_age_p:
                 player_age = player_age_p.text.strip().split(' ')[0]
+        else:
+            player_age = 0
 
-        print(player_age)
+        if player_birthdate_container:
+            player_birthdate_p = player_birthdate_container.find('p', class_='PlayerSummary_playerInfoValue__JS8_v')
+            if player_birthdate_p:
+                player_birthdate = player_birthdate_p.text.strip()
+                player_age = datetime.datetime.now().year - int(player_birthdate.split(', ')[-1])
+                print(f"Player birthdate: {player_birthdate}")
+        else:
+            player_birthdate = 'No birthdate available'
+            print(f"No player birthdate found for {row['first_name']} {row['last_name']}")
+
+        
+        if player_age == 0:
+            player_age = 'No age available'
+        else:
+            print(f"Player age: {player_age}")
 
         player_number_age_dict = {
             'id': row['id'],
             'number': player_number,
-            'age': player_age
+            'age': player_age,
+            'birthdate': player_birthdate
         }
 
         player_number_age_df = pd.concat([player_number_age_df, pd.DataFrame([player_number_age_dict])], ignore_index=True)
 
-    player_number_age_df.to_csv('player_number_age.csv', index=False)
+    player_number_age_df = player_number_age_df[~player_number_age_df['number'].isnull()]
+
+    player_number_age_df.to_csv(f'player_ages/player_number_age_{value}.csv', index=False)
 
     driver.quit()
 
-def player_bio_scraper(player_df):
+def player_bio_scraper(player_df, value):
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
@@ -362,7 +428,9 @@ def player_bio_scraper(player_df):
 
         player_url = row['url']
 
-        url = f"{player_url}rotowire"
+        player_name = f"{row['first_name']}-{row['last_name']}"
+
+        url = f"https://www.nba.com/player/{row['id']}/{player_name}/bio"
 
         print(f"Getting player bio for {row['first_name']} {row['last_name']} in row {index} for {url}")
 
@@ -372,42 +440,39 @@ def player_bio_scraper(player_df):
 
         soup = BeautifulSoup(page_source, 'html.parser')
 
-        player_bio_exist = False
+        # for title in player_bio_title:
+        #     if title.text.strip().lower() == 'player bio':
+        #         print(f"Player bio found for {row['first_name']} {row['last_name']}")
+        #         player_bio_exist = True
+        #         break
 
-        player_bio = 'No bio available'
+        player_bio_div = soup.find('div', class_='PlayerBio_player_bio__kIsc_')
 
-        player_bio_title = soup.find_all('h1', class_='Block_blockTitleText__tX1TF')
+        player_bios = {}
 
-        for title in player_bio_title:
-            if title.text.strip().lower() == 'player bio':
-                print(f"Player bio found for {row['first_name']} {row['last_name']}")
-                player_bio_exist = True
-                break
-
-        if not player_bio_exist:
-            print(f"No player bio found for {row['first_name']} {row['last_name']}")
+        if player_bio_div:
+            print(f"Player bio found for {row['first_name']} {row['last_name']}")
+            player_bio_container = player_bio_div.find_all('div', class_='cplayer-bio__container')
+            for container in player_bio_container:
+                title = container.find('h2', class_='cplayer-bio__title').text.strip()
+                bio = container.find('div', class_='cplayer-bio__content').text.strip()
+                player_bios[title] = bio
         else:
-            player_bio_div = soup.find('div', class_='PlayerBio_player_bio__kIsc_')
+            print(f"No player bio found for {row['first_name']} {row['last_name']}")
 
-            if player_bio_div:
-                player_bio_container = player_bio_div.find('div', class_='cplayer-bio__container')
-                if player_bio_container:
-                    player_bio_content = player_bio_container.find('div', class_='cplayer-bio__content')
-
-            if player_bio_content:
-                player_bio = player_bio_content.text.strip()
-
-            print(player_bio)
+        print(f"Player bios: {player_bios}")
 
         player_bio_dict = {
             'id': row['id'],
-            'bio': player_bio,
+            'professional_bio': player_bios.get('PROFESSIONAL CAREER', 'No professional bio available'),
+            'personal_bio': player_bios.get('PERSONAL LIFE', 'No personal bio available'),
+            'before_nba_bio': player_bios.get('BEFORE NBA', 'No before NBA bio available'),
             'url': url
         }
 
         player_bio_df = pd.concat([player_bio_df, pd.DataFrame([player_bio_dict])], ignore_index=True)
 
-    player_bio_df.to_csv('player_bio.csv', index=False)
+    player_bio_df.to_csv(f'player_bios/player_bio_{value}.csv', index=False)
 
     driver.quit()
 
@@ -555,13 +620,27 @@ def team_bio_text_checker(bio_text, first_name, last_name):
 
 def main():
 
-    # options = webdriver.ChromeOptions()
-    # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument('--ignore-ssl-errors')
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
 
-    # driver = webdriver.Chrome(options=options)
-    player_df = pd.read_csv('player_data_new.csv')
-    player_bio_scraper(player_df)
+
+    # player_scraper('B')
+
+    # player_df = pd.read_csv('players/player_data_B.csv')
+
+    # # player_bio_scraper(player_df, 'B')
+
+    # player_number_age_scraper(player_df, 'B')
+
+
+
+    
+
+
+
+    # player_df = pd.read_csv('player_data_new.csv')
+    # player_bio_scraper(player_df)
     # player_number_age_scraper(player_df)
 
 

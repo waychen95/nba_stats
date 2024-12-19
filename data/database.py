@@ -6,13 +6,14 @@ import psycopg2.extras
 import pandas as pd
 import numpy as np
 import ast
+import math
 from dotenv import load_dotenv
 
 class PlayerDatabase():
     def __init__(self, connection, dataframe):
         self.connection = connection
         self.cursor = self.connection.cursor()
-        self.dataframe = dataframe
+        self.dataframe = self._reformat_data(dataframe)
 
     def get_player_db(self):
         return self.dataframe
@@ -27,8 +28,6 @@ class PlayerDatabase():
         data = dataframe.copy()
         print(f"Dropping {len(data) - len(data.dropna(subset=['id', 'number', 'position', 'height', 'weight']))} rows with missing values")
 
-        missing_data = data[data[['id', 'number', 'position', 'height', 'weight']].isna().any(axis=1)]
-
         data = data.dropna(subset=['id', 'number', 'position', 'height', 'weight'])
 
         # Apply split_height function directly to each element of 'height' column
@@ -36,6 +35,9 @@ class PlayerDatabase():
         data['feet'], data['inches'] = zip(*heights)
 
         data.drop('height', axis=1, inplace=True)
+
+        # if 'number' is in '%s-%s' format, split it and take the first number
+        data['number'] = data['number'].apply(lambda x: x.split('-')[0] if '-' in x else x)
 
         data['number'] = data['number'].astype(int).astype(str)
 
@@ -45,12 +47,15 @@ class PlayerDatabase():
         data['team_full_name'] = data['team_url'].apply(lambda x: x.split('/')[-2].strip())
         data['team_id'] = data['team_url'].apply(lambda x: x.split('/')[-3].strip())
         data['position'] = data['position'].apply(lambda x: x.replace('-', '/'))
+
+        data['active'] = True
+
+        active_player_df = pd.read_csv('active_players.csv')
+
+        # set active column to False for players not in active_players.csv
+        data.loc[~data['id'].isin(active_player_df['id']), 'active'] = False
         
         print(data.head())
-
-        data.to_csv('player_data_new_reformat.csv', index=False)
-
-        missing_data.to_csv('missing_data.csv', index=False)
 
         return data
     
@@ -94,7 +99,8 @@ class PlayerDatabase():
             inches INT,
             weight VARCHAR(50),
             last_attended VARCHAR(50),
-            country VARCHAR(50)
+            country VARCHAR(50),
+            active BOOLEAN
         );
         """
         print(create_table)
@@ -103,8 +109,8 @@ class PlayerDatabase():
 
     def insert_player(self, player):
         insert_player = """
-        INSERT INTO nba_players (id, first_name, last_name, url, image_url, team_id, number, position, feet, inches, weight, last_attended, country)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO nba_players (id, first_name, last_name, url, image_url, team_id, number, position, feet, inches, weight, last_attended, country, active)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         print(insert_player)
         self.cursor.execute(insert_player, (
@@ -120,18 +126,21 @@ class PlayerDatabase():
             player['inches'],
             player['weight'],
             player['last_attended'],
-            player['country']
+            player['country'],
+            player['active']
         ))
         self.connection.commit()
 
     def insert_all_players(self):
         insert_all_players = """
-        INSERT INTO nba_players (id, first_name, last_name, url, image_url, team_id, number, position, feet, inches, weight, last_attended, country)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO nba_players (id, first_name, last_name, url, image_url, team_id, number, position, feet, inches, weight, last_attended, country, active)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (id) DO NOTHING;
         """
 
         player_data = []
         players = self.dataframe.to_dict('records')
+        print(f'Inserting {len(players)} players')
         
         for player in players:
             if player is None:
@@ -150,41 +159,12 @@ class PlayerDatabase():
                 player['inches'],
                 player['weight'],
                 player['last_attended'],
-                player['country']
+                player['country'],
+                player['active']
             )
             player_data.append(player_info)
         
         self.cursor.executemany(insert_all_players, player_data)
-        self.connection.commit()
-
-    def insert_new_players(self):
-        insert_player = """
-        INSERT INTO nba_players (id, first_name, last_name, url, image_url, team_id, number, position, feet, inches, weight, last_attended, country)
-        SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-        WHERE NOT EXISTS (
-            SELECT 1 FROM nba_players WHERE id = %s
-        );
-        """
-
-        player_data = self.dataframe.to_dict('records')
-        for player in player_data:
-            player_info = (
-                player['id'],
-                player['first_name'],
-                player['last_name'],
-                player['url'],
-                player['image_url'],
-                player['team_id'],
-                player['number'],
-                player['position'],
-                player['feet'],
-                player['inches'],
-                player['weight'],
-                player['last_attended'],
-                player['country'],
-                player['id']
-            )
-            self.cursor.execute(insert_player, player_info)
         self.connection.commit()
 
     def get_players(self):
@@ -218,6 +198,29 @@ class PlayerDatabase():
         """
         self.cursor.execute(delete_player, (player_id,))
         self.connection.commit()
+
+    def update_is_active(self):
+        update_player = """
+        ALTER TABLE nba_players
+        ADD COLUMN active BOOLEAN;
+        """
+
+        self.cursor.execute(update_player)
+        self.connection.commit()
+
+    def update_is_active_players(self):
+        update_player = """
+        UPDATE nba_players
+        SET active = FALSE
+        WHERE id = %s;
+        """
+
+        player_data = self.dataframe.to_dict('records')
+        for player in player_data:
+            player_info = (player['id'],)
+            self.cursor.execute(update_player, player_info)
+        self.connection.commit()
+
 
     def __del__(self):
         self.cursor.close()
@@ -387,9 +390,9 @@ class PlayerStatsDatabase():
         self.player_team_df = self._get_player_team_data()
 
     def _get_player_team_data(self):
-        player_stats_df = pd.read_csv('player_stats_all_new_reformat.csv')
+        player_stats_df = self.dataframe.copy()
 
-        missing_data = pd.read_csv('missing_data_new.csv')
+        missing_data = pd.read_csv('missing_data.csv')
 
         missing_ids = missing_data['id'].unique()
 
@@ -403,11 +406,17 @@ class PlayerStatsDatabase():
 
         player_team_df.columns = ['player_id', 'past_teams']
 
-        player_team_df.to_csv('player_team_data_reformat.csv', index=False)
+        player_team_df.to_csv('player_team_data_A.csv', index=False)
 
         print(player_team_df.head())
 
         return player_team_df
+    
+    def sanitize(self, value):
+        if value is None or (isinstance(value, float) and math.isnan(value)):
+            print(f'Value is None: {value}')
+            return None  # Replace 'nan' with NULL
+        return value
 
     def _reformat_data(self, dataframe):
 
@@ -415,7 +424,7 @@ class PlayerStatsDatabase():
         df = dataframe.copy()
 
         # Drop rows with matching id in the missing data file
-        missing_data = pd.read_csv('missing_data_new.csv')
+        missing_data = pd.read_csv('missing_data.csv')
         df = df[~df['player_id'].isin(missing_data['id'])]
         
         team_df = pd.read_csv('team_data.csv')
@@ -425,7 +434,10 @@ class PlayerStatsDatabase():
 
         df['team_id'] = df['team_id'].astype('Int64')
 
-        df.to_csv('player_stats_all_new_reformat.csv', index=False)
+        # Sanitize specific columns
+        df = df.where(pd.notnull(df), None)
+
+        df.to_csv('player_stats_A_reformat.csv', index=False)
 
         return df
     
@@ -474,15 +486,20 @@ class PlayerStatsDatabase():
             ftm, fta, ft_pct, oreb, dreb, reb, 
             ast, tov, stl, blk, pf, fp, dd2, td3, plus_minus
         )
-        VALUES (
+        SELECT
             %s, %s, %s, %s, %s, %s, %s, %s, 
             %s, %s, %s, %s, %s, %s, 
             %s, %s, %s, %s, %s, %s, %s, %s, %s, 
             %s, %s, %s, %s
-        );
+        WHERE EXISTS (
+            SELECT 1 FROM nba_teams WHERE id = %s
+        )
+        ON CONFLICT (player_id, year, team_id) DO NOTHING;
         """
 
-        player_stats_data = self.dataframe.to_dict('records')
+        data = self.dataframe.copy()[:10]
+        player_stats_data = data.to_dict('records')
+        # player_stats_data = self.dataframe.to_dict('records')
         for player_stats in player_stats_data:
             player_stats_info = (
                 player_stats['player_id'],
@@ -511,10 +528,18 @@ class PlayerStatsDatabase():
                 player_stats['fp'],
                 player_stats['dd2'],
                 player_stats['td3'],
-                player_stats['+/-']
+                player_stats['+/-'],
+                player_stats['team_id']
             )
-            self.cursor.execute(insert_all_player_stats, player_stats_info)
+            try:
+                self.cursor.execute(insert_all_player_stats, player_stats_info)
+            except Exception as e:
+                print(e)
+                print(player_stats_info)
+                print(insert_all_player_stats)
         self.connection.commit()
+
+        print(f"Inserted {len(player_stats_data)} player stats")
 
     def update_player_past_team(self):
         update_player = """
@@ -526,7 +551,7 @@ class PlayerStatsDatabase():
         self.connection.commit()
 
     def insert_player_past_team(self):
-        player_team_df = self._get_player_team_data()
+        player_team_df = self.player_team_df.copy()
 
         update_team = """
         UPDATE nba_players
@@ -552,10 +577,10 @@ class PlayerUpdateDatabase():
 
     def _reformat_bio_data(self, bio_df):
         data = bio_df.copy()
-        player_df = pd.read_csv('player_data_new.csv')
+        player_df = pd.read_csv('players/player_data_A.csv')
         missing_data = player_df[player_df[['id', 'number', 'position', 'height', 'weight']].isna().any(axis=1)]
 
-        missing_data.to_csv('missing_data_new.csv', index=False)
+        missing_data.to_csv('missing_bio_data_new.csv', index=False)
 
         print(f"Dropping {len(data) - len(player_df.dropna(subset=['id', 'number', 'position', 'height', 'weight']))} rows with missing values for bio data")
 
@@ -569,10 +594,10 @@ class PlayerUpdateDatabase():
 
     def _reformat_age_number_data(self, age_number_df):
         data = age_number_df.copy()
-        player_df = pd.read_csv('player_data_new.csv')
+        player_df = pd.read_csv('players/player_data_A.csv')
         missing_data = player_df[player_df[['id', 'number', 'position', 'height', 'weight']].isna().any(axis=1)]
 
-        missing_data.to_csv('missing_data_new.csv', index=False)
+        missing_data.to_csv('missing_age_data_new.csv', index=False)
 
         print(f"Dropping {len(data) - len(player_df.dropna(subset=['id', 'number', 'position', 'height', 'weight']))} rows with missing values for age and number data")
 
@@ -580,8 +605,10 @@ class PlayerUpdateDatabase():
 
         data = data[~data['id'].isin(missing_ids)]
 
-        # Replace any 'number' values with -1 if they are missing
-        data['number'] = data['number'].fillna(-1)
+        # if 'number' is not a number, set it to None
+        data['number'] = data['number'].apply(lambda x: None if not x.isnumeric() else x)
+
+        data.to_csv('player_number_age_reformat.csv', index=False)
 
         return data
     
@@ -677,10 +704,17 @@ def main():
         
         # player_df = pd.read_csv('player_data_old.csv')
 
-        # new_player_df = pd.read_csv('player_data_new.csv')
-        # player_db = PlayerDatabase(conn, new_player_df)
+        # player_df = pd.read_csv('players/player_data_A.csv')
+        # player_db = PlayerDatabase(conn, player_df)
+
+        # player_db.update_is_active_players()
 
         # player_db.insert_all_players()
+
+        # player_stats_df = pd.read_csv('player_stats_A.csv')
+        # player_stats_db = PlayerStatsDatabase(conn, player_stats_df)
+
+        # player_stats_db.insert_all_player_stats()
 
         # player_db.create_player_table()
         # player_db.insert_all_players()
@@ -695,21 +729,21 @@ def main():
         # team_db.alter_team_table()
         # team_db.update_all_teams()
 
-        player_stats_df = pd.read_csv('player_stats_all_new.csv')
-        player_stats_db = PlayerStatsDatabase(conn, player_stats_df)
+        # player_stats_df = pd.read_csv('player_stats_all_new.csv')
+        # player_stats_db = PlayerStatsDatabase(conn, player_stats_df)
 
         # player_stats_db.create_player_stats_table()
-        player_stats_db.insert_all_player_stats()
+        # player_stats_db.insert_all_player_stats()
 
         # player_stats_db.insert_player_past_team()
 
         # player_stats_db.create_player_stats_table()
         # player_stats_db.insert_all_player_stats()
 
-        # player_age_df = pd.read_csv('player_number_age.csv')
-        # player_bio_df = pd.read_csv('player_bio.csv')
+        player_age_df = pd.read_csv('player_ages/player_number_age_A.csv')
+        player_bio_df = pd.read_csv('player_bios/player_bio_A.csv')
 
-        # player_update_db = PlayerUpdateDatabase(conn, player_age_df, player_bio_df)
+        player_update_db = PlayerUpdateDatabase(conn, player_age_df, player_bio_df)
 
         # player_update_db.update_null_bio_players()
         
