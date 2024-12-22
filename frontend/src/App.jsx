@@ -5,8 +5,7 @@ import TeamList from './pages/TeamList';
 import Team from './pages/Team';
 import PlayerList from './pages/PlayerList';
 import Player from './pages/Player';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
+import Contact from './pages/Contact';
 import Guess from './pages/Guess';
 import Games from './pages/Games';
 import GuessTeamLogo from './pages/GuessTeamLogo';
@@ -32,7 +31,7 @@ function App() {
               <Link to="/players">Players</Link>
             </li>
             <li>
-              <Link to="/login">Login</Link>
+              <Link to="/contact">Contact</Link>
             </li>
           </ul>
         </nav>
@@ -52,8 +51,7 @@ function App() {
             <Route index element={<PlayerList />} />
             <Route path=":id" element={<Player />} />
           </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </div>
     </Router>

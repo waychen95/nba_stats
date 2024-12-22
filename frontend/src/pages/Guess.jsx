@@ -18,7 +18,7 @@ function Guess() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('http://localhost:5000/players');
+            const response = await fetch('http://localhost:5000/all_players');
             const data = await response.json();
             const playerList = data.players;
 

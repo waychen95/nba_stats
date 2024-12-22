@@ -12,6 +12,7 @@ function PlayerList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [playersPerPage] = useState(24); // Number of players per page
   const [totalPages, setTotalPages] = useState(1); // Total number of pages
+  const [isActive, setIsActive] = useState(false);
 
   const team_list = [
     "HOU", "MIA", "TOR", "DAL", "MEM", "DEN", "MIN", "PHX", "NYK", "POR", "WAS", "CHA",
@@ -29,6 +30,11 @@ function PlayerList() {
       if (search) {
         url += `&search=${search}`;
       }
+      if (isActive) {
+        url += `&active=false`;
+      } else {
+        url += `&active=true`;
+      }
       const response = await fetch(url);
       const data = await response.json();
       setPlayers(data.players);
@@ -37,7 +43,7 @@ function PlayerList() {
     }
 
     fetchPlayers();
-  }, [order, team, search, currentPage]); // Fetch players when page, order, team, or search changes
+  }, [order, team, search, currentPage, isActive]); // Fetch players when page, order, team, or search changes
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -96,7 +102,10 @@ function PlayerList() {
             type='text'
             placeholder='Search by name...'
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1); // Reset to first page when searching
+            }}
           />
         </div>
         <div className='dropdown-name'>
@@ -116,6 +125,15 @@ function PlayerList() {
               </option>
             ))}
           </select>
+        </div>
+        <div className='toggle-active'>
+          <label>Past Players:</label>
+          <button
+            className={`toggle-button ${isActive ? 'active' : 'non-active'}`}
+            onClick={() => setIsActive(!isActive)}
+          >
+            {isActive ? 'On' : 'Off'}
+          </button>
         </div>
       </div>
       {loading ? (

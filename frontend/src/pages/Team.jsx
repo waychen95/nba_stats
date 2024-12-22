@@ -52,7 +52,7 @@ function Team() {
             <img src={team.logo_url} alt={team.name} />
             <div>
               <button className='button' onClick={getProfile}>Profile</button>
-              <button className='button' onClick={getPlayers}>Players</button>
+              <button className='button' onClick={getPlayers}>Current Roster</button>
             </div>
           </div>
         )}

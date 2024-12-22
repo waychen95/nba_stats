@@ -109,7 +109,7 @@ def get_team_players(team_id):
     ON
         p.team_id = t.id
     WHERE
-        p.team_id = %s;
+        p.team_id = %s AND p.active = TRUE;
     """
     cursor.execute(query, (team_id,))
     players = cursor.fetchall()
@@ -140,14 +140,17 @@ def get_player(player_id):
 
 @app.route('/players', methods=['GET'])
 def players():
-    order = request.args.get('order', 'asc')
+    order = request.args.get('order', 'asc').lower()
     team = request.args.get('team', None)
     search = request.args.get('search', None)
-    page = int(request.args.get('page', 1))  # Default to page 1
-    limit = int(request.args.get('limit', 10))  # Default to 10 players per page
-    offset = (page - 1) * limit
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 10))
+    active = request.args.get('active', None)
 
-    # Base query
+    offset = (page - 1) * limit
+    if order not in ['asc', 'desc']:
+        order = 'asc'
+
     query = """
     SELECT 
         p.*, 
@@ -160,66 +163,68 @@ def players():
     ON 
         p.team_id = t.id
     """
-    
-    # Parameters for query filtering
     params = []
-    
-    # Add filtering by team if provided
+    where_clauses = []
+
     if team:
-        query += " WHERE t.name = %s"
+        where_clauses.append("t.name = %s")
         params.append(team.upper())
-    
-    # Add search filter if provided
     if search:
-        if team:
-            query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-        else:
-            query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
+        where_clauses.append("(p.first_name ILIKE %s OR p.last_name ILIKE %s)")
         params.extend([f'%{search}%', f'%{search}%'])
-    
-    # Add ordering and pagination
-    query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s;"
+    if active and active.lower() in ['true', 'false']:
+        is_active = active.lower() == 'true'
+        where_clauses.append("p.active = %s")
+        params.append(is_active)
+
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
+    query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s"
     params.extend([limit, offset])
-    
-    # Execute the query to get paginated players
+
     cursor.execute(query, tuple(params))
     players = cursor.fetchall()
 
-    # Query to get the total number of players without LIMIT and OFFSET for pagination calculation
     count_query = """
     SELECT COUNT(*)
     FROM nba_players p
     JOIN nba_teams t ON p.team_id = t.id
     """
-    
-    if team:
-        count_query += " WHERE t.name = %s"
-        count_params = [team.upper()]
-    else:
-        count_params = []
+    if where_clauses:
+        count_query += " WHERE " + " AND ".join(where_clauses)
 
-    if search:
-        if team:
-            count_query += " AND (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            count_params.extend([f'%{search}%', f'%{search}%'])
-        else:
-            count_query += " WHERE (p.first_name ILIKE %s OR p.last_name ILIKE %s)"
-            count_params.extend([f'%{search}%', f'%{search}%'])
+    cursor.execute(count_query, tuple(params[:-2]))  # Exclude LIMIT and OFFSET
+    total_players = cursor.fetchone()[0]
 
-    # Execute the count query to get the total number of players
-    cursor.execute(count_query, tuple(count_params))
-    total_players = cursor.fetchone()[0]  # Total count of players
-    
-    # Convert fetched players to a dictionary
     players = [dict(player) for player in players]
 
-    # Return players and total number for pagination
     return jsonify({
         'players': players,
         'total': total_players,
         'page': page,
         'limit': limit
     })
+
+
+@app.route('/all_players', methods=['GET'])
+def all_players():
+    query = """
+    SELECT 
+        p.*, 
+        t.name AS team_name,
+        t.conference AS team_conference
+    FROM 
+        nba_players p
+    JOIN 
+        nba_teams t 
+    ON 
+        p.team_id = t.id;
+    """
+    cursor.execute(query)
+    players = cursor.fetchall()
+    players = [dict(player) for player in players]
+    return jsonify({'players': players})
 
 
 @app.route('/players/random', methods=['GET'])
@@ -244,31 +249,43 @@ def random_player():
 
 @app.route('/players/<player_id>/stats', methods=['GET'])
 def player_stats(player_id):
-    player_id = int(player_id)
-    query = """
-    SELECT 
-        ps.*,
-        p.first_name,
-        p.last_name,
-        t.name AS team_name
-    FROM 
-        nba_player_stats ps
-    JOIN 
-        nba_players p 
-    ON 
-        ps.player_id = p.id
-    JOIN
-        nba_teams t
-    ON
-        ps.team_id = t.id
-    WHERE
-        ps.player_id = %s
-    ORDER BY ps.year ASC;
-    """
-    cursor.execute(query, (player_id,))
-    stats = cursor.fetchall()
-    stats = [dict(stat) for stat in stats]
-    return jsonify({'stats': stats})
+    try:
+        player_id = int(player_id)
+        query = """
+        SELECT 
+            ps.*,
+            p.first_name,
+            p.last_name,
+            t.name AS team_name
+        FROM 
+            nba_player_stats ps
+        JOIN 
+            nba_players p 
+        ON 
+            ps.player_id = p.id
+        JOIN
+            nba_teams t
+        ON
+            ps.team_id = t.id
+        WHERE
+            ps.player_id = %s
+        ORDER BY ps.year ASC;
+        """
+        cursor.execute(query, (player_id,))
+        stats = cursor.fetchall()
+
+        # Convert the stats to a list of dictionaries
+        stats = [dict(stat) for stat in stats]
+
+        # Sanitize data: Replace NaN or None with appropriate values
+        for stat in stats:
+            for key, value in stat.items():
+                if value is None or (isinstance(value, float) and np.isnan(value)):
+                    stat[key] = None  # Or set a default value if needed, e.g., 0 or "N/A"
+
+        return jsonify({'stats': stats})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

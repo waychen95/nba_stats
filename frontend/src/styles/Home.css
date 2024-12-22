@@ -69,13 +69,13 @@ a.button {
     letter-spacing: 0.05em;
 }
 
-.signup {
+.contact {
     background-color: #903030;
     height: 100px;
     width: 350px;
 }
 
-.signup:hover {
+.contact:hover {
     background-color: #5b0000;
 }
 

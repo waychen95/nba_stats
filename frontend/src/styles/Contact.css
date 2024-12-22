@@ -1,5 +1,5 @@
 
-.signup-container {
+.contact-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -18,7 +18,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#signup-form {
+#contact-form {
     width: 300px;
     margin: 0 auto;
     padding: 20px;
@@ -55,7 +55,7 @@
 }
 
 /* Button styling */
-.signup-button {
+.contact-button {
     width: 100%;
     padding: 10px;
     background-color: #007bff;
@@ -68,13 +68,13 @@
     transition: background-color 0.3s ease;
 }
 
-/* signup-Button hover effect */
-.signup-button:hover {
+/* contact-Button hover effect */
+.contact-button:hover {
     background-color: #0056b3;
 }
 
-/* signup-Button disabled state */
-.signup-button:disabled {
+/* contact-Button disabled state */
+.contact-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }

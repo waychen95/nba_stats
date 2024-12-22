@@ -134,6 +134,36 @@
     opacity: 0.7;
 }
 
+
+.toggle-button {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 1rem;
+    background-color: #496880;
+    color: white;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.toggle-button:hover {
+    background-color: #304758;
+}
+
+.toggle-button.active {
+    background-color: #4caf50; /* Green for active */
+    color: white;
+    font-weight: bold;
+}
+
+.toggle-button.non-active {
+    background-color: #f44336; /* Red for non-active */
+    color: white;
+    font-weight: bold;
+}
+  
+
 /* Responsive styles for mobile screens */
 @media (max-width: 768px) {
     .player-list-container h1 {
@@ -176,6 +206,11 @@
         padding: 0.75rem 1.5rem;
         font-size: 1.2rem;
     }
+
+    .toggle-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -205,6 +240,11 @@
     }
 
     .page-button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+
+    .toggle-button {
         padding: 0.5rem 1rem;
         font-size: 1rem;
     }

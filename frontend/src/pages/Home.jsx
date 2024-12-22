@@ -11,9 +11,9 @@ function Home() {
         <Link to="/players" className='button'>Players</Link>
       </div>
       <div className='call_to_action'>
-        <h2>Want to lock in your favorite team/player?</h2>
-        <Link to="/signup" className='button signup'>Sign Up</Link>
-        <h3>Already have an account? <a href='/login' id='acount-a-tag'>Log In</a></h3>
+        <h2>Interested in joining?</h2>
+        <Link to="/contact" className='button contact'>Contact Us</Link>
+        {/* <h3>Already have an account? <a href='/login' id='acount-a-tag'>Log In</a></h3> */}
       </div>
     </div>
   );

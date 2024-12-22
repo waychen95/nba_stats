@@ -8,15 +8,30 @@ function PlayerStats({ playerId }) {
 
     useEffect(() => {
         async function fetchStats() {
-            const response = await fetch(`http://localhost:5000/players/${playerId}/stats`);
-            const data = await response.json();
-            
-            // Sort the stats by year (ascending order)
-            const sortedStats = data.stats.sort((a, b) => b.year - a.year);
-            
-            setStats(sortedStats);
-            setStatsLoading(false);
-        }
+            try {
+                const response = await fetch(`http://localhost:5000/players/${playerId}/stats`);
+                const data = await response.json();
+        
+                // Replace `NaN` values with null or default values
+                const sanitizedStats = data.stats.map(stat => {
+                    const cleanStat = { ...stat };
+                    Object.keys(cleanStat).forEach(key => {
+                        if (Number.isNaN(cleanStat[key])) {
+                            cleanStat[key] = null; // or set a default value like 0
+                        }
+                    });
+                    return cleanStat;
+                });
+        
+                // Sort the stats by year (ascending order)
+                const sortedStats = sanitizedStats.sort((a, b) => b.year - a.year);
+        
+                setStats(sortedStats);
+                setStatsLoading(false);
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            }
+        }        
 
         fetchStats();
     }, [playerId]);
@@ -52,15 +67,15 @@ function PlayerStats({ playerId }) {
                         <tbody className="player-stats-list">
                             {stats.map((stat) => (
                                 <tr key={stat.year + stat.team_name} className="player-stats">
-                                    <td>{stat.year}</td>
-                                    <td>{stat.team_name}</td>
-                                    <td>{stat.gp}</td>
-                                    <td>{stat.min}</td>
-                                    <td>{stat.pts}</td>
-                                    <td>{stat.reb}</td>
-                                    <td>{stat.ast}</td>
-                                    <td>{stat.stl}</td>
-                                    <td>{stat.blk}</td>
+                                    <td>{stat.year ?? 'N/A'}</td>
+                                    <td>{stat.team_name ?? 'N/A'}</td>
+                                    <td>{stat.gp ?? 'N/A'}</td>
+                                    <td>{stat.min ?? 'N/A'}</td>
+                                    <td>{stat.pts ?? 'N/A'}</td>
+                                    <td>{stat.reb ?? 'N/A'}</td>
+                                    <td>{stat.ast ?? 'N/A'}</td>
+                                    <td>{stat.stl ?? 'N/A'}</td>
+                                    <td>{stat.blk ?? 'N/A'}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -102,10 +117,24 @@ function PlayerStats({ playerId }) {
                                     name: 'Assists',
                                 }
                             ]}
-                            layout={{ 
-                                title: `Player Stats Across Seasons and Teams`, 
-                                xaxis: { title: 'Season (Team)' }, 
-                                yaxis: { title: 'Stats' } 
+                            layout={{
+                                title: `Player Stats Across Seasons and Teams`,
+                                xaxis: {
+                                    title: 'Season (Team)',
+                                    tickangle: window.innerWidth < 768 ? -30 : -45, // Adjust angle for smaller screens
+                                },
+                                yaxis: { title: 'Stats' },
+                                margin: {
+                                    l: 50, // Left margin
+                                    r: 30, // Right margin for mobile
+                                    t: 50, // Top margin
+                                    b: window.innerWidth < 768 ? 120 : 100, // Bottom margin adjustment
+                                },
+                            }}
+                            useResizeHandler={true} // Enable responsive resizing
+                            style={{ width: '100%', height: window.innerWidth < 768 ? '400px' : '600px' }} // Adjust size dynamically
+                            config={{
+                                responsive: true, // Ensure chart adjusts on resize
                             }}
                         />
                     </div>

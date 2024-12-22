@@ -79,7 +79,7 @@ def get_player_info(player_list, value):
 
     player_df = pd.DataFrame(player_data)
     print(player_df.head())
-    player_df.to_csv(f"player_data_{value}.csv", index=False)
+    player_df.to_csv(f"players/player_data_{value}.csv", index=False)
 
     return player_df
 
@@ -409,7 +409,8 @@ def player_number_age_scraper(player_df, value):
 
         player_number_age_df = pd.concat([player_number_age_df, pd.DataFrame([player_number_age_dict])], ignore_index=True)
 
-    player_number_age_df = player_number_age_df[~player_number_age_df['number'].isnull()]
+    # Remove rows with no player number
+    # player_number_age_df = player_number_age_df[~player_number_age_df['number'].isnull()]
 
     player_number_age_df.to_csv(f'player_ages/player_number_age_{value}.csv', index=False)
 
@@ -456,11 +457,12 @@ def player_bio_scraper(player_df, value):
             for container in player_bio_container:
                 title = container.find('h2', class_='cplayer-bio__title').text.strip()
                 bio = container.find('div', class_='cplayer-bio__content').text.strip()
+                # clean ambiguous unicode characters
+                bio = bio.replace('\u2019', "'").replace('\u2014', '-').replace('\u2013', '-').replace('\u2018', "'").replace('\u201c', '"').replace('\u201d', '"')
                 player_bios[title] = bio
         else:
             print(f"No player bio found for {row['first_name']} {row['last_name']}")
 
-        print(f"Player bios: {player_bios}")
 
         player_bio_dict = {
             'id': row['id'],
@@ -625,23 +627,15 @@ def main():
     options.add_argument('--ignore-ssl-errors')
 
 
-    # player_scraper('B')
+    player_scraper('F')
 
-    # player_df = pd.read_csv('players/player_data_B.csv')
+    active_player_df = pd.read_csv('active_players.csv')
 
-    # # player_bio_scraper(player_df, 'B')
+    player_df = pd.read_csv('players/player_data_E.csv')
 
-    # player_number_age_scraper(player_df, 'B')
+    # player_number_age_scraper(player_df, 'E')
 
-
-
-    
-
-
-
-    # player_df = pd.read_csv('player_data_new.csv')
-    # player_bio_scraper(player_df)
-    # player_number_age_scraper(player_df)
+    # player_bio_scraper(player_df, 'E')
 
 
 if __name__ == '__main__':
