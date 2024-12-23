@@ -19,11 +19,11 @@ function GuessWhoAmI() {
     useEffect(() => {
         async function fetchPlayers() {
             try {
-                const response = await fetch('http://localhost:5000/players');
+                const response = await fetch('http://localhost:5000/all_players');
                 const data = await response.json();
                 let playerList = data.players;
 
-                playerList = playerList.filter(player => player.bio !== 'No bio available' && player.image_url !== 'https://cdn.nba.com/headshots/nba/latest/260x190/1641794.png');
+                playerList = playerList.filter(player => player.professional_bio !== 'No professional bio available' && player.before_nba_bio !== "No before NBA bio available" && player.personal_bio !== "No personal bio available");
 
                 setAllPlayers(playerList);
 
@@ -77,19 +77,21 @@ function GuessWhoAmI() {
     const reformatBio = (player) => {
         const firstName = player.first_name;
         const lastName = player.last_name;
-        const fullName = `${firstName}${lastName}`;
-        const playerBio = player.bio;
+        const fullName = `${firstName} ${lastName}`;
+        const professional_bio = `<h2>Professional Career:</h2><p>${player.professional_bio}</p>`;
+        const before_nba_bio = `<h2>Before NBA:</h2><p>${player.before_nba_bio}</p>`;
+        const personal_bio = `<h2>Personal Life:</h2><p>${player.personal_bio}</p>`;
+        const playerBio = `${professional_bio}${before_nba_bio}${personal_bio}`;
     
-        // Replace the first and last name in the bio with 'XYZ'
         const reformatBio = playerBio
-            .replace(new RegExp(`\\b${firstName}\\b`, 'gi'), 'XYZ') // \b ensures word boundary for exact match
+            .replace(new RegExp(`\\b${firstName}\\b`, 'gi'), 'XYZ')
             .replace(new RegExp(`\\b${lastName}\\b`, 'gi'), 'XYZ')
             .replace(new RegExp(`\\b${fullName}\\b`, 'gi'), 'XYZ')
             .replace(new RegExp(`\\b${fullName.toLowerCase()}\\b`, 'gi'), 'XYZ')
             .replace(/@\w+/g, '@XYZ');
     
         return reformatBio;
-    }
+    };    
 
     const compareGuessPlayer = () => {
         const guessPlayer = allPlayers.find(player =>
@@ -128,15 +130,15 @@ function GuessWhoAmI() {
                 <div className='player'>
                     <h2 id="guess-team-logo-title">{correct ? `Number of tries: ${tries}` : 'Who is this player?'}</h2>
                     <div className='guess-whoami-player'>
-                        <p>{bio}</p>
+                        <p dangerouslySetInnerHTML={{ __html: bio }} />
                     </div>
                     {hint && (
                         <div className='hint'>
                             <p>Hint: The player's first name is {correctPlayer.first_name}.</p>
                         </div>
                     )}
-                    {tries >= 3 && (
-                        <div className='hint button' onClick={() => setHint(hint => !hint)}>Hint {3 - tries}</div>
+                    {tries >= 10 && (
+                        <div className='hint button' onClick={() => setHint(hint => !hint)}>Hint</div>
                     )}
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>

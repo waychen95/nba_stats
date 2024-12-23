@@ -66,7 +66,12 @@ function Player() {
                     {stats && <PlayerStats playerId={id} />}
                     {bio && (
                         <div className='player-bio'>
-                            <p>{player.bio}</p>
+                            <h2>Professional Career</h2>
+                            <p>{player.professional_bio}</p>
+                            <h2>Before NBA</h2>
+                            <p>{player.before_nba_bio}</p>
+                            <h2>Personal Life</h2>
+                            <p>{player.personal_bio}</p>
                         </div>
                     )}
                 </div>

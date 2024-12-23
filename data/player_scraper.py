@@ -627,7 +627,7 @@ def main():
     options.add_argument('--ignore-ssl-errors')
 
 
-    player_scraper('F')
+    player_scraper('G')
 
     active_player_df = pd.read_csv('active_players.csv')
 
