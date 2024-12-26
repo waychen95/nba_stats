@@ -15,6 +15,7 @@ function GuessWhoAmI() {
     const [tries, setTries] = useState(0);
     const [bio, setBio] = useState("");
     const [hint, setHint] = useState(false);
+    const [maxTries, setMaxTries] = useState(3);
 
     useEffect(() => {
         async function fetchPlayers() {
@@ -113,6 +114,7 @@ function GuessWhoAmI() {
         }
 
         setTries((tries) => tries + 1);
+
         
         console.log(tries);
 
@@ -137,8 +139,8 @@ function GuessWhoAmI() {
                             <p>Hint: The player's first name is {correctPlayer.first_name}.</p>
                         </div>
                     )}
-                    {tries >= 10 && (
-                        <div className='hint button' onClick={() => setHint(hint => !hint)}>Hint</div>
+                    {tries >= 3 && (
+                        <div className='hint button' onClick={() => setHint(hint => !hint)}>Hint ({maxTries - tries})</div>
                     )}
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>

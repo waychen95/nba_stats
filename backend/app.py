@@ -174,8 +174,9 @@ def players():
         params.extend([f'%{search}%', f'%{search}%'])
     if active and active.lower() in ['true', 'false']:
         is_active = active.lower() == 'true'
-        where_clauses.append("p.active = %s")
-        params.append(is_active)
+        if is_active:
+            where_clauses.append("p.active = %s")
+            params.append(is_active)
 
     if where_clauses:
         query += " WHERE " + " AND ".join(where_clauses)

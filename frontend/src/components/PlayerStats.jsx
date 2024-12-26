@@ -2,9 +2,44 @@ import { useState, useEffect } from "react";
 import Plot from 'react-plotly.js';
 import "../styles/PlayerStats.css";
 
-function PlayerStats({ playerId }) {
+function PlayerStats({ playerId, teamName }) {
     const [stats, setStats] = useState([]);
     const [statsLoading, setStatsLoading] = useState(true);
+    const [statBoardColor, setStatBoardColor] = useState("");
+    const [selectedGraph, setSelectedGraph] = useState("shotDistribution");
+
+    const statBoardColors = [
+        { team: "hawks", color: "#660000" },
+        { team: "celtics", color: "#004D26" },
+        { team: "nets", color: "#2B2B2B" },
+        { team: "hornets", color: "#140066" },
+        { team: "bulls", color: "#660000" },
+        { team: "cavaliers", color: "#4D0020" },
+        { team: "mavericks", color: "#002044" },
+        { team: "nuggets", color: "#002244" },
+        { team: "pistons", color: "#80001F" },
+        { team: "warriors", color: "#0C2444" },
+        { team: "rockets", color: "#660000" },
+        { team: "pacers", color: "#002244" },
+        { team: "clippers", color: "#660033" },
+        { team: "lakers", color: "#33005C" },
+        { team: "grizzlies", color: "#3D4873" },
+        { team: "heat", color: "#660019" },
+        { team: "bucks", color: "#00401A" },
+        { team: "timberwolves", color: "#0C2444" },
+        { team: "pelicans", color: "#002244" },
+        { team: "knicks", color: "#003C73" },
+        { team: "thunder", color: "#004266" },
+        { team: "magic", color: "#004D80" },
+        { team: "sixers", color: "#003C73" },
+        { team: "suns", color: "#14004D" },
+        { team: "blazers", color: "#660000" },
+        { team: "kings", color: "#33005C" },
+        { team: "spurs", color: "#2B2B2B" },
+        { team: "raptors", color: "#660000" },
+        { team: "jazz", color: "#002244" },
+        { team: "wizards", color: "#66001A" }
+    ];    
 
     useEffect(() => {
         async function fetchStats() {
@@ -28,6 +63,10 @@ function PlayerStats({ playerId }) {
         
                 setStats(sortedStats);
                 setStatsLoading(false);
+
+                const statBoardColor = statBoardColors.find(statBoardColor => statBoardColor.team === teamName.toLowerCase())?.color;
+
+                setStatBoardColor(statBoardColor);
             } catch (error) {
                 console.error("Error fetching stats:", error);
             }
@@ -42,104 +81,145 @@ function PlayerStats({ playerId }) {
     const points = stats.map(stat => stat.pts);
     const rebounds = stats.map(stat => stat.reb);
     const assists = stats.map(stat => stat.ast);
+    const steals = stats.map(stat => stat.stl);
+    const blocks = stats.map(stat => stat.blk);
+
+    // Aggregate shooting stats for the pie chart
+    const totalFGA = stats.reduce((acc, stat) => acc + (stat.fga || 0), 0); // Total field goal attempts
+    const total3PA = stats.reduce((acc, stat) => acc + (stat['3pa'] || 0), 0); // Total 3-point attempts
+    const totalFTA = stats.reduce((acc, stat) => acc + (stat.fta || 0), 0); // Total free throw attempts
+
+    const renderGraph = () => {
+        switch (selectedGraph) {
+            case "shotDistribution":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                labels: ['2PT', '3PT', 'FT'],
+                                values: [totalFGA - total3PA, total3PA, totalFTA],
+                                type: 'pie',
+                                textinfo: 'label+percent',
+                                hoverinfo: 'label+percent',
+                                marker: { colors: ['blue', 'red', 'yellow'] },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Shot Distribution (2PT, 3PT, FT)',
+                            showlegend: false,
+                            height: 500,
+                            width: 500,
+                        }}
+                    />
+                );
+            case "pointsOverTime":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: points,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                marker: { color: 'blue' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Points Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Points' },
+                            height: 500,
+                            width: 800,
+                        }}
+                    />
+                );
+            case "minutesPerGame":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: minutes,
+                                type: 'bar',
+                                marker: { color: 'green' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Minutes Per Game Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Minutes' },
+                            height: 500,
+                            width: 800,
+                        }}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className="player-stats-container">
             {statsLoading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="stats">
-                    <h3>Stats</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Season</th>
-                                <th>Team</th>
-                                <th>Games</th>
-                                <th>Minutes</th>
-                                <th>Points</th>
-                                <th>Rebounds</th>
-                                <th>Assists</th>
-                                <th>Steals</th>
-                                <th>Blocks</th>
-                            </tr>
-                        </thead>
-                        <tbody className="player-stats-list">
-                            {stats.map((stat) => (
-                                <tr key={stat.year + stat.team_name} className="player-stats">
-                                    <td>{stat.year ?? 'N/A'}</td>
-                                    <td>{stat.team_name ?? 'N/A'}</td>
-                                    <td>{stat.gp ?? 'N/A'}</td>
-                                    <td>{stat.min ?? 'N/A'}</td>
-                                    <td>{stat.pts ?? 'N/A'}</td>
-                                    <td>{stat.reb ?? 'N/A'}</td>
-                                    <td>{stat.ast ?? 'N/A'}</td>
-                                    <td>{stat.stl ?? 'N/A'}</td>
-                                    <td>{stat.blk ?? 'N/A'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-
-                    <div className="player-stats-graph">
-                        <Plot
-                            data={[
-                                {
-                                    x: seasonsTeams,
-                                    y: minutes,
-                                    type: 'scatter',
-                                    mode: 'lines+markers',
-                                    marker: { color: 'black' },
-                                    name: 'Minutes',
-                                },
-                                {
-                                    x: seasonsTeams,
-                                    y: points,
-                                    type: 'scatter',
-                                    mode: 'lines+markers',
-                                    marker: { color: 'red' },
-                                    name: 'Points',
-                                },
-                                {
-                                    x: seasonsTeams,
-                                    y: rebounds,
-                                    type: 'scatter',
-                                    mode: 'lines+markers',
-                                    marker: { color: 'blue' },
-                                    name: 'Rebounds',
-                                },
-                                {
-                                    x: seasonsTeams,
-                                    y: assists,
-                                    type: 'scatter',
-                                    mode: 'lines+markers',
-                                    marker: { color: 'green' },
-                                    name: 'Assists',
-                                }
-                            ]}
-                            layout={{
-                                title: `Player Stats Across Seasons and Teams`,
-                                xaxis: {
-                                    title: 'Season (Team)',
-                                    tickangle: window.innerWidth < 768 ? -30 : -45, // Adjust angle for smaller screens
-                                },
-                                yaxis: { title: 'Stats' },
-                                margin: {
-                                    l: 50, // Left margin
-                                    r: 30, // Right margin for mobile
-                                    t: 50, // Top margin
-                                    b: window.innerWidth < 768 ? 120 : 100, // Bottom margin adjustment
-                                },
-                            }}
-                            useResizeHandler={true} // Enable responsive resizing
-                            style={{ width: '100%', height: window.innerWidth < 768 ? '400px' : '600px' }} // Adjust size dynamically
-                            config={{
-                                responsive: true, // Ensure chart adjusts on resize
-                            }}
-                        />
+                <div className="average-stats" style={{ background: statBoardColor }}>
+                    <div className="points">
+                        <div className="stat-title">Points</div>
+                        <div className="stat-value">
+                            {(points.reduce((a, b) => a + b, 0) / points.length).toFixed(1)}
+                        </div>
+                    </div>
+                    <div className="other-stats">
+                        <div className="stat-item">
+                            <div className="stat-title">Rebounds</div>
+                            <div className="stat-value">
+                                {(rebounds.reduce((a, b) => a + b, 0) / rebounds.length).toFixed(1)}
+                            </div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-title">Assists</div>
+                            <div className="stat-value">
+                                {(assists.reduce((a, b) => a + b, 0) / assists.length).toFixed(1)}
+                            </div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-title">Steals</div>
+                            <div className="stat-value">
+                                {(steals.reduce((a, b) => a + b, 0) / steals.length).toFixed(1)}
+                            </div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-title">Blocks</div>
+                            <div className="stat-value">
+                                {(blocks.reduce((a, b) => a + b, 0) / blocks.length).toFixed(1)}
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
+
+            <div className="player-stats-advanced-container">
+                <h2>Player Stats</h2>
+                <div className="player-stats-advanced">
+                    <div className="graph-selector">
+                        <label htmlFor="graphType">Select Graph:</label>
+                        <select
+                            id="graphType"
+                            value={selectedGraph}
+                            onChange={(e) => setSelectedGraph(e.target.value)}
+                        >
+                            <option value="shotDistribution">Shot Distribution</option>
+                            <option value="pointsOverTime">Points Over Time</option>
+                            <option value="minutesPerGame">Minutes Per Game</option>
+                        </select>
+                    </div>
+
+                    <div className="player-stats-graph">
+                        {renderGraph()}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

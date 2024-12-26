@@ -19,13 +19,12 @@
 }
 
 #contact-form {
-    width: 300px;
+    width: 600px;
     margin: 0 auto;
     padding: 20px;
     border-radius: 10px;
     
 }
-
 
 /* Label styling */
 .form-label {
@@ -77,4 +76,36 @@
 .contact-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+/* Button styling */
+.contact-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Button hover effect */
+.contact-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Button disabled state */
+.contact-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Textarea specific styling */
+textarea.form-input {
+    min-height: 300px;
+    resize: vertical;
 }
