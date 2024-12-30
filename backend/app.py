@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, redirect, url_for, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
+from waitress import serve
 import os
 import psycopg2
 import psycopg2.extras
@@ -12,7 +13,7 @@ import requests
 import random
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app)
 
 # Load environment variables
 load_dotenv()
@@ -21,7 +22,7 @@ hostname = os.getenv('HOSTNAME')
 username = os.getenv('USER')
 password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
-port = os.getenv('PORT')
+port = os.getenv('DB_PORT')
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -369,4 +370,5 @@ def contact():
         return jsonify({'error': 'Failed to send message.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
