@@ -51,14 +51,13 @@ def get_db_connection():
         print(f"Error: {str(e)}")
         connection = None
 
-
     return connection
 
 @app.route('/')
 def home():
     connection = get_db_connection()
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
+    print("Connected to the database")
     return "Hello, World!"
 
 @app.route('/teams', methods=['GET'])
@@ -437,4 +436,4 @@ def contact():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    serve(app, host='0.0.0.0', port=5000)
+    app.run(debug=True)
