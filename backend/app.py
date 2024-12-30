@@ -34,21 +34,23 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
 mail = Mail(app)
 
-# Connect to the PostgreSQL database
-try:
-    connection = psycopg2.connect(
-        host=hostname,
-        user=username,
-        password=password,
-        dbname=database,
-        port=port
-    )
-    print("Connected to the database")
+def get_db_connection():
 
-    connection = connection
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-except Exception as e:
-    print(f"Error: {str(e)}")
+    # Connect to the PostgreSQL database
+    try:
+        connection = psycopg2.connect(
+            host=hostname,
+            user=username,
+            password=password,
+            dbname=database,
+            port=port
+        )
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        connection = None
+
+    return connection
 
 @app.route('/')
 def home():
@@ -56,7 +58,10 @@ def home():
 
 @app.route('/teams', methods=['GET'])
 def teams():
-
+    
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
     order = request.args.get('order', 'asc').lower()
     order = 'asc' if order not in ['asc', 'desc'] else order
 
@@ -82,10 +87,18 @@ def teams():
 
     teams = cursor.fetchall()
     teams = [dict(team) for team in teams]
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'teams': teams})
 
 @app.route('/teams/<team_id>', methods=['GET'])
 def get_team(team_id):
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     team_id = int(team_id)
     query = """
     SELECT * FROM nba_teams WHERE id = %s;
@@ -93,10 +106,18 @@ def get_team(team_id):
     cursor.execute(query, (team_id,))
     team = cursor.fetchone()
     team = dict(team)
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'team': team})
 
 @app.route('/teams/abbr/<team_abbr>', methods=['GET'])
 def get_team_by_abbr(team_abbr):
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     team_abbr = team_abbr.upper()
     print(team_abbr)
     query = """
@@ -105,10 +126,18 @@ def get_team_by_abbr(team_abbr):
     cursor.execute(query, (team_abbr,))
     team = cursor.fetchone()
     team = dict(team)
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'team': team})
 
 @app.route('/teams/<team_id>/players', methods=['GET'])
 def get_team_players(team_id):
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     team_id = int(team_id)
     query = """
     SELECT
@@ -126,10 +155,18 @@ def get_team_players(team_id):
     cursor.execute(query, (team_id,))
     players = cursor.fetchall()
     players = [dict(player) for player in players]
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'players': players})
 
 @app.route('/players/<player_id>', methods=['GET'])
 def get_player(player_id):
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     player_id = int(player_id)
     query = """
     SELECT
@@ -148,10 +185,18 @@ def get_player(player_id):
     cursor.execute(query, (player_id,))
     player = cursor.fetchone()
     player = dict(player)
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'player': player})
 
 @app.route('/players', methods=['GET'])
 def players():
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     order = request.args.get('order', 'asc').lower()
     team = request.args.get('team', None)
     search = request.args.get('search', None)
@@ -212,6 +257,9 @@ def players():
 
     players = [dict(player) for player in players]
 
+    cursor.close()
+    connection.close()
+
     return jsonify({
         'players': players,
         'total': total_players,
@@ -221,6 +269,10 @@ def players():
 
 @app.route('/all_players', methods=['GET'])
 def all_players():
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     query = """
     SELECT 
         p.*, 
@@ -236,10 +288,18 @@ def all_players():
     cursor.execute(query)
     players = cursor.fetchall()
     players = [dict(player) for player in players]
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'players': players})
 
 @app.route('/well_known_players', methods=['GET'])
 def well_known_players():
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     query = """
     SELECT
         p.*,
@@ -259,10 +319,18 @@ def well_known_players():
     cursor.execute(query)
     players = cursor.fetchall()
     players = [dict(player) for player in players]
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'players': players})
 
 @app.route('/guess_players', methods=['GET'])
 def guess_players():
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     query = """
     SELECT
         p.*,
@@ -282,31 +350,19 @@ def guess_players():
     cursor.execute(query)
     players = cursor.fetchall()
     players = [dict(player) for player in players]
+
+    cursor.close()
+    connection.close()
+
     return jsonify({'players': players})
 
 
-@app.route('/players/random', methods=['GET'])
-def random_player():
-    query = """
-    SELECT 
-        p.*, 
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM 
-        nba_players p
-    JOIN 
-        nba_teams t 
-    ON 
-        p.team_id = t.id;
-    """
-    cursor.execute(query)
-    players = cursor.fetchall()
-    random_player = random.choice(players)
-    random_player = dict(zip([desc[0] for desc in cursor.description], random_player))
-    return jsonify({'random_player': random_player})
-
 @app.route('/players/<player_id>/stats', methods=['GET'])
 def player_stats(player_id):
+
+    connection = get_db_connection()
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
     try:
         player_id = int(player_id)
         query = """
@@ -344,9 +400,14 @@ def player_stats(player_id):
         return jsonify({'stats': stats})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
     
 @app.route('/api/contact', methods=['POST'])
 def contact():
+
+    # Get data from the request
     data = request.get_json()
 
     # Validate data

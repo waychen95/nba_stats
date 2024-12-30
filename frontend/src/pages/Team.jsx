@@ -46,11 +46,11 @@ function Team() {
 
   useEffect(() => {
       async function fetchTeamAndPlayers() {
-          const teamResponse = await fetch(`http://localhost:5000/teams/${teamId}`);
+          const teamResponse = await fetch(`https://nbadle.onrender.com/teams/${teamId}`);
           const teamData = await teamResponse.json();
           setTeam(teamData.team);
 
-          const playerResponse = await fetch(`http://localhost:5000/teams/${teamId}/players`);
+          const playerResponse = await fetch(`https://nbadle.onrender.com/teams/${teamId}/players`);
           const playerData = await playerResponse.json();
 
           if (playerOption === 'Current Players') {
