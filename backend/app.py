@@ -24,6 +24,8 @@ password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 port = os.getenv('DB_PORT')
 
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -56,8 +58,6 @@ def get_db_connection():
 
 @app.route('/')
 def home():
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     return "Hello, World!"
 
@@ -436,5 +436,5 @@ def contact():
         return jsonify({'error': 'Failed to send message.'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    serve(app, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 50100))
+    serve(app, host='0.0.0.0', port=port, threads=6)
