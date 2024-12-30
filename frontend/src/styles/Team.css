@@ -1,89 +1,231 @@
 .team-container {
     display: flex;
     flex-direction: column;
-    margin: 2rem 1rem 0 1rem;
+    background: linear-gradient(to bottom, #00471B, #EEE1C6);
+    font-family: 'arial';
+    margin: 3rem auto;
+    border-radius: 20px;
+    font-size: 20px;
+    padding: 1rem;
+    color: white;
+    width: 80%;
+    height: auto;
+}
+
+.player-filter-dropdown {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%; /* Stretch to full width of its container */
+    max-width: 300px; /* Prevent it from being too wide */
+    margin: 0 auto; /* Center the dropdown in the parent */
+    text-align: center; /* Align text within the dropdown */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-filter-dropdown:focus {
+    outline: none;
+    background-color: rgba(0, 0, 0, 0.7); /* Slightly darker on focus */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+
+.team-content-container {
+    position: relative; /* For absolute positioning of the logo */
+}
+
+.team-logo-image {
+    position: absolute; /* Position relative to the container */
+    top: 10px; /* Adjust top distance */
+    right: 10px; /* Align to the right */
+    width: 120px; /* Adjust the size */
+    height: auto;
+    z-index: 10; /* Ensure it's above other content */
+}
+
+.team-info-container {
+    padding: 1rem;
+}
+
+.team-primary-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.team-details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 2rem auto;
+}
+
+.team-details p {
+    max-width: 400px;
 }
 
 .team {
     color: white;
-    font-size: 5rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
     text-align: center;
-}
-
-.team img {
-    width: 20%;
-    border: 1px solid white;
-    border-radius: 30px;
-    margin-bottom: 1rem;
-}
-
-.team-info {
-    font-size: 3rem;
 }
 
 .team-profile {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
+    margin: 2rem 1rem;
     padding: 1rem;
-    font-size: 2.5rem;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.team-profile h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.team-profile p {
+    margin: 0.5rem 0;
 }
 
 .team-player-list-container {
-    display: flex;
-    flex-direction: column;
-    margin: 2rem 1rem 0 1rem;
+    margin: 1rem 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .team-player-list {
+    list-style-type: none;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 2rem;
-}
-
-.team-player-list a {
-    text-decoration: none;
-}
-
-.team-player-list-container h3 {
-    color: white;
-    font-size: 2rem;
-    margin-top: 1rem;
-    text-align: center;
-    font-weight: 700;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .team-player-card {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
-    background-color: #496880;
-    color: white;
+    text-align: center;
     padding: 1rem;
-    border-radius: 1rem;
-    width: 850px;
-    height: 200px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    text-decoration: none;
 }
 
 .team-player-card:hover {
-    background-color: #304758;
-}
-
-.team-player-card img {
-    width: 25%
+    transform: scale(1.05);
 }
 
 .team-player-card p {
+    margin: 0;
     color: white;
-    font-size: 2.5rem;
-    margin-top: 1rem;
+    padding: 0.5rem;
+}
+
+.loading {
     text-align: center;
-    font-weight: 700;
+    font-size: 1.5rem;
+    color: white;
+}
+
+@media screen and (max-width: 1200px) {
+    .team-container {
+        flex-direction: column;
+        
+        font-size: 18px;
+        max-width: 800px; /* Prevents the container from growing too wide on large screens */
+        min-width: 300px; /* Reduces the min-width to allow smaller devices */
+    }
+
+    .team-player-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team-player-card {
+        width: 80%;
+    }
+
+    .team-details {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .team-container {
+        display: flex;
+        font-size: 16px;
+        align-items: center;
+    }
+
+    .team-logo-image {
+        width: 60px;
+        top: 20px;
+    }
+
+    .team-player-card {
+        width: 80%; /* Ensure player cards fit on the screen */
+        margin: 0 auto; /* Center-align player cards */
+    }
+
+    .team-player-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+
+    .team-logo-image {
+        top: -40px; /* Adjust vertically to be on top of the red border */
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Center-align by adjusting for logo's width */
+        width: 70px; /* Adjust size as needed */
+        height: 70px; /* Maintain square aspect ratio */
+        z-index: 10; /* Ensure it stays above other elements */
+    }
+
+    .team-details {
+        margin: 0.5rem 0; /* Reduce space between team details */
+    }
+    
+}
+
+@media screen and (max-width: 375px) { /* Target iPhone 14 screen size */
+    .team-container {
+        width: 100%; /* Ensure the container takes the full width */
+        font-size: 14px; /* Smaller text for smaller screens */
+        padding: 1rem; /* Reduce padding */
+    }
+
+    .team-logo-image {
+        width: 80px; /* Smaller logo for smaller screens */
+        top: 8px;
+        right: 8px;
+    }
+
+    .team-details {
+        margin: 1rem 0; /* Reduce space between team details */
+    }
+
+    .team-primary-info {
+        flex-direction: column; /* Stack primary info vertically */
+        text-align: left;
+    }
+
+    .team {
+        font-size: 2rem; /* Smaller team name font size */
+    }
 }

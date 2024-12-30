@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import TeamList from './pages/TeamList';
@@ -12,26 +12,37 @@ import GuessTeamLogo from './pages/GuessTeamLogo';
 import GuessWhoAmI from './pages/GuessWhoAmI.jsx';
 
 function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <Router>
-      <div>
-        <div id='banner'></div>
+      <div id="app">
+        <div id="banner"></div>
         <nav>
-          <ul id='nav-bar'>
+          <div className="hamburger-menu" onClick={toggleMenu}>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <ul id="nav-bar" className={menuOpen ? 'mobile-visible' : ''}>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
             </li>
             <li>
-              <Link to="/games">Games</Link>
+              <Link to="/games" onClick={() => setMenuOpen(false)}>Games</Link>
             </li>
             <li>
-              <Link to="/teams">Teams</Link>
+              <Link to="/teams" onClick={() => setMenuOpen(false)}>Teams</Link>
             </li>
             <li>
-              <Link to="/players">Players</Link>
+              <Link to="/players" onClick={() => setMenuOpen(false)}>Players</Link>
             </li>
             <li>
-              <Link to="/contact">Contact</Link>
+              <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
             </li>
           </ul>
         </nav>
@@ -40,19 +51,23 @@ function App() {
           <Route path="/games">
             <Route index element={<Games />} />
             <Route path="image" element={<Guess />} />
-            <Route path='team' element={<GuessTeamLogo />} />
-            <Route path='whoami' element={<GuessWhoAmI />} />
+            <Route path="team" element={<GuessTeamLogo />} />
+            <Route path="whoami" element={<GuessWhoAmI />} />
           </Route>
           <Route path="/teams">
             <Route index element={<TeamList />} />
             <Route path=":teamId" element={<Team />} />
           </Route>
-          <Route path="/players" >
+          <Route path="/players">
             <Route index element={<PlayerList />} />
             <Route path=":id" element={<Player />} />
           </Route>
           <Route path="/contact" element={<Contact />} />
         </Routes>
+        <div className='footer'>
+          <p>&copy; NBAdle</p>
+          <p>All data were obtained from <a href='https://www.sportingnews.com/'>Sporting News</a></p>
+        </div>
       </div>
     </Router>
   );

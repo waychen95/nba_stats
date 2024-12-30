@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/TeamLogoPlayerCard.css';
 
-function PlayerCard( { player, correctPlayer } ) {
+function TeamLogoPlayerCard( { player, correctPlayer } ) {
 
     const [correct, setCorrect] = useState(false);
     
@@ -31,4 +31,4 @@ function PlayerCard( { player, correctPlayer } ) {
     
 }
 
-export default PlayerCard;
+export default TeamLogoPlayerCard;

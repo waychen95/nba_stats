@@ -109,7 +109,7 @@ def get_team_players(team_id):
     ON
         p.team_id = t.id
     WHERE
-        p.team_id = %s AND p.active = TRUE;
+        p.team_id = %s;
     """
     cursor.execute(query, (team_id,))
     players = cursor.fetchall()
@@ -221,6 +221,29 @@ def all_players():
         nba_teams t 
     ON 
         p.team_id = t.id;
+    """
+    cursor.execute(query)
+    players = cursor.fetchall()
+    players = [dict(player) for player in players]
+    return jsonify({'players': players})
+
+@app.route('/well_known_players', methods=['GET'])
+def well_known_players():
+    query = """
+    SELECT
+        p.*,
+        t.name AS team_name,
+        t.conference AS team_conference
+    FROM nba_players p
+    LEFT JOIN (
+        SELECT player_id
+        FROM nba_player_stats
+        GROUP BY player_id
+        HAVING COUNT(*) >= 6
+    ) AS players_with_more_than_6_stats
+    ON p.id = players_with_more_than_6_stats.player_id
+    JOIN nba_teams t ON p.team_id = t.id
+    WHERE players_with_more_than_6_stats.player_id IS NOT NULL;
     """
     cursor.execute(query)
     players = cursor.fetchall()

@@ -633,11 +633,11 @@ def main():
 
     active_player_df = pd.read_csv('active_players.csv')
 
-    player_df = pd.read_csv('players/player_data_G.csv')
+    player_df = pd.read_csv('players/player_data_Š.csv')
 
-    # player_number_age_scraper(player_df, 'G')
+    player_number_age_scraper(player_df, 'Š')
 
-    player_bio_scraper(player_df, 'G')
+    player_bio_scraper(player_df, 'Š')
 
 
 if __name__ == '__main__':

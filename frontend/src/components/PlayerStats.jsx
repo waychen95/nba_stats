@@ -163,36 +163,39 @@ function PlayerStats({ playerId, teamName }) {
             {statsLoading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="average-stats" style={{ background: statBoardColor }}>
-                    <div className="points">
-                        <div className="stat-title">Points</div>
-                        <div className="stat-value">
-                            {(points.reduce((a, b) => a + b, 0) / points.length).toFixed(1)}
-                        </div>
-                    </div>
-                    <div className="other-stats">
-                        <div className="stat-item">
-                            <div className="stat-title">Rebounds</div>
+                <div className="player-stats-summary">
+                    <h2>Career Stats (Regular Season)</h2>
+                    <div className="average-stats" style={{ background: statBoardColor }}>
+                        <div className="points">
+                            <div className="stat-title">Points</div>
                             <div className="stat-value">
-                                {(rebounds.reduce((a, b) => a + b, 0) / rebounds.length).toFixed(1)}
+                                {(points.reduce((a, b) => a + b, 0) / points.length).toFixed(1)}
                             </div>
                         </div>
-                        <div className="stat-item">
-                            <div className="stat-title">Assists</div>
-                            <div className="stat-value">
-                                {(assists.reduce((a, b) => a + b, 0) / assists.length).toFixed(1)}
+                        <div className="other-stats">
+                            <div className="stat-item">
+                                <div className="stat-title">Rebounds</div>
+                                <div className="stat-value">
+                                    {(rebounds.reduce((a, b) => a + b, 0) / rebounds.length).toFixed(1)}
+                                </div>
                             </div>
-                        </div>
-                        <div className="stat-item">
-                            <div className="stat-title">Steals</div>
-                            <div className="stat-value">
-                                {(steals.reduce((a, b) => a + b, 0) / steals.length).toFixed(1)}
+                            <div className="stat-item">
+                                <div className="stat-title">Assists</div>
+                                <div className="stat-value">
+                                    {(assists.reduce((a, b) => a + b, 0) / assists.length).toFixed(1)}
+                                </div>
                             </div>
-                        </div>
-                        <div className="stat-item">
-                            <div className="stat-title">Blocks</div>
-                            <div className="stat-value">
-                                {(blocks.reduce((a, b) => a + b, 0) / blocks.length).toFixed(1)}
+                            <div className="stat-item">
+                                <div className="stat-title">Steals</div>
+                                <div className="stat-value">
+                                    {(steals.reduce((a, b) => a + b, 0) / steals.length).toFixed(1)}
+                                </div>
+                            </div>
+                            <div className="stat-item">
+                                <div className="stat-title">Blocks</div>
+                                <div className="stat-value">
+                                    {(blocks.reduce((a, b) => a + b, 0) / blocks.length).toFixed(1)}
+                                </div>
                             </div>
                         </div>
                     </div>

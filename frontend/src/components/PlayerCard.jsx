@@ -62,10 +62,10 @@ function PlayerCard( { player, correctPlayer } ) {
     return (
         <div className='guessed-player-cards-div'>
             <div className='guessed-player-cards'>
-                <img src={player.image_url} alt={player.name} />
-                <div className={`player-guess-info info-1 `}>
-                    <p>{player.first_name} {player.last_name}</p>
-                </div>
+                    <img src={player.image_url} alt={player.name} />
+                    <div className={`player-guess-info info-1 `}>
+                        <p>{player.first_name} {player.last_name}</p>
+                    </div>
                 <div className={`player-guess-info info-2 ${correctTeam ? 'correct-team' : 'incorrect'}`}>
                     <label>Team</label>
                     <p>{player.team_name}</p>

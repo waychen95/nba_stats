@@ -37,15 +37,27 @@ class PlayerDatabase():
 
         data.drop('height', axis=1, inplace=True)
 
-        # if 'number' is in '%s-%s' format, split it and take the first number
-        data['number'] = data['number'].apply(lambda x: x.split('-')[0] if '-' in x else x)
+        # Clean up 'number' column to remove extra spaces and then convert to integer
+        data['number'] = data['number'].astype(str).str.strip()  # Remove extra spaces
+        data['number'] = data['number'].apply(lambda x: x.split('-')[0] if '-' in x else x)  # Handle '%s-%s' format
+        data['number'] = data['number'].apply(lambda x: x.split(' ')[0] if ' ' in x else x)  # Handle '%s %s' format
 
-        data['number'] = data['number'].astype(int).astype(str)
+        # Convert 'number' to numeric (if possible), handle cases like '7.0' as 7
+        def convert_to_int(value):
+            try:
+                # Try converting value to float first, then to integer if it's a float
+                return int(float(value))
+            except ValueError:
+                print(f"Could not convert {value} to integer")
+                return value  # Return the original value if it can't be converted
+
+        # Apply conversion function
+        data['number'] = data['number'].apply(convert_to_int).astype(str)  # Convert to integer and back to string
 
         data['feet'] = data['feet'].apply(int)
         data['inches'] = data['inches'].apply(int)
 
-        # drop rows with missing team_url
+        # Drop rows with missing team_url
         data = data.dropna(subset=['team_url'])
 
         data['team_full_name'] = data['team_url'].apply(lambda x: x.split('/')[-2].strip())
@@ -56,14 +68,16 @@ class PlayerDatabase():
 
         active_player_df = pd.read_csv('active_players.csv')
 
-        # set active column to False for players not in active_players.csv
+        # Set active column to False for players not in active_players.csv
         data.loc[~data['id'].isin(active_player_df['id']), 'active'] = False
 
-        data.to_csv('players/player_data_A_reformat.csv', index=False)
+        data.to_csv('players/player_data_reformat.csv', index=False)
         
         print(data.head())
 
         return data
+
+
     
     def create_team_table(self):
         create_table = """
@@ -412,7 +426,7 @@ class PlayerStatsDatabase():
 
         player_team_df.columns = ['player_id', 'past_teams']
 
-        player_team_df.to_csv('player_team_data_B.csv', index=False)
+        player_team_df.to_csv('past_teams/player_team_data.csv', index=False)
 
         print(player_team_df.head())
 
@@ -438,7 +452,7 @@ class PlayerStatsDatabase():
         # Sanitize specific columns
         df = df.where(pd.notnull(df), None)
 
-        df.to_csv('player_stats_B_reformat.csv', index=False)
+        df.to_csv('player_stats_reformat.csv', index=False)
 
         return df
     
@@ -602,7 +616,6 @@ class PlayerUpdateDatabase():
         
         data = bio_df.copy()
 
-        # player_df = pd.read_csv('players/player_data_B_reformat.csv')
         # missing_data = player_df[player_df[['id', 'number', 'position', 'height', 'weight']].isna().any(axis=1)]
 
         # missing_data.to_csv('missing_bio_data_new.csv', index=False)
@@ -631,6 +644,12 @@ class PlayerUpdateDatabase():
 
         # Set 'number' to None if it is not numeric, except if it is already NULL
         data['number'] = data['number'].apply(lambda x: None if pd.notnull(x) and not str(x).isnumeric() else x)
+
+        # Set 'age' to None if it is not numeric, except if it is already NULL
+        data['age'] = data['age'].apply(lambda x: None if pd.notnull(x) and not str(x).isnumeric() else x)
+
+        # set 'birthdate' to '' if it is 'No birthdate available'
+        data['birthdate'] = data['birthdate'].apply(lambda x: '' if x == 'No birthdate available' else x)
 
         # data['number'] = data['number'].apply(lambda x: None if not x.isnumeric() else x)
 
@@ -732,9 +751,9 @@ def main():
         if conn:
             print('Connected to database')
 
-        
+        # Š
 
-        # player_df = pd.read_csv('players/player_data_B.csv')
+        # player_df = pd.read_csv('players/player_data_Š.csv')
 
         # player_db = PlayerDatabase(conn, player_df)
 
@@ -742,7 +761,7 @@ def main():
 
     
 
-        # player_stats_df = pd.read_csv('player_stats/player_stats_B.csv')
+        # player_stats_df = pd.read_csv('player_stats/player_stats_Š.csv')
         # player_stats_db = PlayerStatsDatabase(conn, player_stats_df)
 
         # player_stats_db.insert_all_player_stats()
@@ -751,12 +770,15 @@ def main():
 
 
 
-        player_age_df = pd.read_csv('player_ages/player_number_age_B.csv')
-        player_bio_df = pd.read_csv('player_bios/player_bio_B.csv')
+        player_age_df = pd.read_csv('player_ages/player_number_age_Š.csv')
+        player_bio_df = pd.read_csv('player_bios/player_bio_Š.csv')
+
+        print(player_age_df.head())
+        print(player_bio_df.head())
 
         player_update_db = PlayerUpdateDatabase(conn, player_age_df, player_bio_df)
 
-        # player_update_db.update_players_age()
+        player_update_db.update_players_age()
 
         player_update_db.update_players_bio()
 

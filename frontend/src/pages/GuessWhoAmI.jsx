@@ -15,16 +15,18 @@ function GuessWhoAmI() {
     const [tries, setTries] = useState(0);
     const [bio, setBio] = useState("");
     const [hint, setHint] = useState(false);
-    const [maxTries, setMaxTries] = useState(3);
+    const [maxTries, setMaxTries] = useState(4);
 
     useEffect(() => {
         async function fetchPlayers() {
             try {
-                const response = await fetch('http://localhost:5000/all_players');
+                const response = await fetch('http://localhost:5000/well_known_players');
                 const data = await response.json();
                 let playerList = data.players;
 
                 playerList = playerList.filter(player => player.professional_bio !== 'No professional bio available' && player.before_nba_bio !== "No before NBA bio available" && player.personal_bio !== "No personal bio available");
+
+                playerList = playerList.filter(player => player.professional_bio !== null && player.before_nba_bio !== null && player.personal_bio !== null);
 
                 setAllPlayers(playerList);
 
@@ -136,11 +138,19 @@ function GuessWhoAmI() {
                     </div>
                     {hint && (
                         <div className='hint'>
-                            <p>Hint: The player's first name is {correctPlayer.first_name}.</p>
+                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}.</p>
                         </div>
                     )}
-                    {tries >= 3 && (
-                        <div className='hint button' onClick={() => setHint(hint => !hint)}>Hint ({maxTries - tries})</div>
+                    {tries >= 1 && (
+                        <div 
+                            className={`hint button ${tries >= maxTries ? '' : 'disabled'}`} 
+                            onClick={() => {
+                                if (tries < maxTries) return; // Prevent click action if below maxTries
+                                setHint(hint => !hint);
+                            }}
+                        >
+                            Hint ({maxTries - tries > 0 ? maxTries - tries : 0})
+                        </div>                    
                     )}
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>

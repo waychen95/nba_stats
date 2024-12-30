@@ -6,6 +6,15 @@
     height: 100%;
 }
 
+.player-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
 .average-stats {
     display: grid;
     grid-template-columns: 1fr 2fr; /* Points on left, others on right */
@@ -16,6 +25,10 @@
     width: 80%;
     color: white;
     font-family: Arial, sans-serif;
+}
+
+.average-stats-title {
+    display: none;
 }
 
 .points {
@@ -171,6 +184,10 @@
 @media screen and (max-width: 1500px) {
     .average-stats {
         width: 80%;
+    }
+
+    .average-stats-title {
+        display: block;
     }
 
     .points .stat-value {

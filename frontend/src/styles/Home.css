@@ -88,3 +88,59 @@ a.button {
     text-decoration: none;
 }
 
+/* Mobile Responsive Styles */
+@media screen and (max-width: 830px) {
+    #container {
+        padding: 1rem;
+        height: auto;
+    }
+
+    #button-container {
+        gap: 1rem;
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .button {
+        font-size: 1.2rem; /* Reduce font size on smaller screens */
+        padding: 1rem;
+        height: 70px;
+        width: 100%;
+        max-width: 250px;
+        margin: 0 auto;
+    }
+
+    .call_to_action {
+        padding: 1.5rem;
+        width: 90%; /* Take up most of the screen width on mobile */
+        max-width: 600px;
+    }
+
+    .contact {
+        width: 100%;
+        height: 80px; /* Adjust height for mobile */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #container img {
+        max-width: 200px; /* Further reduce logo size for smaller screens */
+    }
+
+    .button {
+        font-size: 1rem; /* Smaller font size for very small screens */
+        padding: 0.8rem 1.2rem;
+        height: 60px; /* Reduce height on smaller screens */
+    }
+
+    .contact {
+        height: 70px; /* Adjust contact button height for very small screens */
+    }
+
+    .call_to_action {
+        padding: 1rem;
+        width: 90%;
+        max-width: 300px;
+
+    }
+}

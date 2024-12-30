@@ -121,4 +121,131 @@
     align-items: center;
 }
 
+/* Media Queries for Responsiveness */
 
+@media screen and (max-width: 1200px) {
+    .guess-button {
+        font-size: 1.3rem;
+    }
+
+    .search-bar {
+        width: 70%;
+        font-size: 1.5rem;
+    }
+
+    .search-bar input {
+        font-size: 1.3rem;
+        padding: 0.8rem;
+        width: 75%;
+    }
+
+    .player-info h2 {
+        font-size: 1.5rem;
+    }
+
+    .incorrect-players {
+        padding: 1rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .guess-button {
+        font-size: 1.2rem;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .search-bar {
+        width: 80%;
+        font-size: 1.4rem;
+        padding: 1rem;
+    }
+
+    .search-bar input {
+        font-size: 1.2rem;
+        padding: 0.8rem;
+        width: 90%;
+    }
+
+    .player-info h2 {
+        font-size: 1.3rem;
+    }
+
+    .incorrect-players {
+        padding: 1rem;
+        margin-bottom: 0;
+    }
+
+    .next-button {
+        font-size: 2.5rem;
+        width: 80%;
+        padding: 1rem 2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .guess-button {
+        font-size: 1.1rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .search-bar {
+        width: 85%;
+        font-size: 1.3rem;
+        padding: 1rem;
+    }
+
+    .search-bar input {
+        font-size: 1.1rem;
+        padding: 0.8rem;
+        width: 90%;
+    }
+
+    .player-info h2 {
+        font-size: 1.2rem;
+    }
+
+    .incorrect-players {
+        padding: 1rem;
+        margin-bottom: 0;
+    }
+
+    .next-button {
+        font-size: 2rem;
+        width: 100%;
+        padding: 1rem 2rem;
+    }
+}
+
+@media screen and (max-width: 375px) { /* Target small screen sizes like iPhone 5 */
+    .guess-button {
+        font-size: 1rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .search-bar {
+        width: 90%;
+        font-size: 1.2rem;
+        padding: 1rem;
+    }
+
+    .search-bar input {
+        font-size: 1rem;
+        padding: 0.7rem;
+        width: 90%;
+    }
+
+    .player-info h2 {
+        font-size: 1rem;
+    }
+
+    .incorrect-players {
+        padding: 1rem;
+        margin-bottom: 0;
+    }
+
+    .next-button {
+        font-size: 1.8rem;
+        width: 100%;
+        padding: 1rem 1.5rem;
+    }
+}

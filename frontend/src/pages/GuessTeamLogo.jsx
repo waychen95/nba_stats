@@ -16,6 +16,8 @@ function GuessTeamLogo() {
     const [correct, setCorrect] = useState(false);
     const [incorrectPlayers, setIncorrectPlayers] = useState([]);
     const [tries, setTries] = useState(0);
+    const [hint, setHint] = useState(false);
+    const [maxTries, setMaxTries] = useState(4);
 
     useEffect(() => {
         async function fetchTeam(abbr) {
@@ -34,7 +36,7 @@ function GuessTeamLogo() {
 
         async function fetchPlayers() {
             try {
-                const response = await fetch('http://localhost:5000/all_players');
+                const response = await fetch('http://localhost:5000/well_known_players');
                 const data = await response.json();
                 const playerList = data.players;
 
@@ -90,7 +92,8 @@ function GuessTeamLogo() {
             setSearchResults([]);
             setShowDropdown(false);
         }
-    }, [search, allPlayers, incorrectPlayers, dropdownLocked]);
+
+    }, [search, allPlayers, incorrectPlayers, dropdownLocked, tries]);
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
@@ -140,6 +143,22 @@ function GuessTeamLogo() {
                             <img key={team.id} src={team.logo_url} alt={team.name} />
                         ))}
                     </div>
+                    {hint && (
+                        <div className='hint'>
+                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}.</p>
+                        </div>
+                    )}
+                    {tries >= 1 && (
+                        <div 
+                            className={`hint button ${tries >= maxTries ? 'disabled' : ''}`} 
+                            onClick={() => {
+                                if (tries < maxTries) return; // Prevent click action if below maxTries
+                                setHint(hint => !hint);
+                            }}
+                        >
+                            Hint ({maxTries - tries > 0 ? maxTries - tries : 0})
+                        </div>     
+)}
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>
                             <input

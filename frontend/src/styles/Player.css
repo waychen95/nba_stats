@@ -2,15 +2,14 @@
     display: flex;
     background: linear-gradient(to bottom, #8E2325, #C27E7E);
     font-family: 'arial';
-    margin: 2rem 2rem;
     border-radius: 20px;
     font-size: 20px;
-    padding: 1rem;
     color: white;
-    width: 70%;
-    min-width: 560px;
-    margin: 3rem auto 0 auto;
+    margin: 3rem auto 3rem auto;
+    max-width: 1700px;
+    width: 80%;
     position: relative;
+    height: 100%;
 }
 
 .team-logo {
@@ -20,8 +19,6 @@
     transform: translateX(-50%); /* Center-align by adjusting for logo's width */
     width: 100px; /* Adjust size as needed */
     height: 100px; /* Maintain square aspect ratio */
-    border-radius: 50%; /* Optional: Make it circular */
-    background-color: #fff; /* Optional: Add white background for contrast */
     z-index: 10; /* Ensure it stays above other elements */
 }
 
@@ -37,7 +34,6 @@
     flex-direction: row;
     align-items: flex-start;
     padding: 1rem;
-    min-width: 300px;
     margin: 0 auto;
 }
 
@@ -92,6 +88,10 @@
     padding: 1rem;
 }
 
+.player-second-info p {
+    padding: 0.5rem;
+}
+
 .player-stats-container {
     display: flex;
     flex-direction: column;
@@ -101,10 +101,12 @@
 }
 
 .player-bio {
-    max-height: 600px; /* Fixed height for the bio section */
+    max-height: 750px; /* Fixed height for the bio section */
     overflow-y: auto; /* Enable vertical scrolling */
     padding: 10px;
     margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
     border-radius: 8px; /* Rounded corners for a modern look */
     scrollbar-width: thin; /* For Firefox: Make the scrollbar thinner */
 }
@@ -130,7 +132,6 @@
 }
 
 
-
 @media screen and (max-width: 1500px) {
     .player-container {
         flex-direction: column;
@@ -154,4 +155,73 @@
         margin: 0.5rem;
     }
     
+    .player-bio {
+        max-height: 400px;
+    }
+    
+    .team-logo {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media screen and (max-width: 780px) {
+    .player-container {
+        font-size: 13px;
+        width: 95%;
+        margin-bottom: 2rem;
+    }
+
+    .player-content-container {
+        padding: 0.2rem;
+    }
+
+    .player-stats-container {
+        flex-direction: column;
+        align-items: center;
+        margin: 0.5rem;
+    }
+    
+    .player-bio {
+        max-height: 300px;
+        width: 95%;
+    }
+    
+    .team-logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .player-second-info p {
+        max-width: 100px;
+        max-height: 32px;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .player-primary-info {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 2rem;
+    }
+
+    .player-second-info {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    .player-bio {
+        width: 90%;
+    }
+
+    .player-stats-container {
+        margin-top: 2rem 0 0 0;
+        padding: 0;
+    }
+
+    .player-name h1 {
+        text-align: center;
+    }
 }

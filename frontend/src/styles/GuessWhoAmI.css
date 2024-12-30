@@ -8,6 +8,8 @@
     background-color: #304758;
     margin: 3rem auto;
     text-align: left;
+    max-height: 600px;
+    overflow: auto;
 }
 
 .hint {
@@ -15,5 +17,49 @@
     justify-content: center;
     align-items: center;
     margin-top: 1rem;
-    margin: auto
+    margin: auto;
+}
+
+.hint p {
+    font-size: 1.5rem;
+}
+
+.hint.button.disabled {
+    pointer-events: none; /* Disable clicks */
+    opacity: 0.8;         /* Dim the appearance */
+    cursor: not-allowed;  /* Show a disabled cursor */
+}
+
+
+@media screen and (max-width: 768px) {
+    .guess-whoami-player {
+        font-size: 1rem;
+        padding: 1.5rem;
+        width: 80%;
+    }
+
+    .guess-whoami-player h2 {
+        font-size: 1.4rem;
+    }
+
+    .hint {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .guess-whoami-player {
+        font-size: 1rem;
+        padding: 1rem;
+        width: 90%;
+        max-height: 400px;
+    }
+
+    .hint {
+        font-size: 0.8rem;
+    }
+
+    .hint p {
+        font-size: 1rem;
+    }
 }

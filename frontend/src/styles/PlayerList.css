@@ -165,7 +165,12 @@
   
 
 /* Responsive styles for mobile screens */
-@media (max-width: 768px) {
+@media (max-width: 1600px) {
+
+    .player-list {
+        padding: 0.5rem;
+    }
+
     .player-list-container h1 {
         font-size: 3rem;
     }
@@ -182,7 +187,17 @@
 
     .search-bar {
         width: 100% !important;
-        padding: 0;
+        padding: 0 !important;
+    }
+
+    .search-bar input {
+        margin: 0 !important;
+        padding: 0.5rem !important;
+        font-size: 20px !important;
+    }
+
+    .search-bar label {
+        font-size: 1.2rem;
     }
 
     .player-list-dropdowns {

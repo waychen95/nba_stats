@@ -1,4 +1,3 @@
-
 .contact-container {
     display: flex;
     flex-direction: column;
@@ -12,18 +11,20 @@
     border: 3px solid black;
     border-radius: 50px;
     padding: 2rem;
-    width: 800px;
+    width: 90%; /* Make width responsive */
+    max-width: 800px; /* Keep a max width for larger screens */
     background-color: #1F4278;
     letter-spacing: 0.05em;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 #contact-form {
-    width: 600px;
+    width: 100%; /* Full width for the form */
+    max-width: 600px; /* Limit the form's max width */
     margin: 0 auto;
     padding: 20px;
     border-radius: 10px;
-    
+    box-sizing: border-box;
 }
 
 /* Label styling */
@@ -31,7 +32,7 @@
     display: block;
     font-weight: bold;
     margin-bottom: 10px;
-    font-size: 14px;
+    font-size: 1rem; /* Adjusted for readability on smaller screens */
 }
 
 /* Input field styling */
@@ -43,7 +44,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 1rem; /* Adjust font size */
 }
 
 /* Input focus state */
@@ -56,36 +57,11 @@
 /* Button styling */
 .contact-button {
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-/* contact-Button hover effect */
-.contact-button:hover {
-    background-color: #0056b3;
-}
-
-/* contact-Button disabled state */
-.contact-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-/* Button styling */
-.contact-button {
-    width: 100%;
     padding: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: white;
     background-color: #007bff;
+    color: white;
+    font-size: 1rem; /* Adjust font size */
+    font-weight: bold;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -106,6 +82,48 @@
 
 /* Textarea specific styling */
 textarea.form-input {
-    min-height: 300px;
+    min-height: 150px; /* Reduce min height for mobile */
     resize: vertical;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .contact-container {
+        margin-top: 5rem; /* Reduce margin for smaller screens */
+        padding: 1.5rem; /* Adjust padding */
+        font-size: 1.5rem; /* Adjust font size */
+        width: 85%; /* Adjust width */
+    }
+
+    #contact-form {
+        padding: 15px; /* Reduce padding */
+    }
+
+    .form-label {
+        font-size: 0.9rem; /* Smaller label font */
+    }
+
+    .form-input {
+        font-size: 0.9rem; /* Smaller input font */
+    }
+
+    .contact-button {
+        font-size: 0.9rem; /* Adjust button font size */
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-container {
+        margin-top: 2rem; /* Further reduce margin */
+        font-size: 1.2rem; /* Smaller font size */
+        width: 80%; /* Adjust width */
+    }
+
+    .form-input {
+        font-size: 0.8rem; /* Smaller input font size */
+    }
+
+    .contact-button {
+        font-size: 0.8rem; /* Smaller button font size */
+    }
 }

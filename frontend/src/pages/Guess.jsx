@@ -120,9 +120,9 @@ function Guess() {
                             />
                             {showDropdown && searchResults.length > 0 && (
                                 <ul className='search-dropdown'>
-                                    {searchResults.map((player) => (
+                                    {searchResults.map((player, index) => (
                                         <li
-                                            key={player.id}
+                                            key={`${player.id}-${index}`}
                                             onClick={() => handlePlayerSelect(player)}
                                         >
                                             {player.first_name} {player.last_name}
