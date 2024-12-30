@@ -18,9 +18,17 @@
     margin: 1rem 0;
 }
 
+.guess-team-logo-hint {
+    margin-top: 2rem;
+}
+
+.guess-team-logo-hint-button {
+    margin-top: 2rem;
+}
+
 .hint.button.disabled {
     pointer-events: none; /* Disable clicks */
-    opacity: 0.5;         /* Dim the appearance */
+    opacity: 0.8;         /* Dim the appearance */
     cursor: not-allowed;  /* Show a disabled cursor */
 }
 

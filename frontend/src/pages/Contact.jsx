@@ -2,7 +2,7 @@ import { useState } from 'react';
 import '../styles/Contact.css';
 
 function Contact() {
-  const [formData, setFormData] = useState({ email: '', message: '' });
+  const [formData, setFormData] = useState({ email: '', message: '', first_name: '', last_name: '' });
   const [status, setStatus] = useState('');
 
   const handleChange = (e) => {
@@ -15,23 +15,24 @@ function Contact() {
     setStatus(''); // Clear status on new submission
 
     // Basic validation
-    if (!formData.email || !formData.message) {
+    if (!formData.email || !formData.message || !formData.first_name || !formData.last_name) {
       setStatus('Please fill out all fields.');
       return;
     }
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      
+
       if (response.ok) {
-        setFormData({ email: '', message: '' }); // Reset form
+        setFormData({ email: '', message: '', first_name: '', last_name: '' }); // Reset form
         setStatus('Your message has been sent!');
       } else {
-        throw new Error('Failed to send message.');
+        const errorData = await response.json();
+        setStatus(`Error: ${errorData.message || 'Failed to send message.'}`);
       }
     } catch (error) {
       setStatus('An error occurred. Please try again.');
@@ -87,7 +88,7 @@ function Contact() {
         </label>
         <button type="submit" className="contact-button">Submit</button>
       </form>
-      {status && <p className="status-message">{status}</p>}
+      {status && <p className={`status-message ${status.includes('error') ? 'error' : ''}`}>{status}</p>}
     </div>
   );
 }

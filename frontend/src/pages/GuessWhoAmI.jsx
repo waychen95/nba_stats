@@ -138,7 +138,7 @@ function GuessWhoAmI() {
                     </div>
                     {hint && (
                         <div className='hint'>
-                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}.</p>
+                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}</p>
                         </div>
                     )}
                     {tries >= 1 && (

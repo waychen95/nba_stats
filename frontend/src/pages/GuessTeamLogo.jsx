@@ -119,11 +119,12 @@ function GuessTeamLogo() {
         if (guessPlayer.id === correctPlayer.id) {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
-            setTries((tries) => tries + 1);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
         }
+
+        setTries((tries) => tries + 1);
 
         setSearch('');
         setDropdownLocked(false); // Unlock the dropdown after a guess
@@ -144,13 +145,13 @@ function GuessTeamLogo() {
                         ))}
                     </div>
                     {hint && (
-                        <div className='hint'>
-                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}.</p>
+                        <div className='hint guees-team-logo-hint'>
+                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}</p>
                         </div>
                     )}
                     {tries >= 1 && (
                         <div 
-                            className={`hint button ${tries >= maxTries ? 'disabled' : ''}`} 
+                            className={`hint button ${tries >= maxTries ? '' : 'disabled'} guess-team-logo-hint-button`} 
                             onClick={() => {
                                 if (tries < maxTries) return; // Prevent click action if below maxTries
                                 setHint(hint => !hint);
@@ -158,7 +159,7 @@ function GuessTeamLogo() {
                         >
                             Hint ({maxTries - tries > 0 ? maxTries - tries : 0})
                         </div>     
-)}
+                    )}
                     <div className='search-bar'>
                         <div className='search-dropdown-div'>
                             <input

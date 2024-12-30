@@ -23,7 +23,10 @@ function App() {
       <div id="app">
         <div id="banner"></div>
         <nav>
-          <div className="hamburger-menu" onClick={toggleMenu}>
+        <div 
+            className={`hamburger-menu ${menuOpen ? 'rotate' : ''}`} 
+            onClick={toggleMenu}
+        >
             <div></div>
             <div></div>
             <div></div>

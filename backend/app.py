@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, redirect, url_for, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
+from flask_mail import Mail, Message
 import os
 import psycopg2
 import psycopg2.extras
@@ -21,6 +22,16 @@ username = os.getenv('USER')
 password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 port = os.getenv('PORT')
+
+# Flask-Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+
+mail = Mail(app)
 
 # Connect to the PostgreSQL database
 try:
@@ -207,7 +218,6 @@ def players():
         'limit': limit
     })
 
-
 @app.route('/all_players', methods=['GET'])
 def all_players():
     query = """
@@ -244,6 +254,29 @@ def well_known_players():
     ON p.id = players_with_more_than_6_stats.player_id
     JOIN nba_teams t ON p.team_id = t.id
     WHERE players_with_more_than_6_stats.player_id IS NOT NULL;
+    """
+    cursor.execute(query)
+    players = cursor.fetchall()
+    players = [dict(player) for player in players]
+    return jsonify({'players': players})
+
+@app.route('/guess_players', methods=['GET'])
+def guess_players():
+    query = """
+    SELECT
+        p.*,
+        t.name AS team_name,
+        t.conference AS team_conference
+    FROM nba_players p
+    LEFT JOIN (
+        SELECT player_id
+        FROM nba_player_stats
+        GROUP BY player_id
+        HAVING COUNT(*) >= 7
+    ) AS players_with_more_than_7_stats
+    ON p.id = players_with_more_than_7_stats.player_id
+    JOIN nba_teams t ON p.team_id = t.id
+    WHERE players_with_more_than_7_stats.player_id IS NOT NULL;
     """
     cursor.execute(query)
     players = cursor.fetchall()
@@ -310,6 +343,30 @@ def player_stats(player_id):
         return jsonify({'stats': stats})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/contact', methods=['POST'])
+def contact():
+    data = request.get_json()
+
+    # Validate data
+    if not data.get('email') or not data.get('message') or not data.get('first_name') or not data.get('last_name'):
+        return jsonify({'error': 'All fields are required.'}), 400
+
+    try:
+        # Compose email
+        msg = Message(
+            subject=f"New Contact Form Submission from {data['first_name']} {data['last_name']}",
+            recipients=[os.getenv('MAIL_USERNAME')],
+            body=f"Message from {data['first_name']} {data['last_name']} ({data['email']}):\n\n{data['message']}"
+        )
+
+        # Send email
+        mail.send(msg)
+        return jsonify({'message': 'Message sent successfully!'}), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Failed to send message.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

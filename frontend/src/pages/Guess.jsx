@@ -18,7 +18,7 @@ function Guess() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('http://localhost:5000/all_players');
+            const response = await fetch('http://localhost:5000/guess_players');
             const data = await response.json();
             const playerList = data.players;
 
@@ -85,7 +85,7 @@ function Guess() {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
             if (brightness < 0.8) {
-                setBrightness(brightness + 0.05);
+                setBrightness(brightness + 0.02);
             }
 
             setTries((tries) => tries + 1);

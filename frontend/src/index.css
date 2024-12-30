@@ -88,6 +88,20 @@ html, body {
   height: 3px;
   background-color: white;
   margin: 4px 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Rotate the hamburger menu when it's clicked */
+.hamburger-menu.rotate div:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-menu.rotate div:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.rotate div:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* Responsive styles */
@@ -104,9 +118,7 @@ html, body {
     justify-content: flex-end;
     align-items: flex-end;
   }
-}
 
-@media screen and (max-width: 768px) {
   .hamburger-menu {
     display: flex; /* Show hamburger menu on small screens */
   }
