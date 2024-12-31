@@ -18,13 +18,11 @@ CORS(app)
 # Load environment variables
 load_dotenv()
 
-hostname = os.getenv('HOSTNAME')
-username = os.getenv('USER')
-password = os.getenv('PASSWORD')
-database = os.getenv('DATABASE')
-port = os.getenv('DB_PORT')
-
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+# hostname = os.getenv('HOSTNAME')
+# username = os.getenv('USER')
+# password = os.getenv('PASSWORD')
+# database = os.getenv('DATABASE')
+# port = os.getenv('DB_PORT')
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -41,11 +39,7 @@ def get_db_connection():
     # Connect to the PostgreSQL database
     try:
         connection = psycopg2.connect(
-            host=hostname,
-            user=username,
-            password=password,
-            dbname=database,
-            port=port
+            
         )
         print("Connected to the database")
         
@@ -434,7 +428,10 @@ def contact():
     except Exception as e:
         print(e)
         return jsonify({'error': 'Failed to send message.'}), 500
+    
+def run_app():
+    port = int(os.environ.get("PORT", 50100))
+    serve(app, host='0.0.0.0', port=port, threads=2)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 50100))
-    serve(app, host='0.0.0.0', port=port, threads=6)
+    run_app()
