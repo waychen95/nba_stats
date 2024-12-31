@@ -8,14 +8,16 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 10rem;
+    margin-bottom: 3rem;
     border: 3px solid black;
     border-radius: 50px;
-    padding: 2rem;
+    padding: 1rem;
     width: 90%; /* Make width responsive */
-    max-width: 800px; /* Keep a max width for larger screens */
+    max-width: 700px; /* Keep a max width for larger screens */
     background-color: #1F4278;
     letter-spacing: 0.05em;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
 }
 
 #contact-form {
@@ -86,8 +88,26 @@ textarea.form-input {
     resize: vertical;
 }
 
+@media (max-height: 1000px) {
+    .contact-container {
+        font-size: 1.5rem; /* Adjust font size for smaller screens */
+    }
+
+    .form-label {
+        font-size: 0.9rem; /* Adjust label font size */
+    }
+
+    .form-input {
+        font-size: 0.9rem; /* Adjust input font size */
+    }
+
+    .contact-button {
+        font-size: 0.9rem; /* Adjust button font size */
+    }
+}
+
 /* Media Queries for Responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .contact-container {
         margin-top: 5rem; /* Reduce margin for smaller screens */
         padding: 1.5rem; /* Adjust padding */
