@@ -39,7 +39,7 @@ def get_db_connection():
     # Connect to the PostgreSQL database
     try:
         connection = psycopg2.connect(
-            
+            database_url = os.getenv('DATABASE_URL'),
         )
         print("Connected to the database")
         
