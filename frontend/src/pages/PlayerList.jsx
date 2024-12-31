@@ -23,7 +23,7 @@ function PlayerList() {
   useEffect(() => {
     async function fetchPlayers() {
       setLoading(true);
-      let url = `http://localhost:5000/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
+      let url = `https://nbadle.onrender.com/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
       if (team) {
         url += `&team=${team}`;
       }

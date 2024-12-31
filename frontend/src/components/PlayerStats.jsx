@@ -44,7 +44,7 @@ function PlayerStats({ playerId, teamName }) {
     useEffect(() => {
         async function fetchStats() {
             try {
-                const response = await fetch(`http://localhost:5000/players/${playerId}/stats`);
+                const response = await fetch(`https://nbadle.onrender.com/players/${playerId}/stats`);
                 const data = await response.json();
         
                 // Replace `NaN` values with null or default values

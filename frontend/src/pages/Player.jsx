@@ -52,14 +52,14 @@ function Player() {
 
     useEffect(() => {
         async function fetchPlayerAndTeam() {
-            const response = await fetch(`http://localhost:5000/players/${id}`);
+            const response = await fetch(`https://nbadle.onrender.com/players/${id}`);
             const data = await response.json();
             setPlayer(data.player);
 
             setCmHeight((data.player.feet * 30.48) + (data.player.inches * 2.54));
             setKgWeight(data.player.weight * 0.453592);
 
-            const teamResponse = await fetch(`http://localhost:5000/teams/${data.player.team_id}`);
+            const teamResponse = await fetch(`https://nbadle.onrender.com/teams/${data.player.team_id}`);
             const teamData = await teamResponse.json();
             setTeam(teamData.team);
 

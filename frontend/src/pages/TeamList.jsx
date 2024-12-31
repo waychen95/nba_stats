@@ -13,7 +13,7 @@ function TeamList() {
 
     useEffect(() => {
         async function fetchTeams() {
-            let url = `http://localhost:5000/teams?order=${order}`;
+            let url = `https://nbadle.onrender.com/teams?order=${order}`;
             if (conference) {
                 url += `&conference=${conference}`;
             }

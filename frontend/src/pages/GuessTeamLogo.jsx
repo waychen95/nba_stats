@@ -22,7 +22,7 @@ function GuessTeamLogo() {
     useEffect(() => {
         async function fetchTeam(abbr) {
             try {
-                const response = await fetch(`http://localhost:5000/teams/abbr/${abbr}`);
+                const response = await fetch(`https://nbadle.onrender.com/teams/abbr/${abbr}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch team: ${response.statusText}`);
                 }
@@ -36,7 +36,7 @@ function GuessTeamLogo() {
 
         async function fetchPlayers() {
             try {
-                const response = await fetch('http://localhost:5000/well_known_players');
+                const response = await fetch('https://nbadle.onrender.com/well_known_players');
                 const data = await response.json();
                 const playerList = data.players;
 

@@ -21,7 +21,7 @@ function Contact() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      const response = await fetch('https://nbadle.onrender.com/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -41,7 +41,7 @@ function Contact() {
 
   return (
     <div className="contact-container">
-      <h1>Contact Us</h1>
+      <h1>Contact Us HIHI</h1>
       <form id="contact-form" onSubmit={handleSubmit}>
         <label className="form-label">
           Email:
