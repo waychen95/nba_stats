@@ -180,10 +180,6 @@
         width: 80%;
         padding: 1rem 2rem;
     }
-
-    .player {
-        margin: 0 1rem;
-    }
 }
 
 @media screen and (max-width: 480px) {

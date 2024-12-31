@@ -83,6 +83,45 @@
     width: 100%;
 }
 
+@media (max-height: 1200px) {
+
+    .team-list-dropdowns label {
+        max-width: 100px;
+    }
+
+    .team-list {
+        padding: 0.5rem;
+    }
+    
+    .team-card {
+        width: 200px;
+        height: 200px;
+        padding: 0.75rem;
+    }
+
+    .team-card p {
+        font-size: 1.2rem;
+    }
+
+    .team-list-container h1 {
+        font-size: 3rem;
+    }
+
+    .team-list-dropdowns {
+        flex-direction: column;
+        width: 80%;
+        font-size: 1.2rem;
+        padding: 1.5rem;
+    }
+
+    .team-list-dropdowns select,
+    .team-list-dropdowns input {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+        max-width: 1200px;
+    }
+}
+
 /* Responsive styles for mobile screens */
 @media (max-width: 1600px) {
 

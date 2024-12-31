@@ -7,6 +7,7 @@
     text-align: center;
     box-sizing: border-box;
     height: 100%;
+    margin-top: 2rem;
 }
 
 #container img {
@@ -88,10 +89,10 @@ a.button {
     text-decoration: none;
 }
 
-@media screen and (max-height: 1000px) {
+@media screen and (max-height: 1200px) {
+
     .button {
         font-size: 2.5rem; /* Slightly smaller font size for laptops */
-        padding: 1rem 2rem; /* Adjust padding for better fit */
         height: 100px;
         width: 350px;
     }
