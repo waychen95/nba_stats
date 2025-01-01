@@ -14,7 +14,7 @@
     border-radius: 50px;
     font-family: "Bebas Neue", sans-serif;
     transition: background-color 0.3s ease;
-    font-size: 1.5rem;
+    font-size: 16px;
 }
 
 .guess-button:hover {
@@ -22,15 +22,19 @@
 }
 
 .search-bar {
-    font-size: 2rem;
+    font-size: 14px;
     padding: 1rem;
     border-radius: 1rem;
     background-color: #496880;
-    width: 50%;
+    width: 40%;
     margin: 2rem auto;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.guess-search-bar {
+    max-width: 580px;
 }
 
 .search-bar input {
@@ -75,6 +79,7 @@
     color: white;
     cursor: pointer;
     padding: 1rem;
+    font-size: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -119,6 +124,10 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.player-info h2 {
+    font-size: 2rem;
 }
 
 /* Media Queries for Responsiveness */
@@ -184,7 +193,7 @@
 
 @media screen and (max-width: 480px) {
     .guess-button {
-        font-size: 1.1rem;
+        font-size: 1rem;
         padding: 0.8rem 1rem;
     }
 
@@ -218,7 +227,7 @@
 
 @media screen and (max-width: 375px) { /* Target small screen sizes like iPhone 5 */
     .guess-button {
-        font-size: 1rem;
+        font-size: 0.8rem;
         padding: 0.7rem 1rem;
     }
 

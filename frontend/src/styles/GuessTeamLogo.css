@@ -1,16 +1,20 @@
 .past-teams {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    row-gap: 2rem;
+    column-gap: 0.5rem;
+    margin: auto;
+    padding: 1rem;
+    width: 80%;
+    /* Center content in each grid cell */
+    place-items: center;
 }
 
 .past-teams img {
     background-color: white;
     padding: 0.5rem;
     border-radius: 50%;
-    width: 10%;
+    width: 30%;
 }
 
 .player h2 {
@@ -34,8 +38,12 @@
 
 
 @media screen and (max-width: 768px) {
+    .past-teams {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .past-teams img {
-        width: 16%;
+        width: 35%;
     }
     
 }

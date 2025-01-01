@@ -96,7 +96,7 @@ function PlayerList() {
     <div className='player-list-container'>
       <h1>Players</h1>
       <div className='player-list-dropdowns'>
-        <div className='search-bar'>
+        <div className='search-bar search-list'>
           <label>Search Players:</label>
           <input
             type='text'
@@ -130,7 +130,10 @@ function PlayerList() {
           <label>Past Players:</label>
           <button
             className={`toggle-button ${isActive ? 'active' : 'non-active'}`}
-            onClick={() => setIsActive(!isActive)}
+            onClick={() => {
+              setIsActive(!isActive)
+              setCurrentPage(1); // Reset to first page when toggling active
+            }}
           >
             {isActive ? 'On' : 'Off'}
           </button>

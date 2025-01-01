@@ -108,7 +108,7 @@ function Guess() {
                         <h2>{correct ? `Number of tries: ${tries}` : 'Who is this player?'}</h2>
                         <Link to={`/players/${correctPlayer.id}`}/>
                     </div>
-                    <div className='search-bar'>
+                    <div className='search-bar guess-search-bar'>
                         <div className='search-dropdown-div'>
                             <input
                                 type='text'

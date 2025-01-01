@@ -6,8 +6,8 @@
     align-items: center;
     text-align: center;
     box-sizing: border-box;
-    height: 100%;
     margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 #container img {
@@ -32,9 +32,8 @@ a.button {
 }
 
 .button {
-    padding: 0.5rem 1rem;
     margin: 0.5rem;
-    font-size: 3.5rem;
+    font-size: 2rem;
     text-align: center;
     text-decoration: none;
     background-color: #496880;
@@ -59,7 +58,7 @@ a.button {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
+    font-size: 16px;
     color: white;
     margin: 1rem;
     border: 3px solid black;
@@ -92,7 +91,7 @@ a.button {
 @media screen and (max-height: 1200px) {
 
     .button {
-        font-size: 2.5rem; /* Slightly smaller font size for laptops */
+        font-size: 2rem; /* Slightly smaller font size for laptops */
         height: 100px;
         width: 350px;
     }
@@ -129,7 +128,6 @@ a.button {
 
     .button {
         font-size: 1.2rem; /* Reduce font size on smaller screens */
-        padding: 1rem;
         height: 70px;
         width: 100%;
         max-width: 250px;

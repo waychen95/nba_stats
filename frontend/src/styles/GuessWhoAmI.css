@@ -1,6 +1,6 @@
 .guess-whoami-player {
     font-family: 'Roboto', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     padding: 2rem;
     border: 1px solid white;
     border-radius: 10px;
@@ -8,7 +8,7 @@
     background-color: #304758;
     margin: 3rem auto;
     text-align: left;
-    max-height: 600px;
+    max-height: 500px;
     overflow: auto;
 }
 
