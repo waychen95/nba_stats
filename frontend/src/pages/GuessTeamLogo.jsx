@@ -139,7 +139,17 @@ function GuessTeamLogo() {
             ) : (
                 <div className='player'>
                     <h2>Guess the Player</h2>
-                    <div className='past-teams'>
+                    <div
+                        className="past-teams"
+                        style={{
+                            gridTemplateColumns:
+                            pastTeams.length === 1
+                                ? "1fr"
+                                : pastTeams.length === 2
+                                ? "1fr 1fr"
+                                : "1fr 1fr 1fr",
+                        }}
+                    >
                         {pastTeams.map((team) => (
                             <img key={team.id} src={team.logo_url} alt={team.name} />
                         ))}

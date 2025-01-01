@@ -107,8 +107,8 @@ function PlayerStats({ playerId, teamName }) {
                         layout={{
                             title: 'Shot Distribution (2PT, 3PT, FT)',
                             showlegend: false,
-                            height: 500,
-                            width: 500,
+                            height: 450,
+                            width: 450,
                         }}
                     />
                 );
@@ -128,8 +128,8 @@ function PlayerStats({ playerId, teamName }) {
                             title: 'Points Over Seasons',
                             xaxis: { title: 'Season (Team)' },
                             yaxis: { title: 'Points' },
-                            height: 500,
-                            width: 800,
+                            height: 400,
+                            width: 500,
                         }}
                     />
                 );
@@ -148,8 +148,8 @@ function PlayerStats({ playerId, teamName }) {
                             title: 'Minutes Per Game Over Seasons',
                             xaxis: { title: 'Season (Team)' },
                             yaxis: { title: 'Minutes' },
-                            height: 500,
-                            width: 800,
+                            height: 400,
+                            width: 600,
                         }}
                     />
                 );

@@ -3,13 +3,13 @@
     background: linear-gradient(to bottom, #8E2325, #C27E7E);
     font-family: 'arial';
     border-radius: 20px;
-    font-size: 20px;
+    font-size: 16px;
     color: white;
     margin: 3rem auto 3rem auto;
     max-width: 1700px;
-    width: 80%;
+    width: 90%;
     position: relative;
-    height: 100%;
+    height: auto;
 }
 
 .team-logo {
@@ -35,6 +35,7 @@
     align-items: flex-start;
     padding: 1rem;
     margin: 0 auto;
+    height: 100%;
 }
 
 .player-primary-info {
@@ -131,8 +132,14 @@
     background-color: #000000; /* Slightly lighter red on hover */
 }
 
+@media screen and (min-width: 1700px) {
+    .player-container {
+        width: 85%;
+    }
+}
 
-@media screen and (max-width: 1500px) {
+
+@media screen and (max-width: 1200px) {
     .player-container {
         flex-direction: column;
         min-width: none;
@@ -197,6 +204,13 @@
         max-height: 32px;
     }
 }
+
+@media screen and (max-width: 480px) {
+    .player-primary-info img {
+        width: 35%;
+    }
+}
+
 
 @media screen and (max-width: 375px) {
     .player-primary-info {

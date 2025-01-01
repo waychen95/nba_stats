@@ -1,11 +1,10 @@
 .past-teams {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     row-gap: 2rem;
     column-gap: 0.5rem;
     margin: auto;
     padding: 1rem;
-    width: 80%;
+    width: 70%;
     /* Center content in each grid cell */
     place-items: center;
 }
@@ -14,7 +13,7 @@
     background-color: white;
     padding: 0.5rem;
     border-radius: 50%;
-    width: 30%;
+    width: 20%;
 }
 
 .player h2 {
@@ -40,6 +39,7 @@
 @media screen and (max-width: 768px) {
     .past-teams {
         grid-template-columns: 1fr 1fr;
+        width: 90%;
     }
 
     .past-teams img {

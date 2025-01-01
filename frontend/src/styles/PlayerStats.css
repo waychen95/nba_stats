@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    height: 100%;
+    height: fit-content;
 }
 
 .player-stats {
@@ -77,6 +77,7 @@
     justify-content: center;
     align-items: center;
     margin: 1rem auto;
+    height: 100%;
 }
 
 .player-stats-advanced {
@@ -181,7 +182,7 @@
     background-color: #f0f0f0;
 }
 
-@media screen and (max-width: 1500px) {
+@media screen and (max-width: 1200px) {
     .average-stats {
         width: 80%;
     }
