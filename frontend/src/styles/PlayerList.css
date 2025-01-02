@@ -83,7 +83,6 @@
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    width: 100%;
 }
 
 .player-list-dropdowns input {
@@ -173,6 +172,10 @@
 
 @media (max-width: 2000px) {
     .player-list-dropdowns {
+        width: 100%;
+    }
+
+    .player-list-dropdowns select {
         width: 100%;
     }
 
