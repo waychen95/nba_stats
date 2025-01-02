@@ -58,7 +58,6 @@
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    width: 100%;
     margin: 2rem auto;
     display: flex;
     justify-content: space-around;
@@ -170,7 +169,11 @@
     font-weight: bold;
 }
 
-@media (max-width: 2000px) {
+@media (max-width: 1600px) {
+    .player-list-dropdowns {
+        width: 100%;
+    }
+
     .player-list-dropdowns {
         width: 100%;
     }
