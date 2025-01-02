@@ -169,6 +169,14 @@
     font-weight: bold;
 }
 
+.dropdown-name label {
+    width: 100%;
+}
+
+.dropdown-team label {
+    width: 100%;
+}
+
 @media (max-width: 1600px) {
     .player-list-dropdowns {
         width: 100%;
