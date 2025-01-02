@@ -58,7 +58,7 @@
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    width: 80%;
+    width: 100%;
     margin: 2rem auto;
     display: flex;
     justify-content: space-around;
@@ -172,6 +172,10 @@
 }
 
 @media (max-width: 2000px) {
+    .player-list-dropdowns {
+        width: 100%;
+    }
+
     .search-list label {
         width: 90px;
     }
