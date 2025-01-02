@@ -85,6 +85,14 @@
     width: 100%;
 }
 
+.dropdown-name label {
+    width: 90px;
+}
+
+.dropdown-conference label {
+    width: 90px;
+}
+
 @media (max-height: 1200px) {
 
     .team-list-dropdowns label {
@@ -184,5 +192,6 @@
     .team-list-dropdowns input {
         font-size: 1rem;
         padding: 0.5rem;
+        width: 220px;
     }
 }

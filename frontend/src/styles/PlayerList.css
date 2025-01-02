@@ -102,6 +102,12 @@
     margin-right: 1rem;
 }
 
+.search-list-input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 1rem;
+}
+
 .pagination {
     display: flex;
     justify-content: center;
@@ -165,6 +171,18 @@
     font-weight: bold;
 }
 
+.search-list label {
+    width: 90px;
+}
+
+.dropdown-name label {
+    width: 90px;
+}
+
+.dropdown-team label {
+    width: 90px;
+}
+
 @media (max-height: 1000px) {
     .player-list {
         padding: 0.5rem;
@@ -190,7 +208,7 @@
     }
 
     .search-bar input {
-        margin: 0 !important;
+        margin: 1 !important;
         padding: 0.5rem !important;
         font-size: 20px !important;
     }
@@ -316,6 +334,7 @@
     .player-list-dropdowns input {
         font-size: 1rem;
         padding: 0.5rem;
+        width: 220px;
     }
 
     .page-button {

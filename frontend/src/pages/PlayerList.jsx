@@ -100,6 +100,7 @@ function PlayerList() {
         <div className='search-bar search-list'>
           <label>Search Players:</label>
           <input
+            className='search-list-input'
             type='text'
             placeholder='Search by name...'
             value={search}
