@@ -15,9 +15,11 @@
 .player-list {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     gap: 2rem;
     padding: 2rem;
+    min-height: 300px;
 }
 
 .player-card img {
