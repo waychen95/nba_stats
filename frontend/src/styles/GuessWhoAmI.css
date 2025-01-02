@@ -12,6 +12,14 @@
     overflow: auto;
 }
 
+.guess-who-am-i {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
 .hint {
     display: flex;
     justify-content: center;

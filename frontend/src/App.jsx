@@ -53,9 +53,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games">
             <Route index element={<Games />} />
-            <Route path="image" element={<Guess />} />
+            <Route path="classic" element={<Guess />} />
             <Route path="team" element={<GuessTeamLogo />} />
-            <Route path="whoami" element={<GuessWhoAmI />} />
+            <Route path="bio" element={<GuessWhoAmI />} />
           </Route>
           <Route path="/teams">
             <Route index element={<TeamList />} />

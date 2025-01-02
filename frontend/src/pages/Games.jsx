@@ -6,7 +6,7 @@ function Games() {
         <div className="games">
             <h1>Guess the NBA Player</h1>
             <div className="game-link">
-                <Link to="/games/image" className="button">Classic</Link>
+                <Link to="/games/classic" className="button">Classic</Link>
                 <p className="link-description">Guess the player from their silhouette.</p>
             </div>
             <div className="game-link">
@@ -14,7 +14,7 @@ function Games() {
                 <p className="link-description">Guess the player based on their past teams' logos.</p>
             </div>
             <div className="game-link">
-                <Link to="/games/whoami" className="button">Who Am I</Link>
+                <Link to="/games/bio" className="button">Biography</Link>
                 <p className="link-description">Guess the player based on their bio.</p>
             </div>
         </div>
