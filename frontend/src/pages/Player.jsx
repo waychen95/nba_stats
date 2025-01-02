@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/Player.css';
 import PlayerStats from '../components/PlayerStats';
+import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
 
 
@@ -76,7 +77,7 @@ function Player() {
         <div className='player-container' style={{ background: teamColor }}>
             {loading ? (
                 <div className='player'>
-                    <p className='loading'>Loading...</p>
+                    <Loading />
                 </div>
             ) : (
                 <div className='player-content-container'>

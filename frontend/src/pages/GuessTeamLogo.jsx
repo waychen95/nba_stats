@@ -1,7 +1,9 @@
 import '../styles/Guess.css';
 import { useState, useEffect } from 'react';
 import TeamLogoPlayerCard from '../components/TeamLogoPlayerCard';
+import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
+import Modal from '../components/Modal';
 import '../styles/GuessTeamLogo.css';
 
 function GuessTeamLogo() {
@@ -18,6 +20,7 @@ function GuessTeamLogo() {
     const [tries, setTries] = useState(0);
     const [hint, setHint] = useState(false);
     const [maxTries, setMaxTries] = useState(4);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         async function fetchTeam(abbr) {
@@ -46,7 +49,7 @@ function GuessTeamLogo() {
                 const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
                 setCorrectPlayer(randomPlayer);
 
-                console.log('Random player:', randomPlayer);
+                console.log(randomPlayer);
 
                 const playerPastTeams = randomPlayer.past_teams;
 
@@ -119,6 +122,7 @@ function GuessTeamLogo() {
         if (guessPlayer.id === correctPlayer.id) {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
+            setTimeout(() => setShowModal(true), 2000);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
@@ -134,7 +138,7 @@ function GuessTeamLogo() {
         <div className='guess-container'>
             {loading ? (
                 <div className='player'>
-                    <p className='loading'>Loading...</p>
+                    <Loading />
                 </div>
             ) : (
                 <div className='player'>
@@ -155,22 +159,22 @@ function GuessTeamLogo() {
                         ))}
                     </div>
                     {hint && (
-                        <div className='hint guees-team-logo-hint'>
+                        <div className='guees-team-logo-hint'>
                             <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}</p>
                         </div>
                     )}
                     {tries >= 1 && (
                         <div 
-                            className={`hint button ${tries >= maxTries ? '' : 'disabled'} guess-team-logo-hint-button`} 
+                            className={`hint ${tries >= maxTries ? '' : 'disabled'} ${tries >= maxTries ? 'hover-effect' : ''} guess-team-logo-hint-button`} 
                             onClick={() => {
                                 if (tries < maxTries) return; // Prevent click action if below maxTries
                                 setHint(hint => !hint);
                             }}
                         >
-                            Hint ({maxTries - tries > 0 ? maxTries - tries : 0})
+                            <p>Hint ({maxTries - tries > 0 ? maxTries - tries : 0})</p>
                         </div>     
                     )}
-                    <div className='search-bar'>
+                    <div className='search-bar guess-search-bar'>
                         <div className='search-dropdown-div'>
                             <input
                                 type='text'
@@ -196,6 +200,13 @@ function GuessTeamLogo() {
                         <button className='guess-button' onClick={compareGuessPlayer} disabled={correct}>Guess</button>
                     </div>
                 </div>
+            )}
+            {showModal && (
+                <Modal 
+                    correctPlayer={correctPlayer} 
+                    tries={tries} 
+                    onClose={() => setShowModal(false)} 
+                />
             )}
             <div className='incorrect-players'>
                 {incorrectPlayers.slice().reverse().map((player) => (

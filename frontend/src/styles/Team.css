@@ -133,12 +133,6 @@
     padding: 0.5rem;
 }
 
-.loading {
-    text-align: center;
-    font-size: 1.5rem;
-    color: white;
-}
-
 @media screen and (max-width: 1200px) {
     .team-container {
         flex-direction: column;

@@ -19,10 +19,31 @@
     margin-top: 1rem;
     margin-left: auto;
     margin-right: auto;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 10%;
+    padding: 0.2rem;
+}
+
+.guees-whoami-hint {
+    margin-top: 2rem;
+}
+
+.guess-whoami-hint p {
+    font-size: 1.2rem;
+    padding: 2rem;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 60%;
+    background-color: #304758;
+    margin: 3rem auto;
+    text-align: center;
+    max-height: 500px;
+    overflow: auto;
 }
 
 .hint p {
-    font-size: 1.5rem;
+    font-size: 1rem;
 }
 
 .hint.button.disabled {
@@ -45,6 +66,13 @@
 
     .hint {
         font-size: 0.9rem;
+        width: 30%;
+    }
+
+    .guees-whoami-hint p {
+        font-size: 0.8rem;
+        padding: 1rem;
+        width: 80%;
     }
 }
 
@@ -62,5 +90,11 @@
 
     .hint p {
         font-size: 1rem;
+    }
+
+    .guees-whoami-hint p {
+        font-size: 0.6rem;
+        padding: 1rem;
+        width: 90%;
     }
 }

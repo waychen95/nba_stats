@@ -25,8 +25,27 @@
     margin-top: 2rem;
 }
 
+.guees-team-logo-hint p {
+    font-size: 1.2rem;
+    padding: 2rem;
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 60%;
+    background-color: #304758;
+    margin: 3rem auto;
+    text-align: center;
+    max-height: 500px;
+    overflow: auto;
+}
+
 .guess-team-logo-hint-button {
     margin-top: 2rem;
+}
+
+.hover-effect:hover {
+    transition: transform 0.3s;
+    background-color: #304758;
+    cursor: pointer;
 }
 
 .hint.button.disabled {
@@ -44,6 +63,12 @@
 
     .past-teams img {
         width: 35%;
+    }
+
+    .guees-team-logo-hint p {
+        font-size: 1rem;
+        padding: 1.5rem;
+        width: 80%;
     }
     
 }

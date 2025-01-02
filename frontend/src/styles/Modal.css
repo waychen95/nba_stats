@@ -1,0 +1,71 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #496880;
+  color: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  font-family: "Bebas Neue", sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 2rem;
+  color: #68E1FD;
+}
+
+.modal-content p {
+  font-size: 1.2rem;
+  margin: 1.5rem 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: #68E1FD;
+}
+
+.player-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: #68E1FD;
+  text-decoration: none;
+  border: 2px solid #68E1FD;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.player-link:hover {
+  background-color: #68E1FD;
+  color: #1F4278;
+  border-color: #1F4278;
+}
+

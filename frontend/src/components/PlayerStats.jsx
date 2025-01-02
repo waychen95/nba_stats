@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Plot from 'react-plotly.js';
+import Loading from '../components/Loading';
 import "../styles/PlayerStats.css";
+
 
 function PlayerStats({ playerId, teamName }) {
     const [stats, setStats] = useState([]);
@@ -101,14 +103,54 @@ function PlayerStats({ playerId, teamName }) {
                                 type: 'pie',
                                 textinfo: 'label+percent',
                                 hoverinfo: 'label+percent',
-                                marker: { colors: ['blue', 'red', 'yellow'] },
+                                marker: {
+                                    colors: ['#1E88E5', '#6A1B9A', '#FFB300'], // Cool tones for modern UI
+                                },
                             },
                         ]}
                         layout={{
-                            title: 'Shot Distribution (2PT, 3PT, FT)',
-                            showlegend: false,
+                            title: {
+                                text: 'Shot Distribution (2PT, 3PT, FT)',
+                                font: {
+                                    family: 'Arial, sans-serif',
+                                    size: 18,
+                                    color: '#333',
+                                },
+                            },
+                            showlegend: true, // Enable legend for better UX
+                            legend: {
+                                x: 0.5, // Center the legend horizontally
+                                y: -0.5, // Place it below the chart
+                                xanchor: 'center', // Align to center horizontally
+                                font: {
+                                    size: 12,
+                                    color: '#333',
+                                },
+                            },
                             height: 450,
                             width: 450,
+                            paper_bgcolor: '#F9F9F9', // Light grey background for modern aesthetics
+                            plot_bgcolor: '#F9F9F9',
+                        }}
+                    />
+                );
+            case "minutesPerGame":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: minutes,
+                                type: 'bar',
+                                marker: { color: 'green' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Minutes Per Game Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Minutes' },
+                            height: 400,
+                            width: 500,
                         }}
                     />
                 );
@@ -133,23 +175,87 @@ function PlayerStats({ playerId, teamName }) {
                         }}
                     />
                 );
-            case "minutesPerGame":
+            case "reboundsOverTime":
                 return (
                     <Plot
                         data={[
                             {
                                 x: seasonsTeams,
-                                y: minutes,
-                                type: 'bar',
+                                y: rebounds,
+                                type: 'scatter',
+                                mode: 'lines+markers',
                                 marker: { color: 'green' },
                             },
                         ]}
                         layout={{
-                            title: 'Minutes Per Game Over Seasons',
+                            title: 'Rebounds Over Seasons',
                             xaxis: { title: 'Season (Team)' },
-                            yaxis: { title: 'Minutes' },
+                            yaxis: { title: 'Rebounds' },
                             height: 400,
-                            width: 600,
+                            width: 500,
+                        }}
+                    />
+                );
+            case "assistsOverTime":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: assists,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                marker: { color: 'red' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Assists Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Assists' },
+                            height: 400,
+                            width: 500,
+                        }}
+                    />
+                );
+            case "stealsOverTime":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: steals,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                marker: { color: 'purple' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Steals Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Steals' },
+                            height: 400,
+                            width: 500,
+                        }}
+                    />
+                );
+            case "blocksOverTime":
+                return (
+                    <Plot
+                        data={[
+                            {
+                                x: seasonsTeams,
+                                y: blocks,
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                marker: { color: 'orange' },
+                            },
+                        ]}
+                        layout={{
+                            title: 'Blocks Over Seasons',
+                            xaxis: { title: 'Season (Team)' },
+                            yaxis: { title: 'Blocks' },
+                            height: 400,
+                            width: 500,
                         }}
                     />
                 );
@@ -161,7 +267,7 @@ function PlayerStats({ playerId, teamName }) {
     return (
         <div className="player-stats-container">
             {statsLoading ? (
-                <p>Loading...</p>
+                <Loading />
             ) : (
                 <div className="player-stats-summary">
                     <h2>Career Stats (Regular Season)</h2>
@@ -215,6 +321,10 @@ function PlayerStats({ playerId, teamName }) {
                             <option value="shotDistribution">Shot Distribution</option>
                             <option value="pointsOverTime">Points Over Time</option>
                             <option value="minutesPerGame">Minutes Per Game</option>
+                            <option value="reboundsOverTime">Rebounds Over Time</option>
+                            <option value="assistsOverTime">Assists Over Time</option>
+                            <option value="stealsOverTime">Steals Over Time</option>
+                            <option value="blocksOverTime">Blocks Over Time</option>
                         </select>
                     </div>
 

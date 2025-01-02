@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import TeamLogoPlayerCard from '../components/TeamLogoPlayerCard';
+import Loading from '../components/Loading';
+import Modal from '../components/Modal';
 import '../styles/GuessWhoAmI.css';
 
 function GuessWhoAmI() {
@@ -16,6 +18,7 @@ function GuessWhoAmI() {
     const [bio, setBio] = useState("");
     const [hint, setHint] = useState(false);
     const [maxTries, setMaxTries] = useState(4);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         async function fetchPlayers() {
@@ -33,8 +36,8 @@ function GuessWhoAmI() {
                 // Pick a random player for the guessing game
                 const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
                 setCorrectPlayer(randomPlayer);
-                console.log('Random player:', randomPlayer);
                 const playerBio = reformatBio(randomPlayer);
+                console.log(randomPlayer);
                 setBio(playerBio);
                 setLoading(false);
             } catch (error) {
@@ -110,15 +113,13 @@ function GuessWhoAmI() {
             setCorrect(true);
             setBio(correctPlayer.bio);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
+            setTimeout(() => setShowModal(true), 2000);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
         }
 
         setTries((tries) => tries + 1);
-
-        
-        console.log(tries);
 
         setSearch('');
         setDropdownLocked(false); // Unlock the dropdown after a guess
@@ -128,7 +129,7 @@ function GuessWhoAmI() {
         <div className="guess-who-am-i">
             {loading ? (
                 <div className='player'>
-                    <p className='loading'>Loading...</p>
+                    <Loading />
                 </div>
             ) : (
                 <div className='player'>
@@ -137,22 +138,24 @@ function GuessWhoAmI() {
                         <p dangerouslySetInnerHTML={{ __html: bio }} />
                     </div>
                     {hint && (
-                        <div className='hint'>
+                        <div className='guess-whoami-hint'>
                             <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}</p>
                         </div>
                     )}
                     {tries >= 1 && (
                         <div 
-                            className={`hint button ${tries >= maxTries ? '' : 'disabled'}`} 
+                            className={`hint ${tries >= maxTries ? '' : 'disabled'} ${tries >= maxTries ? 'hover-effect' : ''}`}
                             onClick={() => {
-                                if (tries < maxTries) return; // Prevent click action if below maxTries
+                                if (correct || tries >= maxTries) {
+                                    return;
+                                }
                                 setHint(hint => !hint);
                             }}
                         >
-                            Hint ({maxTries - tries > 0 ? maxTries - tries : 0})
+                            <p>Hint ({maxTries - tries > 0 ? maxTries - tries : 0})</p>
                         </div>                    
                     )}
-                    <div className='search-bar'>
+                    <div className='search-bar guess-search-bar'>
                         <div className='search-dropdown-div'>
                             <input
                                 type='text'
@@ -178,6 +181,13 @@ function GuessWhoAmI() {
                         <button className='guess-button' onClick={compareGuessPlayer} disabled={correct}>Guess</button>
                     </div>
                 </div>
+            )}
+            {showModal && (
+                <Modal 
+                    correctPlayer={correctPlayer} 
+                    tries={tries} 
+                    onClose={() => setShowModal(false)} 
+                />
             )}
             <div className='incorrect-players'>
                 {incorrectPlayers.slice().reverse().map((player) => (

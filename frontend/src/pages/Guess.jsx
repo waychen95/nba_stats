@@ -1,6 +1,8 @@
 import '../styles/Guess.css';
 import { useState, useEffect } from 'react';
 import PlayerCard from '../components/PlayerCard';
+import Loading from '../components/Loading';
+import Modal from '../components/Modal';
 import { Link } from 'react-router-dom';
 
 function Guess() {
@@ -15,6 +17,7 @@ function Guess() {
     const [incorrectPlayers, setIncorrectPlayers] = useState([]);
     const [brightness, setBrightness] = useState(0);
     const [tries, setTries] = useState(0);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         async function fetchPlayers() {
@@ -27,6 +30,7 @@ function Guess() {
             // Pick a random player for the guessing game
             const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
             setCorrectPlayer(randomPlayer);
+            console.log(randomPlayer);
             setLoading(false);
         }
 
@@ -79,8 +83,9 @@ function Guess() {
         if (guessPlayer.id === correctPlayer.id) {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
-            setBrightness(1);
             setTries((tries) => tries + 1);
+            setTimeout(() => setShowModal(true), 2000);
+            setTimeout(() => setBrightness(1), 2000);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
@@ -95,11 +100,15 @@ function Guess() {
         setDropdownLocked(false); // Unlock dropdown after guessing
     };
 
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
     return (
         <div className='guess-container'>
             {loading ? (
                 <div className='player'>
-                    <p className='loading'>Loading...</p>
+                    <Loading />
                 </div>
             ) : (
                 <div className='player'>
@@ -134,6 +143,13 @@ function Guess() {
                         <button className='guess-button' onClick={compareGuessPlayer} disabled={correct}>Guess</button>
                     </div>
                 </div>
+            )}
+            {showModal && (
+                <Modal 
+                    correctPlayer={correctPlayer} 
+                    tries={tries} 
+                    onClose={closeModal} 
+                />
             )}
             <div className='incorrect-players'>
                 {incorrectPlayers.slice().reverse().map((player) => (

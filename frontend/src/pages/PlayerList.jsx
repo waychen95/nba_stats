@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Loading from '../components/Loading';
 import Player from './Player';
 import '../styles/PlayerList.css';
 
@@ -141,7 +142,7 @@ function PlayerList() {
       </div>
       {loading ? (
         <div className='player-list'>
-          <p className='loading'>Loading...</p>
+          <Loading />
         </div>
       ) : (
         <>

@@ -1,5 +1,9 @@
-.correct-image {
-    border: 10px solid green !important;
+.guess-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
 }
 
 .guess-button {
@@ -26,7 +30,7 @@
     padding: 1rem;
     border-radius: 1rem;
     background-color: #496880;
-    width: 40%;
+    width: 100%;
     margin: 2rem auto;
     display: flex;
     justify-content: center;
@@ -34,7 +38,7 @@
 }
 
 .guess-search-bar {
-    max-width: 580px;
+    max-width: 400px;
 }
 
 .search-bar input {
@@ -43,7 +47,7 @@
     margin: 1rem;
     border-radius: 1rem;
     background-color: #ffffff;
-    width: 80%;
+    width: 90%;
 }
 
 .search-dropdown-div {
@@ -98,6 +102,9 @@
     gap: 2rem;
     padding: 2rem;
     margin-bottom: 1rem;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .next-button {
@@ -138,7 +145,6 @@
     }
 
     .search-bar {
-        width: 70%;
         font-size: 1.5rem;
     }
 
@@ -154,6 +160,7 @@
 
     .incorrect-players {
         padding: 1rem;
+        width: 100%; 
     }
 }
 

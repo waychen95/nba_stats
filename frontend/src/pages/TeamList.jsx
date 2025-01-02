@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Loading from '../components/Loading';
 import '../styles/TeamList.css';
 
 function TeamList() {
@@ -53,7 +54,7 @@ function TeamList() {
         </div>
             {loading ? (
                 <div className='team-list'>
-                    <p className='loading'>Loading...</p>
+                    <Loading />
                 </div>
             ) : (
                 <ul className='team-list'>

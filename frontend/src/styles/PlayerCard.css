@@ -4,7 +4,6 @@
     justify-content: center;
     align-items: center;
     margin: 2rem 0; /* Remove horizontal margins to avoid overflow issues */
-    overflow-x: auto; /* Enable horizontal scrolling */
     width: 100%; /* Ensure the container takes up the full width of the screen */
     max-width: 100%; /* Prevent overflow beyond the viewport */
     padding: 0 1rem; /* Add padding to avoid abrupt edges */
@@ -53,8 +52,8 @@
     justify-content: center;
     align-items: center;
     background-color: #496880;
-    height: 60%;
-    width: 20%;
+    height: 120px;
+    width: 15%;
     border-radius: 1rem;
     margin: 0 1rem;
     opacity: 0;
@@ -131,6 +130,24 @@
 
 @media (max-width: 1700px) {
     .guessed-player-cards-div {
+        transform: scale(0.6); /* Scale down the entire card to 80% */
+        transform-origin: top center; /* Ensure scaling happens from the top center */
+    }
+
+    .guessed-player-cards {
+        height: auto; /* Maintain proportional height */
+    }
+
+    .guessed-player-cards label {
+        font-size: 1.2rem; /* Reduce label font size */
+    }
+}
+
+@media (max-width: 1200px) {
+    .guessed-player-cards-div {
+        overflow-x: auto; /* Add horizontal scroll for smaller screens */
+        width: 100%; /* Ensure the container takes up the full width of the screen */
+        max-width: 100%; /* Prevent overflow beyond the viewport */
         align-items: flex-start; /* Align items from the top */
     }
 }
@@ -138,12 +155,13 @@
 /* Mobile-Responsive Styles */
 @media (max-width: 768px) {
     .guessed-player-cards-div {
-        margin: 1rem 0;
+        margin: 1rem auto;
         padding: 0 0.5rem;
+        transform: scale(0.9); /* Reset scaling */
     }
 
     .guessed-player-cards {
-        min-width: 1000px; /* Reduce the minimum width for smaller screens */
+        min-width: 1100px;
         height: 150px; /* Reduce card height */
         padding: 0.5rem; /* Reduce padding */
     }

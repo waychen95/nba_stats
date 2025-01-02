@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import Loading from '../components/Loading';
 import '../styles/Team.css';
 
 function Team() {
@@ -74,7 +75,7 @@ function Team() {
       <div className='team-container' style={{ background: teamColor }}>
           {loading ? (
               <div className='team'>
-                  <p className='loading'>Loading...</p>
+                    <Loading />
               </div>
           ) : (
               <div className='team-content-container'>
