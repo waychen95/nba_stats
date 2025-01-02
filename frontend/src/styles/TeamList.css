@@ -85,12 +85,14 @@
     width: 100%;
 }
 
-.dropdown-name label {
-    width: 90px;
-}
-
-.dropdown-conference label {
-    width: 90px;
+@media (max-width: 2000px) {
+    .dropdown-name label {
+        width: 90px;
+    }
+    
+    .dropdown-conference label {
+        width: 90px;
+    }
 }
 
 @media (max-height: 1200px) {
