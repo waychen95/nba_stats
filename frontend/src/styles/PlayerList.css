@@ -89,7 +89,7 @@
     border-radius: 1rem;
     background-color: #496880;
     color: rgb(0, 0, 0);
-    width: 90%;
+    width: 100%;
 }
 
 .search-bar label {
@@ -227,6 +227,7 @@
 
     .search-list label {
         width: 90px;
+        margin-right: 0.5rem;
     }
     
     .dropdown-name label {
@@ -392,15 +393,14 @@
     }
 
     .player-list-dropdowns {
-        width: 90%;
         padding: 1rem;
+        font-size: 1rem;
     }
 
-    .player-list-dropdowns select,
-    .player-list-dropdowns input {
+    .player-list-dropdowns input,
+    .player-list-dropdowns select {
         font-size: 1rem;
         padding: 0.5rem;
-        width: 220px;
     }
 
     .page-button {
@@ -409,7 +409,7 @@
     }
 
     .toggle-button {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.7rem;
     }
 }
