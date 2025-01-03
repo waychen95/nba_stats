@@ -78,7 +78,7 @@ function PlayerStats({ playerId, teamName }) {
     }, [playerId]);
 
     // Data preparation for Plotly
-    const seasonsTeams = stats.map(stat => `${stat.year} (${stat.team_name})`);
+    const seasonsYears = stats.map(stat => `${stat.year}`);
     const minutes = stats.map(stat => stat.min);
     const points = stats.map(stat => stat.pts);
     const rebounds = stats.map(stat => stat.reb);
@@ -139,7 +139,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: minutes,
                                 type: 'bar',
                                 marker: { color: 'green' },
@@ -147,7 +147,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Minutes Per Game Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Minutes' },
                             height: 400,
                             width: 500,
@@ -159,7 +159,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: points,
                                 type: 'scatter',
                                 mode: 'lines+markers',
@@ -168,7 +168,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Points Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Points' },
                             height: 400,
                             width: 500,
@@ -180,7 +180,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: rebounds,
                                 type: 'scatter',
                                 mode: 'lines+markers',
@@ -189,7 +189,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Rebounds Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Rebounds' },
                             height: 400,
                             width: 500,
@@ -201,7 +201,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: assists,
                                 type: 'scatter',
                                 mode: 'lines+markers',
@@ -210,7 +210,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Assists Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Assists' },
                             height: 400,
                             width: 500,
@@ -222,7 +222,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: steals,
                                 type: 'scatter',
                                 mode: 'lines+markers',
@@ -231,7 +231,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Steals Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Steals' },
                             height: 400,
                             width: 500,
@@ -243,7 +243,7 @@ function PlayerStats({ playerId, teamName }) {
                     <Plot
                         data={[
                             {
-                                x: seasonsTeams,
+                                x: seasonsYears,
                                 y: blocks,
                                 type: 'scatter',
                                 mode: 'lines+markers',
@@ -252,7 +252,7 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Blocks Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season' },
                             yaxis: { title: 'Blocks' },
                             height: 400,
                             width: 500,
