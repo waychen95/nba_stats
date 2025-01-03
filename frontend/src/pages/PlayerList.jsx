@@ -29,6 +29,9 @@ function PlayerList() {
         url += `&team=${team}`;
       }
       if (search) {
+        if (search.includes(' ')) {
+          search = search.replace(' ', '+');
+        }
         url += `&search=${search}`;
       }
       if (isActive) {
@@ -151,7 +154,7 @@ function PlayerList() {
         </div>
       ) : (
         <>
-          <p className='updated-time'>Last Updated: 2024/01/02</p>
+          <p className='updated-time'>Last Updated: 2024/12/17</p>
           <ul className='player-list'>
             {players.map((player) => (
               <Link to={`/players/${player.id}`} key={player.id} className='player-card'>
