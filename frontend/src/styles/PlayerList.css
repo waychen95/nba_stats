@@ -61,6 +61,7 @@
     margin: 2rem auto;
     display: flex;
     justify-content: space-around;
+    gap: 1rem;
 }
 
 .player-list-dropdowns div {
@@ -71,14 +72,13 @@
 }
 
 .player-list-dropdowns label {
-    margin-right: 1rem;
     flex-wrap: nowrap;
 }
 
 .player-list-dropdowns select {
     font-size: 1.5rem;
     padding: 1rem;
-    margin: 1rem;
+    margin: 1rem 1rem 1rem 0;
     border-radius: 1rem;
     background-color: #496880;
     color: white;
@@ -91,13 +91,12 @@
     border-radius: 1rem;
     background-color: #496880;
     color: rgb(0, 0, 0);
-    width: 100%;
+    width: 90%;
 }
 
 .search-bar label {
     font-size: 1.5rem;
     color: white;
-    margin-right: 1rem;
 }
 
 .search-list-input {
@@ -140,6 +139,13 @@
     opacity: 0.7;
 }
 
+.toggle-active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
 
 .toggle-button {
     padding: 1rem 2rem;
@@ -178,8 +184,14 @@
 }
 
 @media (max-width: 1600px) {
+
     .player-list-dropdowns {
+        gap: 0;
         width: 100%;
+    }
+
+    .toggle-active {
+        gap: 0;
     }
 
     .player-list-dropdowns {
@@ -200,6 +212,15 @@
     
     .dropdown-team label {
         width: 90px;
+    }
+
+    .search-list-input {
+        width: 100%;
+    }
+
+    .search-list-input {
+        width: 450px;
+        padding: 0.75rem;
     }
 }
 
