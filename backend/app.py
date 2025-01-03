@@ -228,11 +228,12 @@ def players():
     if search:
         search_terms = search.strip().split()
         if len(search_terms) == 2:
-            # If there are two words, treat them as first_name and last_name
-            where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
-            params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
+            where_clauses.append("""
+                (p.first_name ILIKE %s AND p.last_name ILIKE %s) OR
+                (p.first_name ILIKE %s OR p.last_name ILIKE %s)
+            """)
+            params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%', f'%{search}%', f'%{search}%'])
         else:
-            # Otherwise, search in first_name or last_name
             where_clauses.append("(p.first_name ILIKE %s OR p.last_name ILIKE %s)")
             params.extend([f'%{search}%', f'%{search}%'])
     if active and active.lower() in ['true', 'false']:
