@@ -189,6 +189,18 @@
     text-align: center;
 }
 
+.no-results {
+    text-align: center;
+    color: #cacaca;
+    font-size: 1.2em;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  
+
 @media (max-width: 1600px) {
 
     .player-list-dropdowns {

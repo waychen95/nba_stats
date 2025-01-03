@@ -145,9 +145,13 @@ function PlayerList() {
         <div className='player-list'>
           <Loading />
         </div>
+      ) : players.length === 0 ? (
+        <div className='no-results'>
+          <p>No players found. Try adjusting your search or filters.</p>
+        </div>
       ) : (
         <>
-        <p className='updated-time'>Last Updated: 2024/01/02</p>
+          <p className='updated-time'>Last Updated: 2024/01/02</p>
           <ul className='player-list'>
             {players.map((player) => (
               <Link to={`/players/${player.id}`} key={player.id} className='player-card'>
