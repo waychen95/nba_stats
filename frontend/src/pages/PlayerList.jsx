@@ -29,10 +29,14 @@ function PlayerList() {
         url += `&team=${team}`;
       }
       if (search) {
+        let modified_search;
         if (search.includes(' ')) {
-          search = search.replace(' ', '+');
+          modified_search = search.replace(' ', '+');
+        } else {
+          modified_search = search;
         }
-        url += `&search=${search}`;
+        url += `&search=${modified_search}`;
+        console.log(modified_search);
       }
       if (isActive) {
         url += `&active=false`;
