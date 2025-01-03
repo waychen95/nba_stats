@@ -170,11 +170,11 @@
 }
 
 .dropdown-name label {
-    width: 100%;
+    width: 100px;
 }
 
 .dropdown-team label {
-    width: 100%;
+    width: 100px;
 }
 
 @media (max-width: 1600px) {
