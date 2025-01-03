@@ -183,6 +183,12 @@
     width: 100px;
 }
 
+.updated-time {
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
 @media (max-width: 1600px) {
 
     .player-list-dropdowns {

@@ -319,8 +319,8 @@ function PlayerStats({ playerId, teamName }) {
                             onChange={(e) => setSelectedGraph(e.target.value)}
                         >
                             <option value="shotDistribution">Shot Distribution</option>
-                            <option value="pointsOverTime">Points Over Time</option>
                             <option value="minutesPerGame">Minutes Per Game</option>
+                            <option value="pointsOverTime">Points Over Time</option>
                             <option value="reboundsOverTime">Rebounds Over Time</option>
                             <option value="assistsOverTime">Assists Over Time</option>
                             <option value="stealsOverTime">Steals Over Time</option>
