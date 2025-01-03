@@ -37,7 +37,6 @@ function GuessWhoAmI() {
                 const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
                 setCorrectPlayer(randomPlayer);
                 const playerBio = reformatBio(randomPlayer);
-                console.log(randomPlayer);
                 setBio(playerBio);
                 setLoading(false);
             } catch (error) {

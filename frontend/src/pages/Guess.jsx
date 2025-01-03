@@ -30,7 +30,6 @@ function Guess() {
             // Pick a random player for the guessing game
             const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
             setCorrectPlayer(randomPlayer);
-            console.log(randomPlayer);
             setLoading(false);
         }
 

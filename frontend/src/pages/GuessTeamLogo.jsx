@@ -49,8 +49,6 @@ function GuessTeamLogo() {
                 const randomPlayer = playerList[Math.floor(Math.random() * playerList.length)];
                 setCorrectPlayer(randomPlayer);
 
-                console.log(randomPlayer);
-
                 const playerPastTeams = randomPlayer.past_teams;
 
                 // Fetch logos for each team in the player's past teams
