@@ -20,6 +20,11 @@
 
 }
 
+.contact-prompt {
+    font-size: 1rem; /* Adjust font size */
+    margin-bottom: 1rem;
+}
+
 #contact-form {
     width: 100%; /* Full width for the form */
     max-width: 600px; /* Limit the form's max width */
@@ -112,7 +117,11 @@ textarea.form-input {
         margin-top: 5rem; /* Reduce margin for smaller screens */
         padding: 1.5rem; /* Adjust padding */
         font-size: 1.5rem; /* Adjust font size */
-        width: 85%; /* Adjust width */
+        width: 75%; /* Adjust width */
+    }
+
+    .contact-prompt {
+        font-size: 0.8rem; /* Smaller font size */
     }
 
     #contact-form {

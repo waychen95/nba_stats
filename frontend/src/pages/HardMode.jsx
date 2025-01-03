@@ -5,7 +5,7 @@ import Loading from '../components/Loading';
 import Modal from '../components/Modal';
 import { Link } from 'react-router-dom';
 
-function Guess() {
+function HardMode() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ function Guess() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('https://nbadle.onrender.com/players?active=true');
+            const response = await fetch('https://nbadle.onrender.com/guess_players');
             const data = await response.json();
             const playerList = data.players;
 
@@ -160,4 +160,4 @@ function Guess() {
     );
 }
 
-export default Guess;
+export default HardMode;

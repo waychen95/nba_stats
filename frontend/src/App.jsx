@@ -10,6 +10,7 @@ import Guess from './pages/Guess';
 import Games from './pages/Games';
 import GuessTeamLogo from './pages/GuessTeamLogo';
 import GuessWhoAmI from './pages/GuessWhoAmI.jsx';
+import HardMode from './pages/HardMode.jsx';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,6 +57,7 @@ function App() {
             <Route path="classic" element={<Guess />} />
             <Route path="team" element={<GuessTeamLogo />} />
             <Route path="bio" element={<GuessWhoAmI />} />
+            <Route path="hard" element={<HardMode />} />
           </Route>
           <Route path="/teams">
             <Route index element={<TeamList />} />

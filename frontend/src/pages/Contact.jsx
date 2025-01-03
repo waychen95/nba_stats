@@ -42,6 +42,7 @@ function Contact() {
   return (
     <div className="contact-container">
       <h1>Contact Us</h1>
+      <p className='contact-prompt'>Have a question or feedback? Send us a message!</p>
       <form id="contact-form" onSubmit={handleSubmit}>
         <label className="form-label">
           Email:

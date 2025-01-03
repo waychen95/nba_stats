@@ -226,10 +226,12 @@
     
     .dropdown-name label {
         width: 90px;
+        margin-right: 0.5rem;
     }
     
     .dropdown-team label {
         width: 90px;
+        margin-right: 0.5rem;
     }
 
     .search-list-input {
@@ -299,7 +301,7 @@
     }
 
     .toggle-button {
-        padding: 0.75rem 1.5rem;
+        padding: 0.6rem 1.5rem;
         font-size: 1.2rem;
     }
 }
