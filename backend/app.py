@@ -234,7 +234,7 @@ def players():
             where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
             params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
         else:
-            # Otherwise, search in first_name or last_name
+            # Otherwise, search in all fields
             where_clauses.append("(p.full_name ILIKE %s OR p.first_name ILIKE %s OR p.last_name ILIKE %s)")
             params.extend([f'%{search}%', f'%{search}%'])
     if active and active.lower() in ['true', 'false']:
