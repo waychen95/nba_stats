@@ -97,7 +97,7 @@ function PlayerList() {
     <div className='player-list-container'>
       <h1>Players</h1>
       <div className='player-list-dropdowns'>
-        <div className='search-bar search-list'>
+        <div className='search-list'>
           <label>Search Players:</label>
           <input
             className='search-list-input'
