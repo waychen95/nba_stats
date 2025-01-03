@@ -30,7 +30,6 @@ function PlayerList() {
       }
       if (search) {
         url += `&search=${search}`;
-        console.log(url);
       }
       if (isActive) {
         url += `&active=false`;
