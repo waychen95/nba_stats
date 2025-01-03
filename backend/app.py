@@ -226,8 +226,6 @@ def players():
         where_clauses.append("t.name = %s")
         params.append(team.upper())
     if search:
-        if search.includes('+'):
-            search = search.replace('+', '')
         search_terms = search.strip().split()
         if len(search_terms) == 2:
             # If there are two words, treat them as first_name and last_name
