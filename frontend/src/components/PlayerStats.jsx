@@ -172,7 +172,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Points Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season (Team)',
+                                tickfont: {
+                                    size: 10, // Adjust font size for better readability
+                                },
+                             },
                             yaxis: { title: 'Points' },
                             height: 400,
                             width: 500,
@@ -193,7 +197,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Rebounds Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season (Team)',
+                                tickfont: {
+                                    size: 10, // Adjust font size for better readability
+                                },
+                             },
                             yaxis: { title: 'Rebounds' },
                             height: 400,
                             width: 500,
@@ -214,7 +222,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Assists Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season (Team)',
+                                tickfont: {
+                                    size: 10, // Adjust font size for better readability
+                                },
+                             },
                             yaxis: { title: 'Assists' },
                             height: 400,
                             width: 500,
@@ -235,7 +247,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Steals Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season (Team)',
+                                tickfont: {
+                                    size: 10, // Adjust font size for better readability
+                                },
+                             },
                             yaxis: { title: 'Steals' },
                             height: 400,
                             width: 500,
@@ -256,7 +272,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Blocks Over Seasons',
-                            xaxis: { title: 'Season (Team)' },
+                            xaxis: { title: 'Season (Team)',
+                                tickfont: {
+                                    size: 10, // Adjust font size for better readability
+                                },
+                             },
                             yaxis: { title: 'Blocks' },
                             height: 400,
                             width: 500,

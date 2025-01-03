@@ -165,7 +165,7 @@ function GuessTeamLogo() {
                     )}
                     {tries >= 1 && (
                         <div 
-                            className={`hint ${tries >= maxTries ? '' : 'disabled'} ${tries >= maxTries ? 'hover-effect' : ''} guess-team-logo-hint-button`} 
+                            className={`hint ${tries >= maxTries ? 'hover-effect' : ''} guess-team-logo-hint-button ${tries >= maxTries ? '' : 'disabled'}`} 
                             onClick={() => {
                                 if (tries < maxTries) return; // Prevent click action if below maxTries
                                 setHint(hint => !hint);

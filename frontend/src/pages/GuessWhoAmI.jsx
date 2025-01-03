@@ -133,7 +133,6 @@ function GuessWhoAmI() {
                 </div>
             ) : (
                 <div className='player'>
-                    <h2 id="guess-team-logo-title">{correct ? `Number of tries: ${tries}` : 'Who is this player?'}</h2>
                     <div className='guess-whoami-player'>
                         <p dangerouslySetInnerHTML={{ __html: bio }} />
                     </div>
@@ -144,9 +143,9 @@ function GuessWhoAmI() {
                     )}
                     {tries >= 1 && (
                         <div 
-                            className={`hint ${tries >= maxTries ? '' : 'disabled'} ${tries >= maxTries ? 'hover-effect' : ''}`}
+                            className={`hint ${tries >= maxTries ? 'hover-effect' : ''} ${tries >= maxTries ? '' : 'disabled'}`}
                             onClick={() => {
-                                if (correct || tries >= maxTries) {
+                                if (correct || tries < maxTries) {
                                     return;
                                 }
                                 setHint(hint => !hint);

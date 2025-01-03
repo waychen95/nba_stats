@@ -84,8 +84,8 @@ function Guess() {
             setCorrect(true);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
             setTries((tries) => tries + 1);
-            setTimeout(() => setShowModal(true), 2000);
-            setTimeout(() => setBrightness(1), 2000);
+            setTimeout(() => setShowModal(true), 2500);
+            setTimeout(() => setBrightness(1), 2500);
         } else {
             setCorrect(false);
             setIncorrectPlayers([...incorrectPlayers, guessPlayer]);
