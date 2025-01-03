@@ -21,7 +21,7 @@ function Guess() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('https://nbadle.onrender.com/players?active=true');
+            const response = await fetch('https://nbadle.onrender.com/all_players?active=true');
             const data = await response.json();
             const playerList = data.players;
 

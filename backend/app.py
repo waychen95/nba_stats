@@ -279,6 +279,11 @@ def all_players():
     connection = get_db_connection()
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+    active = request.args.get('active', None)
+
+    params = []
+    where_clauses = []
+
     query = """
     SELECT 
         p.*, 
@@ -291,7 +296,18 @@ def all_players():
     ON 
         p.team_id = t.id;
     """
-    cursor.execute(query)
+
+    if active and active.lower() in ['true', 'false']:
+        is_active = active.lower() == 'true'
+        if is_active:
+            where_clauses.append("p.active = %s")
+            params.append(is_active)
+    
+    if where_clauses:
+        query += " WHERE " + " AND ".join(where_clauses)
+
+    cursor.execute(query, tuple(params))
+
     players = cursor.fetchall()
     players = [dict(player) for player in players]
 
