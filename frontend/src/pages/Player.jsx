@@ -76,7 +76,7 @@ function Player() {
     return (
         <div className='player-container' style={{ background: teamColor }}>
             {loading ? (
-                <div className='player'>
+                <div className='player' style={{ margin: 'auto' }}>
                     <Loading />
                 </div>
             ) : (
