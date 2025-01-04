@@ -78,7 +78,7 @@ function PlayerStats({ playerId, teamName }) {
     }, [playerId]);
 
     // Data preparation for Plotly
-    const seasonsTeams = stats.map(stat => `${stat.year}.`);
+    const seasonsTeams = stats.map(stat => `${stat.year} (${stat.team_name})`);
     const minutes = stats.map(stat => stat.min);
     const points = stats.map(stat => stat.pts);
     const rebounds = stats.map(stat => stat.reb);
@@ -147,10 +147,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Minutes Per Game Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Minutes' },
                             height: 400,
@@ -172,10 +173,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Points Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Points' },
                             height: 400,
@@ -197,10 +199,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Rebounds Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Rebounds' },
                             height: 400,
@@ -222,10 +225,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Assists Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Assists' },
                             height: 400,
@@ -247,10 +251,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Steals Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Steals' },
                             height: 400,
@@ -272,10 +277,11 @@ function PlayerStats({ playerId, teamName }) {
                         ]}
                         layout={{
                             title: 'Blocks Over Seasons',
-                            xaxis: { title: 'Season',
+                            xaxis: { title: 'Season (Team)',
                                 tickfont: {
                                     size: 10, // Adjust font size for better readability
                                 },
+                                tickangle: 35, // Rotate x-axis labels for better readability
                              },
                             yaxis: { title: 'Blocks' },
                             height: 400,
