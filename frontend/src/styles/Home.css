@@ -64,7 +64,7 @@ a.button {
     border: 3px solid black;
     border-radius: 50px;
     padding: 2rem;
-    width: 800px;
+    width: 500px;
     background-color: #1F4278;
     letter-spacing: 0.05em;
 }
@@ -120,6 +120,10 @@ a.button {
         height: auto;
     }
 
+    #container img {
+        max-width: 250px;
+    }
+
     #button-container {
         gap: 1rem;
         width: 90%;
@@ -137,7 +141,7 @@ a.button {
     .call_to_action {
         padding: 1.5rem;
         width: 90%; /* Take up most of the screen width on mobile */
-        max-width: 400px;
+        max-width: 350px;
     }
 
     .contact {
@@ -164,7 +168,7 @@ a.button {
     .call_to_action {
         padding: 1rem;
         width: 90%;
-        max-width: 300px;
+        max-width: 320px;
 
     }
 }

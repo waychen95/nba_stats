@@ -98,6 +98,7 @@ function Team() {
                           <option value='Current Players'>Current Players</option>
                           <option value='Past Players'>Past Players</option>
                         </select>
+                        <p className='updated-time'>Last Updated: 2024/08/17</p>
                       </div>
                       <ul className='team-player-list'>
                           {players.map(player => (

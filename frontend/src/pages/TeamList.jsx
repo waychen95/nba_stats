@@ -33,23 +33,23 @@ function TeamList() {
         <div className='team-list-container'>
             <h1>Teams</h1>
             <div className='team-list-dropdowns'>
-            <div className='dropdown-name'>
+            <div className='team-dropdown-name'>
             <label>Order by name:</label>
-            <select value={order} onChange={(e) => setOrder(e.target.value)}>
-                <option value='asc'>Ascending</option>
-                <option value='desc'>Descending</option>
-            </select>
+                <select value={order} onChange={(e) => setOrder(e.target.value)}>
+                    <option value='asc'>Ascending</option>
+                    <option value='desc'>Descending</option>
+                </select>
             </div>
             <div className='dropdown-conference'>
-            <label>Filter by conference:</label>
-            <select value={conference} onChange={(e) => setConference(e.target.value)}>
-                <option value=''>All Teams</option>
-                {conference_list.map((conference) => (
-                <option key={conference} value={conference}>
-                    {conference}
-                </option>
-                ))}
-            </select>
+                <label>Filter by conference:</label>
+                <select value={conference} onChange={(e) => setConference(e.target.value)}>
+                    <option value=''>All Teams</option>
+                    {conference_list.map((conference) => (
+                    <option key={conference} value={conference}>
+                        {conference}
+                    </option>
+                    ))}
+                </select>
             </div>
         </div>
             {loading ? (

@@ -306,7 +306,7 @@ def all_players():
     if where_clauses:
         query += " WHERE " + " AND ".join(where_clauses)
 
-    
+    query += ";"
 
     cursor.execute(query, tuple(params))
 
