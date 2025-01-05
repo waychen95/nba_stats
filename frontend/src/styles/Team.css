@@ -66,6 +66,7 @@
     flex-direction: row;
     justify-content: space-between;
     margin: 2rem auto;
+    gap: 2rem;
 }
 
 .team-details p {
@@ -153,6 +154,8 @@
 
     .team-details {
         flex-direction: column;
+        gap: 0.1rem;
+        margin: 1rem auto;
     }
 }
 
@@ -164,7 +167,7 @@
     }
 
     .team-logo-image {
-        width: 60px;
+        width: 100px;
         top: 20px;
     }
 
@@ -206,7 +209,6 @@
 
     .team-logo-image {
         width: 80px; /* Smaller logo for smaller screens */
-        top: 8px;
         right: 8px;
     }
 
