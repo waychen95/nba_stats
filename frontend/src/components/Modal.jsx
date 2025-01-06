@@ -16,7 +16,7 @@ function Modal({ correctPlayer, tries, onClose }) {
                 <Link to={`/players/${correctPlayer.id}`} className="player-link">
                     View {correctPlayer.first_name}'s Details
                 </Link>
-                <p>or <span style={{color: 'red'}}>refresh</span> the page to play again!</p>
+                <p>or try our other game modes <Link to="/games">here</Link>!</p>
             </div>
         </div>
     );
