@@ -87,7 +87,6 @@
 .player-list-dropdowns input {
     font-size: 1.5rem;
     border-radius: 1rem;
-    background-color: #496880;
     color: rgb(0, 0, 0);
     width: 100%;
 }
@@ -107,7 +106,7 @@
     width: 100%;
     padding: 0.75rem;
     margin: 1rem 1rem 1rem 0;
-    background-color: white !important;
+    background-color: white;
 }
 
 .pagination {
@@ -270,14 +269,14 @@
     }
 
     .search-list {
-        width: 100% !important;
-        padding: 0 !important;
+        width: 100% ;
+        padding: 0 ;
     }
 
     .search-bar input {
-        margin: 1 !important;
-        padding: 0.5rem !important;
-        font-size: 20px !important;
+        margin: 1 ;
+        padding: 0.5rem ;
+        font-size: 20px ;
     }
 
     .search-bar label {
@@ -335,14 +334,14 @@
     }
 
     .search-list {
-        width: 100% !important;
-        padding: 0 !important;
+        width: 100% ;
+        padding: 0 ;
     }
 
     .search-bar input {
-        margin: 0 !important;
-        padding: 0.5rem !important;
-        font-size: 18px !important;
+        margin: 0 ;
+        padding: 0.5rem ;
+        font-size: 18px ;
     }
 
     .search-bar label {

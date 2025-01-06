@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 2rem 0; /* Remove horizontal margins to avoid overflow issues */
+    margin: 0.2rem 0; /* Remove horizontal margins to avoid overflow issues */
     width: 100%; /* Ensure the container takes up the full width of the screen */
     max-width: 100%; /* Prevent overflow beyond the viewport */
     padding: 0 1rem; /* Add padding to avoid abrupt edges */

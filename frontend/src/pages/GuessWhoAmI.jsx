@@ -18,6 +18,7 @@ function GuessWhoAmI() {
     const [bio, setBio] = useState("");
     const [hint, setHint] = useState(false);
     const [maxTries, setMaxTries] = useState(4);
+    const [secondHint, setSecondHint] = useState(8);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -137,7 +138,10 @@ function GuessWhoAmI() {
                     </div>
                     {hint && (
                         <div className='guess-whoami-hint'>
-                            <p>Hint: The first 3 letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}</p>
+                            <p>First Hint: The team name of the player is: {correctPlayer.team_name}.</p>
+                            {tries >= secondHint && (
+                                <p>Second Hint: The first three letters of the player's first name are: {correctPlayer.first_name.slice(0, 3)}.</p>
+                            )}
                         </div>
                     )}
                     {tries >= 1 && (

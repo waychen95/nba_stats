@@ -369,7 +369,7 @@ def guess_players():
     ) AS players_with_more_than_7_stats
     ON p.id = players_with_more_than_7_stats.player_id
     JOIN nba_teams t ON p.team_id = t.id
-    WHERE players_with_more_than_7_stats.player_id IS NOT NULL AND p.image_url != "https://cdn.nba.com/headshots/nba/latest/260x190/fallback.png";
+    WHERE players_with_more_than_7_stats.player_id IS NOT NULL AND p.image_url != 'https://cdn.nba.com/headshots/nba/latest/260x190/fallback.png';
     """
     cursor.execute(query)
     players = cursor.fetchall()
