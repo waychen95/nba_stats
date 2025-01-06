@@ -25,7 +25,6 @@
 }
 
 .modal-content h2 {
-  margin-top: 0;
   font-size: 2rem;
   color: #68E1FD;
 }
@@ -53,7 +52,6 @@
 
 .player-link {
   display: inline-block;
-  margin-top: 1rem;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   color: #68E1FD;
