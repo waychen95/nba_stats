@@ -52,8 +52,8 @@ function PlayerList() {
 
   const renderPagination = () => {
     const pageNumbers = [];
-    const startPage = Math.max(1, currentPage - 5); // Start 5 pages before the current page
-    const endPage = Math.min(totalPages, currentPage + 5); // End 5 pages after the current page
+    const startPage = Math.max(1, currentPage - 3); // Start 5 pages before the current page
+    const endPage = Math.min(totalPages, currentPage + 3); // End 5 pages after the current page
   
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
@@ -91,7 +91,25 @@ function PlayerList() {
       </div>
     );
   };
-  
+
+  const renderDropdownPagination = () => {
+    return (
+      <div className='pagination-dropdown'>
+        <label htmlFor='page-select'>Select Page:</label>
+        <select
+          id='page-select'
+          value={currentPage}
+          onChange={(e) => handlePageChange(Number(e.target.value))}
+        >
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+            <option key={number} value={number}>
+              {`Page ${number}`}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
 
   return (
     <div className='player-list-container'>
@@ -151,7 +169,10 @@ function PlayerList() {
         </div>
       ) : (
         <>
-          <p className='updated-time'>Last Updated: 2024/08/17</p>
+          <div className='extra-info'>
+            <p className='updated-time'>Last Updated: 2024/08/17</p>
+            {renderDropdownPagination()}
+          </div>
           <ul className='player-list'>
             {players.map((player) => (
               <Link to={`/players/${player.id}`} key={player.id} className='player-card'>
