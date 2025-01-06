@@ -37,7 +37,7 @@
 }
 
 .guess-search-bar {
-    max-width: 400px;
+    max-width: 300px;
 }
 
 .search-bar input {
@@ -193,6 +193,10 @@
         font-size: 2rem;
         width: 100%;
         padding: 1rem 2rem;
+    }
+
+    .search-bar {
+        transform: scale(0.9);
     }
 }
 
