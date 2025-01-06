@@ -7,8 +7,8 @@
     color: white;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 10rem;
-    margin-bottom: 3rem;
+    margin-top: 5rem;
+    margin-bottom: 8rem;
     border: 3px solid black;
     border-radius: 50px;
     padding: 1rem;
@@ -146,6 +146,7 @@ textarea.form-input {
         margin-top: 2rem; /* Further reduce margin */
         font-size: 1.2rem; /* Smaller font size */
         width: 80%; /* Adjust width */
+        margin-bottom: 2rem;
     }
 
     .form-input {
