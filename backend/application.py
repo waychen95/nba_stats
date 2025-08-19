@@ -13,16 +13,17 @@ import requests
 import random
 
 app = Flask(__name__)
+application = app
 CORS(app)
 
 # Load environment variables
-load_dotenv()
+# load_dotenv()
 
-# hostname = os.getenv('HOSTNAME')
-# username = os.getenv('USER')
-# password = os.getenv('PASSWORD')
-# database = os.getenv('DATABASE')
-# port = os.getenv('DB_PORT')
+hostname = os.getenv('HOSTNAME')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+port = os.getenv('DB_PORT')
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -36,17 +37,17 @@ mail = Mail(app)
 
 def get_db_connection():
 
-    # Connect to the PostgreSQL database
+    db_url = os.getenv('DATABASE_URL')
+    if not db_url:
+        print("Database URL not found in environment variables.")
+        return None
+    
     try:
-        connection = psycopg2.connect(
-            os.getenv('DATABASE_URL'),
-        )
+        connection = psycopg2.connect(db_url)
         print("Connected to the database")
-        
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Database connection error: {str(e)}")
         connection = None
-
 
     return connection
 
@@ -54,6 +55,19 @@ def get_db_connection():
 def home():
 
     return "Hello, World!"
+
+
+@app.route('/test-db')
+def test_db():
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database not configured'}), 500
+    cur = connection.cursor()
+    cur.execute("SELECT NOW();")
+    result = cur.fetchone()
+    cur.close()
+    connection.close()
+    return jsonify({'db_time': result[0].isoformat()})
 
 @app.route('/teams', methods=['GET'])
 def teams():
@@ -454,9 +468,12 @@ def contact():
         print(e)
         return jsonify({'error': 'Failed to send message.'}), 500
     
+
+# --- Required for Elastic Beanstalk ---
+application = app
+
 def run_app():
-    port = int(os.environ.get("PORT", 50100))
-    serve(app, host='0.0.0.0', port=port, threads=2)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     run_app()
