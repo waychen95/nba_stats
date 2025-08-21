@@ -24,7 +24,7 @@ function GuessWhoAmI() {
     useEffect(() => {
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://nbadle.onrender.com/well_known_players');
+                const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/well_known_players');
                 const data = await response.json();
                 let playerList = data.players;
 

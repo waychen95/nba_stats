@@ -21,7 +21,7 @@ function Contact() {
     }
 
     try {
-      const response = await fetch('https://nbadle.onrender.com/api/contact', {
+      const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

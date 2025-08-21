@@ -14,7 +14,7 @@ function TeamList() {
 
     useEffect(() => {
         async function fetchTeams() {
-            let url = `https://nbadle.onrender.com/teams?order=${order}`;
+            let url = `https://d1zi95jowxdkwf.cloudfront.net/teams?order=${order}`;
             if (conference) {
                 url += `&conference=${conference}`;
             }

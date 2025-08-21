@@ -24,21 +24,18 @@ function PlayerList() {
   useEffect(() => {
     async function fetchPlayers() {
       setLoading(true);
-      let url = `https://nbadle.onrender.com/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
+      let url = `https://d1zi95jowxdkwf.cloudfront.net/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
       if (team) {
         url += `&team=${team}`;
       }
       if (search) {
         url += `&search=${search}`;
       }
-      if (isActive) {
-        url += `&active=false`;
-      } else {
-        url += `&active=true`;
-      }
+      url += `&active=${isActive ? 'true' : 'false'}`;
       const response = await fetch(url);
       const data = await response.json();
-      setPlayers(data.players);
+      const fetchedPlayers = data?.players || [];
+      setPlayers(fetchedPlayers);
       setTotalPages(Math.ceil(data.total / playersPerPage)); // Assuming API returns `total` count
       setLoading(false);
     }

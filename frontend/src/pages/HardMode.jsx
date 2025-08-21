@@ -21,7 +21,7 @@ function HardMode() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('https://nbadle.onrender.com/guess_players');
+            const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/guess_players');
             const data = await response.json();
             const playerList = data.players;
 
