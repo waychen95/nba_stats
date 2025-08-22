@@ -140,7 +140,6 @@
         
         font-size: 18px;
         max-width: 800px; /* Prevents the container from growing too wide on large screens */
-        min-width: 300px; /* Reduces the min-width to allow smaller devices */
     }
 
     .team-player-list {
@@ -158,8 +157,12 @@
 @media screen and (max-width: 768px) {
     .team-container {
         display: flex;
-        font-size: 16px;
+        font-size: 12px;
         align-items: center;
+    }
+
+    .team-info-container {
+        margin-top: 1.5rem;
     }
 
     .team-logo-image {
@@ -182,16 +185,21 @@
 @media screen and (max-width: 480px) {
 
     .team-logo-image {
-        top: -40px; /* Adjust vertically to be on top of the red border */
+        top: -50px; /* Adjust vertically to be on top of the red border */
         left: 50%; /* Center horizontally */
         transform: translateX(-50%); /* Center-align by adjusting for logo's width */
-        width: 70px; /* Adjust size as needed */
-        height: 70px; /* Maintain square aspect ratio */
+        width: 90px; /* Adjust size as needed */
+        height: 90px; /* Maintain square aspect ratio */
         z-index: 10; /* Ensure it stays above other elements */
     }
 
     .team-details {
         margin: 0.5rem 0; /* Reduce space between team details */
+    }
+
+    .player-image {
+        width: 90%;
+        height: auto;
     }
     
 }

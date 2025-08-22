@@ -184,7 +184,8 @@
 
 @media screen and (max-width: 1200px) {
     .average-stats {
-        width: 80%;
+        width: auto;
+        padding: 1rem;
     }
 
     .average-stats-title {
@@ -200,3 +201,20 @@
     }
 
 }
+
+@media screen and (max-width: 400px) {
+    .average-stats {
+        width: auto;
+        padding: 1rem;
+    }
+
+    .average-stats .stat-title {
+        font-size: 12px;
+    }
+
+    .average-stats .stat-value {
+        font-size: 18px;
+    }
+
+}
+

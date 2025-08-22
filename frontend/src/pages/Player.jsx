@@ -109,9 +109,7 @@ function Player() {
                             <p>{player.personal_bio}</p>
                         </div>
                     </div>
-                    <div className='player-stats-container'>
-                        <PlayerStats playerId={id} teamName={team.full_name} />
-                    </div>
+                    <PlayerStats playerId={id} teamName={team.full_name} />
                 </div>
             )}  
         </div>
