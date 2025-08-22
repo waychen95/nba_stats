@@ -180,6 +180,10 @@
         align-items: center;
     }
 
+    .player-image {
+        width: 90%;
+    }
+
 }
 
 @media screen and (max-width: 480px) {
@@ -198,8 +202,7 @@
     }
 
     .player-image {
-        width: 90%;
-        height: auto;
+        width: 80%;
     }
     
 }
