@@ -2,6 +2,12 @@
 
 NBAdle is a Wordle-inspired web application for NBA enthusiasts. The goal of the game is to guess an NBA player within a limited number of attempts based on various clues.
 
+![NBAdle Home Page](./images/nbadle_home.png)
+
+![NBAdle Player Page](./images/nbadle_player.png)
+
+![NBAdle Game Page](./images/nbadle_game.png)
+
 ## Features
 
 - **Interactive Gameplay**: Players guess NBA players using a user-friendly interface.

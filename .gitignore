@@ -1,3 +1,19 @@
 venv/
 .env
 package-lock.json
+
+# Elastic Beanstalk
+backend/.elasticbeanstalk/
+
+# Amplify auto-generated files
+frontend/amplify/backend/amplify-meta.json
+frontend/amplify/backend/awscloudformation/
+frontend/amplify/hooks/*.sample
+frontend/amplify/#current-cloud-backend/
+frontend/amplify/.config/local-aws-info.json
+frontend/amplify/.config/local-env-info.json
+
+# Amplify frontend configs (generated on amplify pull/push)
+frontend/src/amplifyconfiguration.json
+frontend/src/aws-exports.js
+
