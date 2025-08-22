@@ -8,7 +8,7 @@ import numpy as np
 
 app = Flask(__name__)
 application = app
-CORS(app, resources={r"/*": {"origins": "https://staging.dmr1u1ap6c0fe.amplifyapp.com"}})
+CORS(app, resources={r"/*": {"origins": ["https://staging.dmr1u1ap6c0fe.amplifyapp.com", "http://localhost:5173"]}})
 
 # Load environment variables
 # load_dotenv()

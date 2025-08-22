@@ -148,10 +148,6 @@
         align-items: center;
     }
 
-    .team-player-card {
-        width: 80%;
-    }
-
     .team-details {
         flex-direction: column;
         gap: 0.1rem;
@@ -202,9 +198,12 @@
 
 @media screen and (max-width: 375px) { /* Target iPhone 14 screen size */
     .team-container {
-        width: 100%; /* Ensure the container takes the full width */
         font-size: 14px; /* Smaller text for smaller screens */
         padding: 1rem; /* Reduce padding */
+    }
+
+    .team-info-container {
+        padding: 1.5rem; /* Reduce padding for smaller screens */
     }
 
     .team-logo-image {

@@ -158,11 +158,7 @@ a.button {
     .button {
         font-size: 1rem; /* Smaller font size for very small screens */
         padding: 0.8rem 1.2rem;
-        height: 60px; /* Reduce height on smaller screens */
-    }
-
-    .contact {
-        height: 70px; /* Adjust contact button height for very small screens */
+        height: 40px; /* Reduce height on smaller screens */
     }
 
     .call_to_action {

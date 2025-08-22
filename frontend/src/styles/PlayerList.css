@@ -2,7 +2,18 @@
 .player-list-container {
     display: flex;
     flex-direction: column;
-    margin: 2rem 1rem 0 1rem;
+    gap: 0.5rem;
+    margin: 2rem auto 0 auto; /* center container */
+    max-width: 1300px; /* set a max width */
+    width: 100%;
+}
+
+.player-list-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
 }
 
 .player-list-container h1 {
@@ -14,11 +25,10 @@
 
 .player-list {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 2rem; /* spacing between cards */
+    padding: 0; /* remove padding so it aligns with dropdowns */
     min-height: 300px;
 }
 
@@ -58,16 +68,17 @@
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    margin: 2rem auto;
     display: flex;
+    width: 100%;
     justify-content: space-around;
     gap: 1rem;
+    box-sizing: border-box; /* include padding in width */
 }
 
 .player-list-dropdowns div {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -78,7 +89,7 @@
 .player-list-dropdowns select {
     font-size: 1.5rem;
     padding: 1rem;
-    margin: 1rem 1rem 1rem 0;
+    margin: 1rem 0 1rem 0;
     border-radius: 1rem;
     background-color: #496880;
     color: white;
@@ -105,7 +116,7 @@
 .search-list-input {
     width: 100%;
     padding: 0.75rem;
-    margin: 1rem 1rem 1rem 0;
+    margin: 1rem 0 1rem 0;
     background-color: white;
 }
 
@@ -238,10 +249,6 @@
         gap: 0;
     }
 
-    .player-list-dropdowns {
-        width: 100%;
-    }
-
     .player-list-dropdowns select {
         width: 100%;
     }
@@ -268,77 +275,6 @@
     .search-list-input {
         width: 450px;
         padding: 0.75rem;
-    }
-}
-
-@media (max-height: 1000px) {
-    .player-list {
-        padding: 0.5rem;
-    }
-
-    .player-list-container h1 {
-        font-size: 3rem;
-    }
-
-    .player-card {
-        width: 200px;
-        height: 200px;
-        padding: 0.75rem;
-    }
-
-    .player-card p {
-        font-size: 1.2rem;
-    }
-
-    .search-list {
-        width: 100% ;
-        padding: 0 ;
-    }
-
-    .search-bar input {
-        margin: 1 ;
-        padding: 0.5rem ;
-        font-size: 20px ;
-    }
-
-    .search-bar label {
-        font-size: 1.2rem;
-    }
-
-    .player-list-dropdowns {
-        flex-direction: column;
-        width: 80%;
-        font-size: 1.2rem;
-        padding: 1.5rem;
-    }
-
-    .player-list-dropdowns select,
-    .player-list-dropdowns input {
-        font-size: 1.2rem;
-        padding: 0.75rem;
-    }
-
-    .pagination {
-        gap: 0.5rem;
-    }
-
-    .page-button {
-        padding: 0.75rem 1.5rem;
-        font-size: 1.2rem;
-    }
-
-    .toggle-button {
-        padding: 0.6rem 1.5rem;
-        font-size: 1.2rem;
-    }
-}
-  
-
-/* Responsive styles for mobile screens */
-@media (max-width: 1600px) {
-
-    .player-list {
-        padding: 0.5rem;
     }
 
     .player-list-container h1 {
@@ -372,7 +308,6 @@
 
     .player-list-dropdowns {
         flex-direction: column;
-        width: 80%;
         font-size: 1.2rem;
         padding: 1.5rem;
     }
@@ -398,6 +333,131 @@
     }
 }
 
+@media (max-height: 1200px) {
+
+    .player-list-container h1 {
+        font-size: 3rem;
+    }
+
+    .player-card {
+        width: 200px;
+        height: 200px;
+        padding: 1rem;
+    }
+
+    .player-card p {
+        font-size: 1.2rem;
+    }
+
+    .search-list {
+        width: 100% ;
+        padding: 0 ;
+    }
+
+    .search-bar input {
+        margin: 1 ;
+        padding: 0.5rem ;
+        font-size: 20px ;
+    }
+
+    .search-bar label {
+        font-size: 1.2rem;
+    }
+
+    .player-list-dropdowns {
+        flex-direction: column;
+        font-size: 1rem;
+        padding: 1.5rem;
+    }
+
+    .player-list-dropdowns select,
+    .player-list-dropdowns input {
+        font-size: 1rem;
+        padding: 0.75rem;
+    }
+
+    .pagination {
+        gap: 0.5rem;
+    }
+
+    .page-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.2rem;
+    }
+
+    .toggle-button {
+        padding: 0.6rem 1.5rem;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 1400px) {
+
+    .player-list-container {
+        max-width: 900px; /* set a max width */
+    }
+
+    .player-list {
+        gap: 1rem;
+    }
+
+    .player-card {
+        /* width: 220px;
+        height: 220px; */
+        padding: 0.75rem;
+    }
+
+    .player-card p {
+        font-size: 1.2rem;
+    }
+
+    .player-list-container h1 {
+        font-size: 3rem;
+    }
+
+    .search-list label {
+        width: 80px;
+        margin-right: 1rem;
+    }
+
+    .dropdown-name label {
+        width: 80px;
+        margin-right: 1rem;
+    }
+
+    .dropdown-team label {
+        width: 80px;
+        margin-right: 1rem;
+    }
+
+    .search-list-input {
+        width: 300px;
+        padding: 0.75rem;
+    }
+}
+
+
+@media (max-width: 1000px) {
+
+    .player-list-container {
+        max-width: fit-content; /* set a max width */
+        padding: 2rem;
+    }
+
+    .player-list-container h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 850px) {
+
+    .player-card {
+        width: 165px;
+        height: 165px;
+        padding: 0.75rem;
+    }
+}
+
 @media (max-width: 700px) {
     .pagination {
         display: none;
@@ -412,15 +472,19 @@
 }
 
 
-@media (max-width: 480px) {
+@media (max-width: 680px) {
     .player-list-container h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .player-card {
-        width: 150px;
-        height: 150px;
+        width: 100%;
+        height: fit-content;
         padding: 0.5rem;
+    }
+
+    .player-card img {
+        width: 50%;
     }
 
     .player-card p {

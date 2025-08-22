@@ -31,7 +31,7 @@ function PlayerList() {
       if (search) {
         url += `&search=${search}`;
       }
-      url += `&active=${isActive ? 'true' : 'false'}`;
+      url += `&active=${isActive ? 'false' : 'true'}`;
       const response = await fetch(url);
       const data = await response.json();
       const fetchedPlayers = data?.players || [];
@@ -158,7 +158,9 @@ function PlayerList() {
       </div>
       {loading ? (
         <div className='player-list'>
-          <Loading />
+          <div className='player-list-loading'>
+            <Loading />
+          </div>
         </div>
       ) : players.length === 0 ? (
         <div className='no-results'>
