@@ -5,6 +5,7 @@
     margin: 2rem auto 0 auto; /* center container */
     max-width: 1300px; /* set a max width */
     width: 100%;
+    flex: 1;
 }
 
 .player-list-loading {
@@ -30,6 +31,11 @@
     padding: 0; /* remove padding so it aligns with dropdowns */
     min-height: 300px;
     height: 100%;
+    flex: 1;
+}
+
+.pagination-wrapper {
+    margin-top: auto; /* pushes pagination to bottom of container */
 }
 
 .player-card img {

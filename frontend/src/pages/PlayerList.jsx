@@ -11,7 +11,7 @@ function PlayerList() {
   const [team, setTeam] = useState('');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [playersPerPage] = useState(24); // Number of players per page
+  const [playersPerPage] = useState(30); // Number of players per page
   const [totalPages, setTotalPages] = useState(1); // Total number of pages
   const [isActive, setIsActive] = useState(false);
 
@@ -180,7 +180,9 @@ function PlayerList() {
               </Link>
             ))}
           </ul>
-          {renderPagination()}
+          <div className="pagination-wrapper">
+            {renderPagination()}
+          </div>
         </>
       )}
     </div>
