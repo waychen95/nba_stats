@@ -39,7 +39,7 @@
     background-color: #496880;
     color: white;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 100%; /* already same as container */
     box-sizing: border-box; /* include padding in width */
     padding: 2rem;
