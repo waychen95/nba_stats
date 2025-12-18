@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import '../styles/Contact.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function Contact() {
   const [formData, setFormData] = useState({ email: '', message: '', first_name: '', last_name: '' });
   const [status, setStatus] = useState('');
@@ -21,7 +23,7 @@ function Contact() {
     }
 
     try {
-      const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/api/contact', {
+      const response = await fetch(`${BASE_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

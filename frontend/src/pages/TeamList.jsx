@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import Loading from '../components/Loading';
 import '../styles/TeamList.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function TeamList() {
 
     const [teams, setTeams] = useState([]);
@@ -14,7 +16,7 @@ function TeamList() {
 
     useEffect(() => {
         async function fetchTeams() {
-            let url = `https://d1zi95jowxdkwf.cloudfront.net/teams?order=${order}`;
+            let url = `${BASE_URL}/teams?order=${order}`;
             if (conference) {
                 url += `&conference=${conference}`;
             }

@@ -5,6 +5,8 @@ import Loading from '../components/Loading';
 import Modal from '../components/Modal';
 import { Link } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function Guess() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
@@ -21,7 +23,7 @@ function Guess() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/all_players?active=true');
+            const response = await fetch(`${BASE_URL}/all_players?active=true`);
             const data = await response.json();
             const playerList = data.players;
 

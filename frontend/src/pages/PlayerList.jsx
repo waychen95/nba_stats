@@ -4,6 +4,8 @@ import Loading from '../components/Loading';
 import Player from './Player';
 import '../styles/PlayerList.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function PlayerList() {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ function PlayerList() {
   useEffect(() => {
     async function fetchPlayers() {
       setLoading(true);
-      let url = `https://d1zi95jowxdkwf.cloudfront.net/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
+      let url = `${BASE_URL}/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
       if (team) {
         url += `&team=${team}`;
       }

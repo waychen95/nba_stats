@@ -3,6 +3,7 @@ import Plot from 'react-plotly.js';
 import Loading from '../components/Loading';
 import "../styles/PlayerStats.css";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 function PlayerStats({ playerId, teamName }) {
     const [stats, setStats] = useState([]);
@@ -46,7 +47,7 @@ function PlayerStats({ playerId, teamName }) {
     useEffect(() => {
         async function fetchStats() {
             try {
-                const response = await fetch(`https://d1zi95jowxdkwf.cloudfront.net/players/${playerId}/stats`);
+                const response = await fetch(`${BASE_URL}/players/${playerId}/stats`);
                 const data = await response.json();
         
                 // Replace `NaN` values with null or default values

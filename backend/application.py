@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_mail import Mail, Message
+from dotenv import load_dotenv
 import os
 import psycopg2
 import psycopg2.extras
@@ -8,16 +9,16 @@ import numpy as np
 
 app = Flask(__name__)
 application = app
-CORS(app, resources={r"/*": {"origins": ["https://staging.d1glbwndlcoh8o.amplifyapp.com", "http://localhost:5173"]}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})
 
 # Load environment variables
-# load_dotenv()
+load_dotenv()
 
 hostname = os.getenv('HOSTNAME')
 username = os.getenv('USER')
 password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
-port = os.getenv('DB_PORT')
+port = os.getenv('PORT', 5432)
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -63,7 +64,7 @@ def get_db_connection():
 @app.route('/')
 def home():
 
-    return "Hello, World!"
+    return "Hello!"
 
 @app.route("/test-db")
 def test_db():
@@ -491,7 +492,7 @@ def contact():
     
 
 def run_app():
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=3000)
 
 if __name__ == '__main__':
     run_app()

@@ -5,6 +5,8 @@ import Loading from '../components/Loading';
 import Modal from '../components/Modal';
 import { Link } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function HardMode() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
@@ -21,7 +23,7 @@ function HardMode() {
 
     useEffect(() => {
         async function fetchPlayers() {
-            const response = await fetch('https://d1zi95jowxdkwf.cloudfront.net/guess_players');
+            const response = await fetch(`${BASE_URL}/guess_players`);
             const data = await response.json();
             const playerList = data.players;
 
