@@ -1,8 +1,20 @@
 .team-list-container {
     display: flex;
     flex-direction: column;
-    margin: 2rem 1rem 0 1rem;
+    gap: 0.5rem;
+    margin: 2rem auto 0 auto; /* center container */
+    max-width: 1300px; /* set a max width */
+    width: 100%;
 }
+
+.team-list-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
 
 .team-list-container h1 {
     color: white;
@@ -13,12 +25,24 @@
 
 .team-list {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 2rem;
-    padding: 2rem;
+    gap: 2rem; /* spacing between cards */
+    padding: 0; /* remove padding so it aligns with dropdowns */
+    margin-top: 2rem; /* optional spacing */
     min-height: 300px;
+}
+
+.team-list-dropdowns {
+    font-size: 1.5rem;
+    border-radius: 1rem;
+    background-color: #496880;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* already same as container */
+    box-sizing: border-box; /* include padding in width */
+    padding: 2rem;
 }
 
 .team-card img {
@@ -51,22 +75,10 @@
     background-color: #304758;
 }
 
-.team-list-dropdowns {
-    font-size: 1.5rem;
-    padding: 2rem;
-    border-radius: 1rem;
-    background-color: #496880;
-    color: white;
-    width: 40%;
-    margin: 2rem auto;
-    display: flex;
-    justify-content: space-around;
-}
-
 .team-list-dropdowns div {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -96,6 +108,13 @@
         width: 20%;
         margin-right: 1rem;
     }
+
+    .team-list-dropdowns {
+        flex-direction: column;
+        padding: 1.5rem;
+        font-size: 1.2rem;
+    }
+
 }
 
 @media (max-height: 1200px) {
@@ -104,9 +123,9 @@
         max-width: 100px;
     }
 
-    .team-list {
+    /* .team-list {
         padding: 0.5rem;
-    }
+    } */
     
     .team-card {
         width: 200px;
@@ -124,7 +143,6 @@
 
     .team-list-dropdowns {
         flex-direction: column;
-        width: 80%;
         font-size: 1.2rem;
         padding: 1.5rem;
     }
@@ -137,14 +155,16 @@
     }
 }
 
-/* Responsive styles for mobile screens */
-@media (max-width: 1600px) {
+@media (max-width: 1300px) {
 
-    .team-list {
-        padding: 0.5rem;
+    .team-list-container {
+        max-width: 900px; /* set a max width */
     }
 
-    
+    .team-list {
+        gap: 1rem;
+    }
+
     .team-card {
         width: 200px;
         height: 200px;
@@ -161,27 +181,43 @@
 
     .team-list-dropdowns {
         flex-direction: column;
-        width: 80%;
-        font-size: 1.2rem;
+        font-size: 1rem;
         padding: 1.5rem;
     }
 
     .team-list-dropdowns select,
     .team-list-dropdowns input {
-        font-size: 1.2rem;
+        font-size: 1rem;
         padding: 0.75rem;
     }
 }
 
-@media (max-width: 480px) {
+
+@media (max-width: 1000px) {
+
+    .team-list-container {
+        max-width: fit-content; /* set a max width */
+        padding: 2rem;
+    }
+
+    .team-list-container h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 520px) {
     .team-list-container h1 {
         font-size: 2.5rem;
     }
 
     .team-card {
-        width: 150px;
-        height: 150px;
+        width: 100%;
+        height: fit-content;
         padding: 0.5rem;
+    }
+
+    .team-card img {
+        width: 50%;
     }
 
     .team-card p {
@@ -189,7 +225,6 @@
     }
 
     .team-list-dropdowns {
-        width: 90%;
         padding: 1rem;
     }
 
@@ -198,5 +233,10 @@
         font-size: 1rem;
         padding: 0.5rem;
         width: 220px;
+    }
+
+    .team-list-container {
+        max-width:min-content; /* set a max width */
+
     }
 }

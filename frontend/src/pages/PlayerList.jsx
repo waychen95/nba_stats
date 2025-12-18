@@ -4,6 +4,8 @@ import Loading from '../components/Loading';
 import Player from './Player';
 import '../styles/PlayerList.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function PlayerList() {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ function PlayerList() {
   const [team, setTeam] = useState('');
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [playersPerPage] = useState(24); // Number of players per page
+  const [playersPerPage] = useState(30); // Number of players per page
   const [totalPages, setTotalPages] = useState(1); // Total number of pages
   const [isActive, setIsActive] = useState(false);
 
@@ -24,21 +26,18 @@ function PlayerList() {
   useEffect(() => {
     async function fetchPlayers() {
       setLoading(true);
-      let url = `https://nbadle.onrender.com/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
+      let url = `${BASE_URL}/players?order=${order}&page=${currentPage}&limit=${playersPerPage}`;
       if (team) {
         url += `&team=${team}`;
       }
       if (search) {
         url += `&search=${search}`;
       }
-      if (isActive) {
-        url += `&active=false`;
-      } else {
-        url += `&active=true`;
-      }
+      url += `&active=${isActive ? 'false' : 'true'}`;
       const response = await fetch(url);
       const data = await response.json();
-      setPlayers(data.players);
+      const fetchedPlayers = data?.players || [];
+      setPlayers(fetchedPlayers);
       setTotalPages(Math.ceil(data.total / playersPerPage)); // Assuming API returns `total` count
       setLoading(false);
     }
@@ -161,7 +160,9 @@ function PlayerList() {
       </div>
       {loading ? (
         <div className='player-list'>
-          <Loading />
+          <div className='player-list-loading'>
+            <Loading />
+          </div>
         </div>
       ) : players.length === 0 ? (
         <div className='no-results'>
@@ -181,7 +182,9 @@ function PlayerList() {
               </Link>
             ))}
           </ul>
-          {renderPagination()}
+          <div className="pagination-wrapper">
+            {renderPagination()}
+          </div>
         </>
       )}
     </div>

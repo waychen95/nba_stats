@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import '../styles/GuessTeamLogo.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function GuessTeamLogo() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
@@ -26,7 +28,7 @@ function GuessTeamLogo() {
     useEffect(() => {
         async function fetchTeam(abbr) {
             try {
-                const response = await fetch(`https://nbadle.onrender.com/teams/abbr/${abbr}`);
+                const response = await fetch(`${BASE_URL}/teams/abbr/${abbr}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch team: ${response.statusText}`);
                 }
@@ -40,7 +42,7 @@ function GuessTeamLogo() {
 
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://nbadle.onrender.com/well_known_players');
+                const response = await fetch(`${BASE_URL}/well_known_players`);
                 const data = await response.json();
                 const playerList = data.players;
 

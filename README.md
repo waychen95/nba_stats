@@ -6,7 +6,7 @@ NBAdle is a Wordle-inspired web application for NBA enthusiasts. The goal of the
 
 ![NBAdle Player Page](./images/nbadle_player.png)
 
-![NBAdle Game Page](./images/nbadle_game.png)
+![NBAdle Game](./images/nbadle_game.png)
 
 ## Features
 

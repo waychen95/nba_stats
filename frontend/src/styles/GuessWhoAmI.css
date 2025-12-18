@@ -17,7 +17,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 2rem;
+    height: 100%;
 }
 
 .hint {

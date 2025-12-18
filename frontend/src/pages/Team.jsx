@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import Loading from '../components/Loading';
 import '../styles/Team.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function Team() {
   const { teamId } = useParams();
 
@@ -47,11 +49,11 @@ function Team() {
 
   useEffect(() => {
       async function fetchTeamAndPlayers() {
-          const teamResponse = await fetch(`https://nbadle.onrender.com/teams/${teamId}`);
+          const teamResponse = await fetch(`${BASE_URL}/teams/${teamId}`);
           const teamData = await teamResponse.json();
           setTeam(teamData.team);
 
-          const playerResponse = await fetch(`https://nbadle.onrender.com/teams/${teamId}/players`);
+          const playerResponse = await fetch(`${BASE_URL}/teams/${teamId}/players`);
           const playerData = await playerResponse.json();
 
           if (playerOption === 'Current Players') {

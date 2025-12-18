@@ -1,28 +1,24 @@
-from flask import Flask, request, jsonify, redirect, url_for, render_template
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 from flask_mail import Mail, Message
-from waitress import serve
+from dotenv import load_dotenv
 import os
 import psycopg2
 import psycopg2.extras
 import numpy as np
-import pandas as pd
-import json
-import requests
-import random
 
 app = Flask(__name__)
-CORS(app)
+application = app
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})
 
 # Load environment variables
 load_dotenv()
 
-# hostname = os.getenv('HOSTNAME')
-# username = os.getenv('USER')
-# password = os.getenv('PASSWORD')
-# database = os.getenv('DATABASE')
-# port = os.getenv('DB_PORT')
+hostname = os.getenv('HOSTNAME')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+port = os.getenv('PORT', 5432)
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -35,25 +31,53 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
 
 def get_db_connection():
+    """
+    Connect to PostgreSQL using either DATABASE_URL or individual environment variables.
+    """
+    db_url = os.getenv('DATABASE_URL')
 
-    # Connect to the PostgreSQL database
     try:
-        connection = psycopg2.connect(
-            os.getenv('DATABASE_URL'),
-        )
+        if db_url:
+            # Use single DATABASE_URL if available
+            connection = psycopg2.connect(db_url)
+        else:
+            # Fall back to individual environment variables
+            if not all([hostname, username, password, database]):
+                raise ValueError("Database connection variables are not fully set")
+
+            connection = psycopg2.connect(
+                host=hostname,
+                user=username,
+                password=password,
+                dbname=database,
+                port=port
+            )
+
         print("Connected to the database")
-        
+        return connection
+
     except Exception as e:
-        print(f"Error: {str(e)}")
-        connection = None
+        print(f"Database connection error: {str(e)}")
+        return None
 
-
-    return connection
 
 @app.route('/')
 def home():
 
-    return "Hello, World!"
+    return "Hello!"
+
+@app.route("/test-db")
+def test_db():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT version();")
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return {"db": "ok", "version": result}
+    except Exception as e:
+        return {"db": "error", "message": str(e)}
 
 @app.route('/teams', methods=['GET'])
 def teams():
@@ -226,15 +250,27 @@ def players():
         where_clauses.append("t.name = %s")
         params.append(team.upper())
     if search:
-        search_terms = search.strip().split()
-        if len(search_terms) == 2:
-            # If there are two words, treat them as first_name and last_name
-            where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
-            params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
-        else:
-            # Otherwise, search in first_name or last_name
-            where_clauses.append("(p.first_name ILIKE %s OR p.last_name ILIKE %s OR p.full_name ILIKE %s)")
-            params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+        search_pattern = f"%{search.strip()}%"
+        # Search either in first_name, last_name, or full_name (first + last)
+        where_clauses.append("""
+            (p.first_name ILIKE %s OR 
+            p.last_name ILIKE %s OR 
+            (p.first_name || ' ' || p.last_name) ILIKE %s)
+        """)
+        params.extend([search_pattern, search_pattern, search_pattern])
+        # search_terms = search.strip().split()
+        # if len(search_terms) == 2:
+        #     # If there are two words, treat them as first_name and last_name
+        #     where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
+        #     params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
+        # else:
+        #     # Otherwise, search in first_name or last_name
+        #     where_clauses.append("""
+        #         (p.first_name ILIKE %s OR 
+        #         p.last_name ILIKE %s OR 
+        #         (p.first_name || ' ' || p.last_name) ILIKE %s)
+        #     """)
+        #     params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
     if active and active.lower() in ['true', 'false']:
         is_active = active.lower() == 'true'
         if is_active:
@@ -454,9 +490,9 @@ def contact():
         print(e)
         return jsonify({'error': 'Failed to send message.'}), 500
     
+
 def run_app():
-    port = int(os.environ.get("PORT", 50100))
-    serve(app, host='0.0.0.0', port=port, threads=2)
+    app.run(debug=True, host='0.0.0.0', port=3000)
 
 if __name__ == '__main__':
     run_app()

@@ -5,6 +5,7 @@ import PlayerStats from '../components/PlayerStats';
 import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 function Player() {
 
@@ -53,14 +54,14 @@ function Player() {
 
     useEffect(() => {
         async function fetchPlayerAndTeam() {
-            const response = await fetch(`https://nbadle.onrender.com/players/${id}`);
+            const response = await fetch(`${BASE_URL}/players/${id}`);
             const data = await response.json();
             setPlayer(data.player);
 
             setCmHeight((data.player.feet * 30.48) + (data.player.inches * 2.54));
             setKgWeight(data.player.weight * 0.453592);
 
-            const teamResponse = await fetch(`https://nbadle.onrender.com/teams/${data.player.team_id}`);
+            const teamResponse = await fetch(`${BASE_URL}/teams/${data.player.team_id}`);
             const teamData = await teamResponse.json();
             setTeam(teamData.team);
 
@@ -109,9 +110,7 @@ function Player() {
                             <p>{player.personal_bio}</p>
                         </div>
                     </div>
-                    <div className='player-stats-container'>
-                        <PlayerStats playerId={id} teamName={team.full_name} />
-                    </div>
+                    <PlayerStats playerId={id} teamName={team.full_name} />
                 </div>
             )}  
         </div>

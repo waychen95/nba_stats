@@ -4,6 +4,8 @@ import Loading from '../components/Loading';
 import Modal from '../components/Modal';
 import '../styles/GuessWhoAmI.css';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
+
 function GuessWhoAmI() {
     const [correctPlayer, setCorrectPlayer] = useState({});
     const [allPlayers, setAllPlayers] = useState([]);
@@ -24,7 +26,7 @@ function GuessWhoAmI() {
     useEffect(() => {
         async function fetchPlayers() {
             try {
-                const response = await fetch('https://nbadle.onrender.com/well_known_players');
+                const response = await fetch(`${BASE_URL}/well_known_players`);
                 const data = await response.json();
                 let playerList = data.players;
 

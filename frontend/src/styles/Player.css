@@ -3,13 +3,14 @@
     background: linear-gradient(to bottom, #8E2325, #C27E7E);
     font-family: 'arial';
     border-radius: 20px;
-    font-size: 16px;
+    font-size: 20px;
     color: white;
     margin: 3rem auto;
     max-width: 1700px;
     width: 90%;
     position: relative;
     height: auto;
+    padding: 1rem;
 }
 
 .team-logo {
@@ -34,8 +35,9 @@
     flex-direction: row;
     align-items: flex-start;
     padding: 1rem;
-    margin: 0 auto;
     height: 100%;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
 }
 
 .player-primary-info {
@@ -86,7 +88,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 .player-second-info p {
@@ -142,12 +144,10 @@
 @media screen and (max-width: 1200px) {
     .player-container {
         flex-direction: column;
-        min-width: none;
         padding: 0.2rem;
         margin-top: 2rem;
         margin-left: auto;
         margin-right: auto;
-        font-size: 16px;
     }
 
     .player-content-container {
@@ -174,13 +174,14 @@
 
 @media screen and (max-width: 780px) {
     .player-container {
-        font-size: 13px;
-        width: 95%;
+        font-size: 12px;
+        width: 85%;
         margin-bottom: 2rem;
     }
 
     .player-content-container {
         padding: 0.2rem;
+        margin-top: 2rem;
     }
 
     .player-stats-container {
@@ -191,12 +192,12 @@
     
     .player-bio {
         max-height: 300px;
-        width: 95%;
+        width: 80%;
     }
     
     .team-logo {
-        width: 60px;
-        height: 60px;
+        width: 90px;
+        height: 90px;
     }
 
     .player-second-info p {
@@ -206,8 +207,18 @@
 }
 
 @media screen and (max-width: 480px) {
+    .player-primary-info {
+        margin: auto;
+    }
+    
     .player-primary-info img {
-        width: 35%;
+        width: 50%;
+        margin-left:1rem;
+    }
+
+    .player-second-info p {
+        max-width: fit-content;
+        max-height: fit-content;
     }
 }
 
@@ -227,12 +238,11 @@
     }
 
     .player-bio {
-        width: 90%;
+        width: 80%;
     }
 
     .player-stats-container {
-        margin-top: 2rem 0 0 0;
-        padding: 0;
+        margin-top: 2rem;
     }
 
     .player-name h1 {
