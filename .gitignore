@@ -1,6 +1,14 @@
 venv/
 .env
-package-lock.json
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Chatbot vector store files
+backend/chatbot/*.index
+backend/chatbot/*.faiss
+backend/chatbot/*.pkl
 
 # Elastic Beanstalk
 backend/.elasticbeanstalk/
