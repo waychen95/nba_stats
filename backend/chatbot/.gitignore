@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+
+backend/chatbot/*.index
+backend/chatbot/*.faiss
+backend/chatbot/*.pkl
