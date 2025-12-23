@@ -1,80 +1,65 @@
-import pandas as pd
-import faiss
-import numpy as np
-import pickle
+import json
 import os
+import pickle
+import numpy as np
+import faiss
 from dotenv import load_dotenv
-import tiktoken
 from openai import OpenAI
 
-# Load environment variables
 load_dotenv()
 
-class TextEmbedder:
-    
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+DOCS_JSONL = "docs.jsonl"
+OUT_INDEX = "nbadle.index"
+OUT_DOCS = "docs.pkl"
+OUT_METAS = "metas.pkl"
 
-    def chunk_text_with_overlap(self, text, max_tokens=500, overlap_tokens=50):
-        """
-        Splits text into chunks of roughly max_tokens tokens with a small overlap.
-        Returns a list of strings.
-        """
-        # Initialize tokenizer for counting tokens
-        encoding = tiktoken.get_encoding("cl100k_base")
+EMBED_MODEL = "text-embedding-3-small"
+BATCH_SIZE = 256
 
-        words = text.split()
-        chunks = []
-        start_idx = 0
-        while start_idx < len(words):
-            current_chunk = []
-            current_tokens = 0
-            idx = start_idx
-            while idx < len(words):
-                word_tokens = len(encoding.encode(words[idx]))
-                if current_tokens + word_tokens > max_tokens:
-                    break
-                current_chunk.append(words[idx])
-                current_tokens += word_tokens
-                idx += 1
-            chunks.append(" ".join(current_chunk))
-            # move start index back by overlap
-            start_idx = max(start_idx + len(current_chunk) - overlap_tokens, start_idx + 1)
-        return chunks
-    
-    def create_and_save_faiss_index(self):
-        # Load the text data
-        with open('embedding_data.txt', 'r', encoding='utf-8') as f:
-            data = f.read()
 
-        # Split text into chunks with overlap
-        texts = self.chunk_text_with_overlap(data, max_tokens=500, overlap_tokens=50)
+def main():
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-        # Generate embeddings in batches
-        batch_size = 100
-        vectors = []
+    texts = []
+    metas = []
 
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i:i+batch_size]
-            response = self.client.embeddings.create(
-                model="text-embedding-3-small",
-                input=batch
-            )
-            vectors.extend([e.embedding for e in response.data])
+    with open(DOCS_JSONL, "r", encoding="utf-8") as f:
+        for line in f:
+            obj = json.loads(line)
+            texts.append(obj["text"])
+            meta = obj.get("meta", {})
+            meta["id"] = obj.get("id", "")
+            metas.append(meta)
 
-        # Convert embeddings to NumPy array
-        vectors = np.array(vectors).astype("float32")
+    if not texts:
+        raise RuntimeError("No documents found in docs.jsonl")
 
-        # Create a FAISS index and add vectors
-        index = faiss.IndexFlatL2(vectors.shape[1])
-        index.add(vectors)
+    vectors = []
+    for i in range(0, len(texts), BATCH_SIZE):
+        batch = texts[i:i + BATCH_SIZE]
+        resp = client.embeddings.create(model=EMBED_MODEL, input=batch)
+        vectors.extend([e.embedding for e in resp.data])
 
-        # Save the FAISS index
-        faiss.write_index(index, "players.index")
+    vecs = np.array(vectors, dtype="float32")
 
-        # Save the text chunks for retrieval
-        with open("players_texts.pkl", "wb") as f:
-            pickle.dump(texts, f)
+    # Cosine similarity setup: normalize, then IndexFlatIP
+    faiss.normalize_L2(vecs)
+    index = faiss.IndexFlatIP(vecs.shape[1])
+    index.add(vecs)
 
-        print(f"Done: {len(texts)} chunks embedded and saved with overlap.")
+    faiss.write_index(index, OUT_INDEX)
 
+    with open(OUT_DOCS, "wb") as f:
+        pickle.dump(texts, f)
+
+    with open(OUT_METAS, "wb") as f:
+        pickle.dump(metas, f)
+
+    print(f"Embedded {len(texts)} docs.")
+    print(f"Saved index: {OUT_INDEX}")
+    print(f"Saved docs:  {OUT_DOCS}")
+    print(f"Saved metas: {OUT_METAS}")
+
+
+if __name__ == "__main__":
+    main()

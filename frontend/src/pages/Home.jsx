@@ -7,6 +7,7 @@ function Home() {
       <img src="/nba_logo.png" alt="NBA Logo" />
       <div id='button-container'>
         <Link to="/games" className='button'>Guess The Player</Link>
+        <Link to="/chatbot" className='button'>Chatbot</Link>
         <Link to="/teams" className='button'>Teams</Link>
         <Link to="/players" className='button'>Players</Link>
       </div>

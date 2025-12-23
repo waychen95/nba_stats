@@ -11,6 +11,7 @@ import Games from './pages/Games';
 import GuessTeamLogo from './pages/GuessTeamLogo';
 import GuessWhoAmI from './pages/GuessWhoAmI.jsx';
 import HardMode from './pages/HardMode.jsx';
+import Chatbot from './pages/Chatbot';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,6 +38,9 @@ function App() {
               <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
             </li>
             <li>
+              <Link to="/chatbot" onClick={() => setMenuOpen(false)}>Chatbot</Link>
+            </li>
+            <li>
               <Link to="/games" onClick={() => setMenuOpen(false)}>Games</Link>
             </li>
             <li>
@@ -52,6 +56,7 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/chatbot" element={<Chatbot />} />
           <Route path="/games">
             <Route index element={<Games />} />
             <Route path="classic" element={<Guess />} />

@@ -3,24 +3,19 @@ import re
 import faiss
 import numpy as np
 import pickle
-import time
-from google.api_core import exceptions as google_exceptions
-from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 from google import genai
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage
-
-from chatbot.config import PROMPT_TEMPLATE
+from config import PROMPT_TEMPLATE
 
 load_dotenv()
 
 # Default paths for FAISS assets
-BASE_DIR = Path(__file__).resolve().parent  # backend/chatbot
-DEFAULT_INDEX_PATH = str(BASE_DIR / "nbadle.index")
-DEFAULT_DOCS_PATH  = str(BASE_DIR / "docs.pkl")
-DEFAULT_METAS_PATH = str(BASE_DIR / "metas.pkl")
+DEFAULT_INDEX_PATH = "nbadle.index"
+DEFAULT_DOCS_PATH = "docs.pkl"
+DEFAULT_METAS_PATH = "metas.pkl"
 
 # Precompiled regex
 RE_SEASON_RANGE = re.compile(r"(19|20)\d{2}\s*-\s*\d{2}")
@@ -42,7 +37,6 @@ INTENT_WORDS = {
 
 # Minimum Jaccard similarity for strong name match
 MIN_JACCARD_NAME_MATCH = 0.6
-MAX_RETRIES = 3
 
 
 def detect_season(query: str) -> str | None:
@@ -150,10 +144,11 @@ def strong_name_matches(query: str, results, min_jaccard: float = 0.6):
 
 
 class NBAdleChatbot:
-    def __init__(self):
-        self.prompt_template = PROMPT_TEMPLATE
+    def __init__(self, prompt_template: str):
+        self.prompt_template = prompt_template
         self.load_models()
         self.load_faiss_assets()
+        self.history = InMemoryChatMessageHistory()
 
     def load_models(self):
         self.embedder = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -166,8 +161,9 @@ class NBAdleChatbot:
         docs_path: str = DEFAULT_DOCS_PATH,
         metas_path: str = DEFAULT_METAS_PATH
     ):
+        self.index = faiss.read_index(index_path)
+
         try:
-            self.index = faiss.read_index(index_path)
             with open(docs_path, "rb") as f:
                 self.docs = pickle.load(f)
             with open(metas_path, "rb") as f:
@@ -286,21 +282,35 @@ class NBAdleChatbot:
             + "\n".join(options)
             + "\n\nReply with the full name, or add a hint like team, position, or season."
         )
+    
+    def add_user(self, text: str):
+        self.history.add_message(HumanMessage(content=text))
 
-    def generate_prompt(self, context: str, question: str, history: str) -> str:
+    def add_ai(self, text: str):
+        self.history.add_message(AIMessage(content=text))
+
+    def format_history(self, max_messages: int = 3) -> str:
+        msgs = self.history.messages[-max_messages:]
+        lines = []
+        for m in msgs:
+            role = "User" if m.type == "human" else "Assistant"
+            lines.append(f"{role}: {m.content}")
+        return "\n".join(lines)
+
+    def generate_prompt(self, context: str, question: str) -> str:
+        history = self.format_history()
+        print(history)
         return self.prompt_template.format(context=context, question=question, history=history)
 
-    def answer_question(self, question: str, history: str = "") -> str:
+    def answer_question(self, question: str) -> str:
+
+        self.add_user(question)
     
         name_only = is_name_only_query(question)
 
         top_k = 8 if name_only else 5
         prefetch_k = 50 if name_only else 60
         results = self.retrieve(question, top_k=top_k, prefetch_k=prefetch_k)
-
-        if not results:
-            return "Sorry, I could not find any relevant NBA stats information to answer your question."
-        
         if name_only:
             matches = strong_name_matches(question, results, min_jaccard=MIN_JACCARD_NAME_MATCH)
 
@@ -315,7 +325,6 @@ class NBAdleChatbot:
                 # If multiple strong matches, then disambiguate
                 unique_pids = list({m[2].get("player_id") for m in matches if m[2].get("player_id") is not None})
                 if len(unique_pids) >= 2:
-                    print(f"Disambiguation needed for query '{question}': {[m[2].get('player_name') for m in matches]}")
                     return self.disambiguation_message(matches, results)
 
                 # If only one strong match, lock onto it
@@ -324,29 +333,20 @@ class NBAdleChatbot:
                     results = [r for r in results if r[2].get("player_id") == target_pid and r[2].get("doc_type") in ["player_profile", "player_career"]]
 
         context = self.format_context(results)
-        prompt = self.generate_prompt(context, question, history)
+        prompt = self.generate_prompt(context, question)
 
-        for attempt in range(MAX_RETRIES):
-            try:
-                res = self.chat_client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                    config={"max_output_tokens": 2000, "temperature": 0.2}
-                )
-                return res.text.strip()
-
-            except google_exceptions.ResourceExhausted as e:
-                if attempt < MAX_RETRIES - 1:
-                    wait_time = (2 ** attempt) * 1
-                    print(f"Rate limit hit. Retrying in {wait_time}s...")
-                    time.sleep(wait_time)
-                else:
-                    error_msg = "I'm experiencing high demand right now. Please try again in a minute."
-                    return error_msg
-            
-            except Exception as e:
-                print(f"Error during answer generation: {e}")
-                return "Sorry, I encountered an error while generating the answer."
+        try:
+            res = self.chat_client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config={"max_output_tokens": 2000, "temperature": 0.2}
+            )
+            self.add_ai(res.text.strip())
+        except Exception as e:
+            self.add_ai("Sorry, I encountered an error while generating the answer.")
+            return "Sorry, I encountered an error while generating the answer."
+        
+        return res.text.strip()
     
     def format_context(self, results) -> str:
         context_parts = []
@@ -378,4 +378,4 @@ class NBAdleChatbot:
 
 if __name__ == "__main__":
 
-    NBAdleChatbot().chat()
+    NBAdleChatbot(prompt_template=PROMPT_TEMPLATE).chat()

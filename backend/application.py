@@ -6,6 +6,10 @@ import os
 import psycopg2
 import psycopg2.extras
 import numpy as np
+from datetime import datetime, timedelta
+
+from collections import deque
+from chatbot.nbadlechatbot import NBAdleChatbot
 
 app = Flask(__name__)
 application = app
@@ -29,6 +33,50 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
 mail = Mail(app)
+
+# Initialize the chatbot
+CHATBOT = NBAdleChatbot()
+
+# session_id -> deque of {"role": "...", "text": "..."}
+SESSION_HISTORY: dict[str, deque] = {}
+SESSION_TIMEOUT = timedelta(minutes=15)
+MAX_TURNS = 3
+MAX_HISTORY_CHARS = 2500
+
+def get_session_history(session_id: str) -> deque:
+    cleanup_old_sessions()
+    
+    if session_id not in SESSION_HISTORY:
+        SESSION_HISTORY[session_id] = {
+            "history": deque(maxlen=MAX_TURNS * 2),
+            "last_access": datetime.now()
+        }
+    
+    SESSION_HISTORY[session_id]["last_access"] = datetime.now()
+    return SESSION_HISTORY[session_id]["history"]
+
+def cleanup_old_sessions():
+    now = datetime.now()
+    expired = [
+        sid for sid, data in SESSION_HISTORY.items()
+        if now - data["last_access"] > SESSION_TIMEOUT
+    ]
+    for sid in expired:
+        del SESSION_HISTORY[sid]
+
+def format_history(history: deque, max_chars: int = MAX_HISTORY_CHARS) -> str:
+    lines = []
+    for msg in history:
+        role = "User" if msg.get("role") == "user" else "Assistant"
+        lines.append(f"{role}: {msg.get('text','')}")
+    s = "\n".join(lines)
+
+    if len(s) > max_chars:
+        s = s[-max_chars:]
+        cut = s.find("\n")
+        if cut != -1:
+            s = s[cut + 1 :]
+    return s
 
 def get_db_connection():
     """
@@ -78,343 +126,405 @@ def test_db():
         return {"db": "ok", "version": result}
     except Exception as e:
         return {"db": "error", "message": str(e)}
+    
+@app.route("/chat/health", methods=["GET"])
+def chat_health():
+    return jsonify({
+        "status": "ok",
+        "docs": len(getattr(CHATBOT, "docs", []))
+    })
+    
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    if CHATBOT is None:
+        return jsonify({"error": "Chatbot not initialized"}), 503
+    
+    data = request.get_json(silent=True) or {}
+    message = (data.get("message") or "").strip()
+    session_id = (data.get("session_id") or "default").strip()
+
+    if not message:
+        return jsonify({"error": "message is required"}), 400
+
+    history = get_session_history(session_id)
+
+    # build history text BEFORE adding the current message
+    history_text = format_history(history)
+
+    print(history_text)
+
+    # store the user message
+    history.append({"role": "user", "text": message})
+
+    try:
+        answer = CHATBOT.answer_question(message, history=history_text)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    history.append({"role": "assistant", "text": answer})
+
+    return jsonify({
+        "session_id": session_id,
+        "answer": answer
+    })
 
 @app.route('/teams', methods=['GET'])
 def teams():
     
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    
-    order = request.args.get('order', 'asc').lower()
-    order = 'asc' if order not in ['asc', 'desc'] else order
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        order = request.args.get('order', 'asc').lower()
+        order = 'asc' if order not in ['asc', 'desc'] else order
 
-    conference = request.args.get('conference', None)
+        conference = request.args.get('conference', None)
 
-    base_query = """
-    SELECT * FROM nba_teams
-    """
+        base_query = """
+        SELECT * FROM nba_teams
+        """
 
-    if conference:
-        query = base_query + """
-        WHERE conference = %s
-        ORDER BY full_name {};
-        """.format(order)
+        if conference:
+            query = base_query + """
+            WHERE conference = %s
+            ORDER BY full_name {};
+            """.format(order)
 
-        cursor.execute(query, (conference,))
+            cursor.execute(query, (conference,))
 
-    else:
-        query = base_query + f"ORDER BY full_name {order};"
-        cursor.execute(query)
+        else:
+            query = base_query + f"ORDER BY full_name {order};"
+            cursor.execute(query)
 
-    print(query)
+        print(query)
 
-    teams = cursor.fetchall()
-    teams = [dict(team) for team in teams]
+        teams = cursor.fetchall()
+        teams = [dict(team) for team in teams]
 
-    cursor.close()
-    connection.close()
-
-    return jsonify({'teams': teams})
+        return jsonify({'teams': teams})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/teams/<team_id>', methods=['GET'])
 def get_team(team_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    team_id = int(team_id)
-    query = """
-    SELECT * FROM nba_teams WHERE id = %s;
-    """
-    cursor.execute(query, (team_id,))
-    team = cursor.fetchone()
-    team = dict(team)
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'team': team})
+        team_id = int(team_id)
+        query = """
+        SELECT * FROM nba_teams WHERE id = %s;
+        """
+        cursor.execute(query, (team_id,))
+        team = cursor.fetchone()
+        team = dict(team)
+        return jsonify({'team': team})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/teams/abbr/<team_abbr>', methods=['GET'])
 def get_team_by_abbr(team_abbr):
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    team_abbr = team_abbr.upper()
-    print(team_abbr)
-    query = """
-    SELECT * FROM nba_teams WHERE name = %s;
-    """
-    cursor.execute(query, (team_abbr,))
-    team = cursor.fetchone()
-    team = dict(team)
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'team': team})
+        team_abbr = team_abbr.upper()
+        print(team_abbr)
+        query = """
+        SELECT * FROM nba_teams WHERE name = %s;
+        """
+        cursor.execute(query, (team_abbr,))
+        team = cursor.fetchone()
+        team = dict(team)
+        return jsonify({'team': team})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/teams/<team_id>/players', methods=['GET'])
 def get_team_players(team_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    team_id = int(team_id)
-    query = """
-    SELECT
-        p.*,
-        t.name AS team_name
-    FROM
-        nba_players p
-    JOIN
-        nba_teams t
-    ON
-        p.team_id = t.id
-    WHERE
-        p.team_id = %s;
-    """
-    cursor.execute(query, (team_id,))
-    players = cursor.fetchall()
-    players = [dict(player) for player in players]
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'players': players})
+        team_id = int(team_id)
+        query = """
+        SELECT
+            p.*,
+            t.name AS team_name
+        FROM
+            nba_players p
+        JOIN
+            nba_teams t
+        ON
+            p.team_id = t.id
+        WHERE
+            p.team_id = %s;
+        """
+        cursor.execute(query, (team_id,))
+        players = cursor.fetchall()
+        players = [dict(player) for player in players]
+        return jsonify({'players': players})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/players/<player_id>', methods=['GET'])
 def get_player(player_id):
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    player_id = int(player_id)
-    query = """
-    SELECT
-        p.*,
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM
-        nba_players p
-    JOIN
-        nba_teams t
-    ON
-        p.team_id = t.id
-    WHERE
-        p.id = %s;
-    """
-    cursor.execute(query, (player_id,))
-    player = cursor.fetchone()
-    player = dict(player)
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'player': player})
+        player_id = int(player_id)
+        query = """
+        SELECT
+            p.*,
+            t.name AS team_name,
+            t.conference AS team_conference
+        FROM
+            nba_players p
+        JOIN
+            nba_teams t
+        ON
+            p.team_id = t.id
+        WHERE
+            p.id = %s;
+        """
+        cursor.execute(query, (player_id,))
+        player = cursor.fetchone()
+        player = dict(player)
+        return jsonify({'player': player})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/players', methods=['GET'])
 def players():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    order = request.args.get('order', 'asc').lower()
-    team = request.args.get('team', None)
-    search = request.args.get('search', None)
-    page = int(request.args.get('page', 1))
-    limit = int(request.args.get('limit', 10))
-    active = request.args.get('active', None)
+        order = request.args.get('order', 'asc').lower()
+        team = request.args.get('team', None)
+        search = request.args.get('search', None)
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 10))
+        active = request.args.get('active', None)
 
-    offset = (page - 1) * limit
-    if order not in ['asc', 'desc']:
-        order = 'asc'
+        offset = (page - 1) * limit
+        if order not in ['asc', 'desc']:
+            order = 'asc'
 
-    query = """
-    SELECT 
-        p.*, 
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM 
-        nba_players p
-    JOIN 
-        nba_teams t 
-    ON 
-        p.team_id = t.id
-    """
-    params = []
-    where_clauses = []
+        query = """
+        SELECT 
+            p.*, 
+            t.name AS team_name,
+            t.conference AS team_conference
+        FROM 
+            nba_players p
+        JOIN 
+            nba_teams t 
+        ON 
+            p.team_id = t.id
+        """
+        params = []
+        where_clauses = []
 
-    if team:
-        where_clauses.append("t.name = %s")
-        params.append(team.upper())
-    if search:
-        search_pattern = f"%{search.strip()}%"
-        # Search either in first_name, last_name, or full_name (first + last)
-        where_clauses.append("""
-            (p.first_name ILIKE %s OR 
-            p.last_name ILIKE %s OR 
-            (p.first_name || ' ' || p.last_name) ILIKE %s)
-        """)
-        params.extend([search_pattern, search_pattern, search_pattern])
-        # search_terms = search.strip().split()
-        # if len(search_terms) == 2:
-        #     # If there are two words, treat them as first_name and last_name
-        #     where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
-        #     params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
-        # else:
-        #     # Otherwise, search in first_name or last_name
-        #     where_clauses.append("""
-        #         (p.first_name ILIKE %s OR 
-        #         p.last_name ILIKE %s OR 
-        #         (p.first_name || ' ' || p.last_name) ILIKE %s)
-        #     """)
-        #     params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
-    if active and active.lower() in ['true', 'false']:
-        is_active = active.lower() == 'true'
-        if is_active:
-            where_clauses.append("p.active = %s")
-            params.append(is_active)
+        if team:
+            where_clauses.append("t.name = %s")
+            params.append(team.upper())
+        if search:
+            search_pattern = f"%{search.strip()}%"
+            # Search either in first_name, last_name, or full_name (first + last)
+            where_clauses.append("""
+                (p.first_name ILIKE %s OR 
+                p.last_name ILIKE %s OR 
+                (p.first_name || ' ' || p.last_name) ILIKE %s)
+            """)
+            params.extend([search_pattern, search_pattern, search_pattern])
+            # search_terms = search.strip().split()
+            # if len(search_terms) == 2:
+            #     # If there are two words, treat them as first_name and last_name
+            #     where_clauses.append("(p.first_name ILIKE %s AND p.last_name ILIKE %s)")
+            #     params.extend([f'%{search_terms[0]}%', f'%{search_terms[1]}%'])
+            # else:
+            #     # Otherwise, search in first_name or last_name
+            #     where_clauses.append("""
+            #         (p.first_name ILIKE %s OR 
+            #         p.last_name ILIKE %s OR 
+            #         (p.first_name || ' ' || p.last_name) ILIKE %s)
+            #     """)
+            #     params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+        if active and active.lower() in ['true', 'false']:
+            is_active = active.lower() == 'true'
+            if is_active:
+                where_clauses.append("p.active = %s")
+                params.append(is_active)
 
-    if where_clauses:
-        query += " WHERE " + " AND ".join(where_clauses)
+        if where_clauses:
+            query += " WHERE " + " AND ".join(where_clauses)
 
-    query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s"
-    params.extend([limit, offset])
+        query += f" ORDER BY p.last_name {order} LIMIT %s OFFSET %s"
+        params.extend([limit, offset])
 
-    cursor.execute(query, tuple(params))
-    players = cursor.fetchall()
+        cursor.execute(query, tuple(params))
+        players = cursor.fetchall()
 
-    count_query = """
-    SELECT COUNT(*)
-    FROM nba_players p
-    JOIN nba_teams t ON p.team_id = t.id
-    """
-    if where_clauses:
-        count_query += " WHERE " + " AND ".join(where_clauses)
+        count_query = """
+        SELECT COUNT(*)
+        FROM nba_players p
+        JOIN nba_teams t ON p.team_id = t.id
+        """
+        if where_clauses:
+            count_query += " WHERE " + " AND ".join(where_clauses)
 
-    cursor.execute(count_query, tuple(params[:-2]))  # Exclude LIMIT and OFFSET
-    total_players = cursor.fetchone()[0]
+        cursor.execute(count_query, tuple(params[:-2]))  # Exclude LIMIT and OFFSET
+        total_players = cursor.fetchone()[0]
 
-    players = [dict(player) for player in players]
+        players = [dict(player) for player in players]
 
-    cursor.close()
-    connection.close()
-
-    return jsonify({
-        'players': players,
-        'total': total_players,
-        'page': page,
-        'limit': limit
-    })
+        return jsonify({
+            'players': players,
+            'total': total_players,
+            'page': page,
+            'limit': limit
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/all_players', methods=['GET'])
 def all_players():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    active = request.args.get('active', None)
+        active = request.args.get('active', None)
 
-    params = []
-    where_clauses = []
+        params = []
+        where_clauses = []
 
-    query = """
-    SELECT 
-        p.*, 
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM 
-        nba_players p
-    JOIN 
-        nba_teams t 
-    ON 
-        p.team_id = t.id
-    """
+        query = """
+        SELECT 
+            p.*, 
+            t.name AS team_name,
+            t.conference AS team_conference
+        FROM 
+            nba_players p
+        JOIN 
+            nba_teams t 
+        ON 
+            p.team_id = t.id
+        """
 
-    if active and active.lower() in ['true', 'false']:
-        is_active = active.lower() == 'true'
-        if is_active:
-            where_clauses.append("p.active = %s")
-            params.append(is_active)
-    
-    if where_clauses:
-        query += " WHERE " + " AND ".join(where_clauses)
+        if active and active.lower() in ['true', 'false']:
+            is_active = active.lower() == 'true'
+            if is_active:
+                where_clauses.append("p.active = %s")
+                params.append(is_active)
+        
+        if where_clauses:
+            query += " WHERE " + " AND ".join(where_clauses)
 
-    query += ";"
+        query += ";"
 
-    cursor.execute(query, tuple(params))
+        cursor.execute(query, tuple(params))
 
-    players = cursor.fetchall()
-    players = [dict(player) for player in players]
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'players': players})
+        players = cursor.fetchall()
+        players = [dict(player) for player in players]
+        return jsonify({'players': players})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/well_known_players', methods=['GET'])
 def well_known_players():
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    query = """
-    SELECT
-        p.*,
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM nba_players p
-    LEFT JOIN (
-        SELECT player_id
-        FROM nba_player_stats
-        GROUP BY player_id
-        HAVING COUNT(*) >= 6
-    ) AS players_with_more_than_6_stats
-    ON p.id = players_with_more_than_6_stats.player_id
-    JOIN nba_teams t ON p.team_id = t.id
-    WHERE players_with_more_than_6_stats.player_id IS NOT NULL;
-    """
-    cursor.execute(query)
-    players = cursor.fetchall()
-    players = [dict(player) for player in players]
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'players': players})
+        query = """
+        SELECT
+            p.*,
+            t.name AS team_name,
+            t.conference AS team_conference
+        FROM nba_players p
+        LEFT JOIN (
+            SELECT player_id
+            FROM nba_player_stats
+            GROUP BY player_id
+            HAVING COUNT(*) >= 6
+        ) AS players_with_more_than_6_stats
+        ON p.id = players_with_more_than_6_stats.player_id
+        JOIN nba_teams t ON p.team_id = t.id
+        WHERE players_with_more_than_6_stats.player_id IS NOT NULL;
+        """
+        cursor.execute(query)
+        players = cursor.fetchall()
+        players = [dict(player) for player in players]
+        return jsonify({'players': players})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 @app.route('/guess_players', methods=['GET'])
 def guess_players():
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    connection = get_db_connection()
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-    query = """
-    SELECT
-        p.*,
-        t.name AS team_name,
-        t.conference AS team_conference
-    FROM nba_players p
-    LEFT JOIN (
-        SELECT player_id
-        FROM nba_player_stats
-        GROUP BY player_id
-        HAVING COUNT(*) >= 7
-    ) AS players_with_more_than_7_stats
-    ON p.id = players_with_more_than_7_stats.player_id
-    JOIN nba_teams t ON p.team_id = t.id
-    WHERE players_with_more_than_7_stats.player_id IS NOT NULL AND p.image_url != 'https://cdn.nba.com/headshots/nba/latest/260x190/fallback.png';
-    """
-    cursor.execute(query)
-    players = cursor.fetchall()
-    players = [dict(player) for player in players]
-
-    cursor.close()
-    connection.close()
-
-    return jsonify({'players': players})
+        query = """
+        SELECT
+            p.*,
+            t.name AS team_name,
+            t.conference AS team_conference
+        FROM nba_players p
+        LEFT JOIN (
+            SELECT player_id
+            FROM nba_player_stats
+            GROUP BY player_id
+            HAVING COUNT(*) >= 7
+        ) AS players_with_more_than_7_stats
+        ON p.id = players_with_more_than_7_stats.player_id
+        JOIN nba_teams t ON p.team_id = t.id
+        WHERE players_with_more_than_7_stats.player_id IS NOT NULL AND p.image_url != 'https://cdn.nba.com/headshots/nba/latest/260x190/fallback.png';
+        """
+        cursor.execute(query)
+        players = cursor.fetchall()
+        players = [dict(player) for player in players]
+        return jsonify({'players': players})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        connection.close()
 
 
 @app.route('/players/<player_id>/stats', methods=['GET'])

@@ -9,6 +9,7 @@ __pycache__/
 backend/chatbot/*.index
 backend/chatbot/*.faiss
 backend/chatbot/*.pkl
+backend/chatbot/*.jsonl
 
 # Elastic Beanstalk
 backend/.elasticbeanstalk/
