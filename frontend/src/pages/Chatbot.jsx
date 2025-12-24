@@ -1,6 +1,5 @@
 // src/pages/Chatbot.jsx
 import "../styles/Chatbot.css";
-import { Link } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useRef, useState } from "react";
 
@@ -20,15 +19,25 @@ function Chatbot() {
   const [chat, setChat] = useState([
     {
       role: "assistant",
-      text: "Ask me anything about NBA, and I'll do my best to help!",
+      text: "Hey! Ask me anything about the NBA, and I'll do my best to help!",
     },
   ]);
 
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
-//   useEffect(() => {
-//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   }, [chat, loading]);
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat, loading]);
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+    }
+  }, [message]);
 
   async function sendMessage() {
     const text = message.trim();
@@ -47,18 +56,35 @@ function Chatbot() {
 
       const data = await res.json();
 
-      if (!res.ok || res.stats == 500) {
+      if (!res.ok || res.status === 500) {
         setChat((prev) => [
           ...prev,
-          { role: "assistant", text: data?.error || "Something went wrong." },
+          { 
+            role: "assistant", 
+            text: data?.error || "Something went wrong. Please try again." 
+          },
         ]);
       } else {
-        setChat((prev) => [...prev, { role: "assistant", text: data.answer }]);
+        let answerText = data.answer;
+      
+        // Append internal link if metadata exists
+        if (data.metadata && (data.metadata.player_id || data.metadata.team_id)) {
+            if (data.metadata.player_id) {
+                answerText += `\n\n[View ${data.metadata.player_name}'s Profile](/players/${data.metadata.player_id})`;
+            } else if (data.metadata.team_id) {
+                answerText += `\n\n[View ${data.metadata.team_name}'s Page](/teams/${data.metadata.team_id})`;
+            }
+        }
+
+        setChat((prev) => [...prev, { role: "assistant", text: answerText, metadata: data.metadata || null }]);
       }
     } catch (e) {
       setChat((prev) => [
         ...prev,
-        { role: "assistant", text: "Could not connect to the server. Make sure the Flask API is running." },
+        { 
+          role: "assistant", 
+          text: "Could not connect to the server. Please try again later." 
+        },
       ]);
     } finally {
       setLoading(false);
@@ -74,7 +100,6 @@ function Chatbot() {
 
   return (
     <div id="chatbot-container">
-
       <div id="chatbot-header">
         <h1>NBAdle Assistant</h1>
       </div>
@@ -83,11 +108,27 @@ function Chatbot() {
         {chat.map((m, idx) => (
           <div key={idx} className={`msg ${m.role}`}>
             <div className="bubble">
-              {m.role === "assistant" ? (
-                <ReactMarkdown>{m.text}</ReactMarkdown>
-              ) : (
+                {m.role === "assistant" ? (
+                <>
+                    {(m.metadata?.player_image_url || m.metadata?.team_image_url) && (
+                    <img
+                        src={m.metadata.player_image_url || m.metadata.team_image_url}
+                        alt={
+                        m.metadata?.player_name
+                            ? `${m.metadata.player_name} headshot`
+                            : m.metadata?.team_name
+                            ? `${m.metadata.team_name} logo`
+                            : "Image"
+                        }
+                        className="chatbot-headshot"
+                        loading="lazy"
+                    />
+                    )}
+                    <ReactMarkdown>{m.text}</ReactMarkdown>
+                </>
+                ) : (
                 m.text
-              )}
+                )}
             </div>
           </div>
         ))}
@@ -103,15 +144,20 @@ function Chatbot() {
 
       <div id="chat-input-area">
         <textarea
+          ref={textareaRef}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder='Type your message here...'
+          placeholder='Ask about players, stats, teams...'
           rows={1}
           disabled={loading}
         />
-        <button className="button send" onClick={sendMessage} disabled={loading || !message.trim()}>
-          Send
+        <button 
+          className="button send" 
+          onClick={sendMessage} 
+          disabled={loading || !message.trim()}
+        >
+          {loading ? "..." : "Send"}
         </button>
       </div>
     </div>

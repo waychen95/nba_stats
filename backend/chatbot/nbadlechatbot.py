@@ -12,7 +12,7 @@ from google import genai
 from langchain_core.chat_history import InMemoryChatMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage
 
-from chatbot.config import PROMPT_TEMPLATE
+from chatbot.config import PROMPT_TEMPLATE, REWRITE_PROMPT_TEMPLATE
 
 load_dotenv()
 
@@ -240,13 +240,12 @@ class NBAdleChatbot:
 
         return final
     
-    def disambiguation_message(self, matches, results, limit: int = 5) -> str:
+    def disambiguation_message(self, matches, limit: int = 5) -> str:
         # Show top profile matches with a little identifying info
         options = []
         seen = set()
 
         for _, text, meta, _jac in matches:
-
             pid = meta.get("player_id")
             name = meta.get("player_name", "Unknown")
             if pid in seen:
@@ -285,10 +284,75 @@ class NBAdleChatbot:
             "Which one did you mean?\n"
             + "\n".join(options)
             + "\n\nReply with the full name, or add a hint like team, position, or season."
-        )
+        ), {}
 
-    def generate_prompt(self, context: str, question: str, history: str) -> str:
-        return self.prompt_template.format(context=context, question=question, history=history)
+    def generate_prompt(self, context: str, question: str) -> str:
+        return self.prompt_template.format(context=context, question=question)
+    
+    def ask_gemini(self, prompt: str, metadata: dict) -> tuple[str, dict]:
+        for attempt in range(MAX_RETRIES):
+            try:
+                res = self.chat_client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt,
+                    config={"max_output_tokens": 2000, "temperature": 0.2}
+                )
+                if res.text == "Sorry, I can only answer NBA stats questions. Please ask another question.":
+                    return res.text, {}
+                return res.text.strip(), metadata
+
+            except google_exceptions.ResourceExhausted as e:
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = (2 ** attempt) * 1
+                    print(f"Rate limit hit. Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                else:
+                    error_msg = "I'm experiencing high demand right now. Please try again in a minute."
+                    return error_msg, {}
+            
+            except Exception as e:
+                print(f"Error during answer generation: {e}")
+                return "Sorry, I encountered an error while generating the answer.", {}
+            
+    def rewrite_query(self, message: str, history: str) -> str:
+        """
+        Returns a standalone query for embedding + retrieval.
+        Falls back to original message if rewrite fails or history is empty.
+        """
+        if not history.strip():
+            return message
+
+        prompt = REWRITE_PROMPT_TEMPLATE.format(history=history, message=message)
+
+        for attempt in range(MAX_RETRIES):
+            try:
+                res = self.chat_client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt,
+                    config={"max_output_tokens": 80, "temperature": 0.0}
+                )
+                rewritten = (res.text or "").strip()
+
+                # Safety: avoid empty rewrites
+                if rewritten:
+                    return rewritten
+
+                return message
+
+            except google_exceptions.ResourceExhausted:
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep((2 ** attempt) * 1)
+                    continue
+                return message
+            except Exception:
+                return message
+
+    def build_retrieval_query(self, message: str, history: str) -> str:
+        """
+        If history exists, use Gemini to rewrite.
+        Otherwise use message as-is.
+        """
+        return self.rewrite_query(message, history) if history else message
 
     def answer_question(self, question: str, history: str = "") -> str:
     
@@ -296,7 +360,12 @@ class NBAdleChatbot:
 
         top_k = 8 if name_only else 5
         prefetch_k = 50 if name_only else 60
-        results = self.retrieve(question, top_k=top_k, prefetch_k=prefetch_k)
+        
+        retrieval_query = self.build_retrieval_query(question, history)
+
+        print(f"[rewrite] user='{question}' -> retrieval='{retrieval_query}'")
+
+        results = self.retrieve(retrieval_query, top_k=top_k, prefetch_k=prefetch_k)
 
         if not results:
             return "Sorry, I could not find any relevant NBA stats information to answer your question."
@@ -316,38 +385,35 @@ class NBAdleChatbot:
                 unique_pids = list({m[2].get("player_id") for m in matches if m[2].get("player_id") is not None})
                 if len(unique_pids) >= 2:
                     print(f"Disambiguation needed for query '{question}': {[m[2].get('player_name') for m in matches]}")
-                    return self.disambiguation_message(matches, results)
+                    return self.disambiguation_message(matches)
 
                 # If only one strong match, lock onto it
                 if len(unique_pids) == 1:
                     target_pid = unique_pids[0]
                     results = [r for r in results if r[2].get("player_id") == target_pid and r[2].get("doc_type") in ["player_profile", "player_career"]]
 
+        # Extract metadata for links
+        metadata = {}
+        if results:
+            first_meta = results[0][2]
+            if first_meta.get("player_id"):
+                metadata["player_id"] = first_meta["player_id"]
+                metadata["player_name"] = first_meta.get("player_name", "")
+                metadata["player_image_url"] = first_meta.get("player_image_url", "")
+            elif first_meta.get("team_id"):
+                metadata["team_id"] = first_meta["team_id"]
+                metadata["team_name"] = first_meta.get("team_name", "")
+                metadata["team_abbr"] = first_meta.get("team_abbr", "")
+                metadata["team_url"] = first_meta.get("team_url", "")
+                metadata["team_image_url"] = first_meta.get("team_image_url", "")
+
         context = self.format_context(results)
-        prompt = self.generate_prompt(context, question, history)
+        print(context)
+        prompt = self.generate_prompt(context, retrieval_query)
 
-        for attempt in range(MAX_RETRIES):
-            try:
-                res = self.chat_client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                    config={"max_output_tokens": 2000, "temperature": 0.2}
-                )
-                return res.text.strip()
+        answer, answer_metadata = self.ask_gemini(prompt, metadata)
+        return answer, answer_metadata
 
-            except google_exceptions.ResourceExhausted as e:
-                if attempt < MAX_RETRIES - 1:
-                    wait_time = (2 ** attempt) * 1
-                    print(f"Rate limit hit. Retrying in {wait_time}s...")
-                    time.sleep(wait_time)
-                else:
-                    error_msg = "I'm experiencing high demand right now. Please try again in a minute."
-                    return error_msg
-            
-            except Exception as e:
-                print(f"Error during answer generation: {e}")
-                return "Sorry, I encountered an error while generating the answer."
-    
     def format_context(self, results) -> str:
         context_parts = []
         for score, text, meta in results:

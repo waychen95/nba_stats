@@ -152,22 +152,25 @@ def chat():
     # build history text BEFORE adding the current message
     history_text = format_history(history)
 
-    print(history_text)
-
     # store the user message
     history.append({"role": "user", "text": message})
 
     try:
-        answer = CHATBOT.answer_question(message, history=history_text)
+        answer, metadata = CHATBOT.answer_question(message, history=history_text)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     history.append({"role": "assistant", "text": answer})
 
-    return jsonify({
+    response =  {
         "session_id": session_id,
-        "answer": answer
-    })
+        "answer": answer,
+    }
+
+    if metadata:
+        response['metadata'] = metadata if "sorry" not in answer.lower() else {}
+
+    return jsonify(response)
 
 @app.route('/teams', methods=['GET'])
 def teams():

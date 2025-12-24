@@ -83,6 +83,8 @@ def build_team_docs(teams: pd.DataFrame) -> list[dict]:
         city = clean(t.get("city"))
         conf = clean(t.get("conference"))
         coach = clean(t.get("head_coach"))
+        url = clean(t.get("url"))
+        image_url = clean(t.get("logo_url"))
 
         text_parts = []
         if city or full_name or abbr:
@@ -91,6 +93,10 @@ def build_team_docs(teams: pd.DataFrame) -> list[dict]:
             text_parts.append(f"Conference: {conf}.")
         if coach:
             text_parts.append(f"Head coach: {coach}.")
+        if url:
+            text_parts.append(f"URL: {url}")
+        if image_url:
+            text_parts.append(f"Image: {image_url}")
 
         text = " ".join([p for p in text_parts if p]).strip()
 
@@ -101,7 +107,9 @@ def build_team_docs(teams: pd.DataFrame) -> list[dict]:
                 "doc_type": "team",
                 "team_id": team_id,
                 "team_abbr": abbr,
-                "team_name": f"{city} {full_name}".strip()
+                "team_name": f"{city} {full_name}".strip(),
+                "team_url": url,
+                "team_image_url": image_url
             }
         })
     return docs
@@ -125,6 +133,7 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
         school = clean(p.get("last_attended"))
         active = clean(p.get("active"))
         url = clean(p.get("url"))
+        image_url = clean(p.get("image_url"))
 
         # Current team info may exist in your merged players CSV (name, full_name, city)
         cur_abbr = clean(p.get("name")).upper()
@@ -159,6 +168,8 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
             profile_parts.append(f"Bio: {bio}")
         if url:
             profile_parts.append(f"URL: {url}")
+        if image_url:
+            profile_parts.append(f"Image: {image_url}")
 
         profile_text = " ".join(profile_parts).strip()
 
@@ -168,7 +179,9 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
             "meta": {
                 "doc_type": "player_profile",
                 "player_id": player_id,
-                "player_name": full_name
+                "player_name": full_name,
+                "player_url": url,
+                "player_image_url": image_url
             }
         })
 
@@ -202,7 +215,9 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
                     "player_name": full_name,
                     "season": season,
                     "team_id": team_id,
-                    "team_abbr": team_abbr
+                    "team_abbr": team_abbr,
+                    "player_url": url,
+                    "player_image_url": image_url
                 }
             })
 
@@ -307,7 +322,9 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
                     "meta": {
                         "doc_type": "player_career",
                         "player_id": player_id,
-                        "player_name": full_name
+                        "player_name": full_name,
+                        "player_url": url,
+                        "player_image_url": image_url
                     }
                 })
 
