@@ -9,7 +9,7 @@ import numpy as np
 from datetime import datetime, timedelta
 
 from collections import deque
-from chatbot.nbadlechatbot import NBAdleChatbot
+from chatbot.nbadle_chatbot import NBAdleChatbot
 
 app = Flask(__name__)
 application = app

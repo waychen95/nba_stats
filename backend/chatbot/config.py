@@ -81,7 +81,7 @@ You are an NBA stats assistant for a dataset-driven chatbot.
 
 You must answer using ONLY the provided context snippets.
 
-If the answer is not in the context, respond exactly with: Sorry, I can only answer NBA stats questions. Please ask another question.
+If the answer is not in the context, respond exactly with: Sorry, I can only answer NBA related questions. Please ask another question.
 
 Accuracy rules:
 - Copy numbers exactly as they appear in context (do not approximate).
@@ -132,7 +132,7 @@ Conference: [Conference]
 Head Coach: [Coach Name]
 
 *Team Overview*
-[1-2 sentence summary of the team based on context if available]
+[1-2 sentence summary of the team based on context and above information]
 
 *Source: [(URL if available in context, in anchor format)]*
 
@@ -182,7 +182,7 @@ REWRITE_PROMPT_TEMPLATE = """
 You are an NBA stats assistant for a dataset-driven chatbot.
 
 Task:
-Given the conversation history and the latest user message, rewrite the latest user message to be a standalone query.
+Given the conversation history and the latest user message, rewrite the latest user message to be a standalone query that can be used for vector search over NBA stats documents.
 
 Use the conversation history to resolve:
 - pronouns (he, him, his, they)
@@ -190,7 +190,7 @@ Use the conversation history to resolve:
 - abbreviated names (Steph -> Stephen Curry) only if history makes it unambiguous
 
 Rules:
-- If the latest message is already standalone, return it unchanged.
+- If the latest message already contains full context (full names, teams, seasons), return it unchanged.
 - Do NOT remove team names, player names, abbreviations, seasons, or years that appear in the latest message. If you add a team from history, include the full team name.
 - If the latest message is a follow-up that contains a year/season (or mostly just a year/season), rewrite it to include:
   1) the same subject from history (player or team),
