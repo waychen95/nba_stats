@@ -1,4 +1,3 @@
-// src/pages/Chatbot.jsx
 import "../styles/Chatbot.css";
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useRef, useState } from "react";
@@ -6,14 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 function Chatbot() {
-  const [sessionId] = useState(() => {
-    const existing = localStorage.getItem("nbadle_session_id");
-    if (existing) return existing;
-    const id = `sess_${Math.random().toString(36).slice(2)}_${Date.now()}`;
-    localStorage.setItem("nbadle_session_id", id);
-    return id;
-  });
-
+  const [sessionId] = useState(() => `sess_${crypto.randomUUID()}`);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [chat, setChat] = useState([
@@ -67,7 +59,6 @@ function Chatbot() {
       } else {
         let answerText = data.answer;
       
-        // Append internal link if metadata exists
         if (data.metadata && (data.metadata.player_id || data.metadata.team_id)) {
             if (data.metadata.player_id) {
                 answerText += `\n\n[View ${data.metadata.player_name}'s Profile](/players/${data.metadata.player_id})`;
@@ -75,6 +66,8 @@ function Chatbot() {
                 answerText += `\n\n[View ${data.metadata.team_name}'s Page](/teams/${data.metadata.team_id})`;
             }
         }
+
+        console.log(data.metadata);
 
         setChat((prev) => [...prev, { role: "assistant", text: answerText, metadata: data.metadata || null }]);
       }

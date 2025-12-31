@@ -1,6 +1,7 @@
 import json
 import math
 import pandas as pd
+import numpy as np
 
 PLAYERS_CSV = "../export/merged_players.csv"
 TEAMS_CSV = "../export/teams.csv"
@@ -74,6 +75,24 @@ def fmt_height(feet, inches) -> str:
     return f"{f}'{i}"
 
 
+def convert_to_native_types(obj):
+    """Convert numpy/pandas types to native Python types for JSON serialization."""
+    if isinstance(obj, dict):
+        return {k: convert_to_native_types(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_native_types(item) for item in obj]
+    elif isinstance(obj, (np.integer, pd.Int64Dtype)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, pd.Float64Dtype)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif pd.isna(obj):
+        return None
+    else:
+        return obj
+
+
 def build_team_docs(teams: pd.DataFrame) -> list[dict]:
     docs = []
     for _, t in teams.iterrows():
@@ -86,20 +105,37 @@ def build_team_docs(teams: pd.DataFrame) -> list[dict]:
         url = clean(t.get("url"))
         image_url = clean(t.get("logo_url"))
 
+        # Create a richer main team document
         text_parts = []
+        
+        # Start with multiple name variations for better matching
         if city or full_name or abbr:
-            text_parts.append(f"{city} {full_name} ({abbr}).".strip())
+            full_team = f"{city} {full_name}".strip()
+            text_parts.append(f"{full_team} ({abbr})")
+            text_parts.append(f"The {full_team} are an NBA team")
+            if abbr:
+                text_parts.append(f"Team abbreviation: {abbr}")
+        
         if conf:
-            text_parts.append(f"Conference: {conf}.")
+            text_parts.append(f"Conference: {conf}")
+            text_parts.append(f"The team plays in the {conf} conference")
+        
         if coach:
-            text_parts.append(f"Head coach: {coach}.")
+            text_parts.append(f"Head coach: {coach}")
+            text_parts.append(f"{coach} is the head coach of the {full_team}")
+        
+        if city:
+            text_parts.append(f"Located in {city}")
+            
         if url:
-            text_parts.append(f"URL: {url}")
+            text_parts.append(f"Official website: {url}")
+        
         if image_url:
-            text_parts.append(f"Image: {image_url}")
+            text_parts.append(f"Team logo: {image_url}")
 
-        text = " ".join([p for p in text_parts if p]).strip()
+        text = ". ".join([p for p in text_parts if p]).strip() + "."
 
+        # Main team info document
         docs.append({
             "id": f"team:{team_id}",
             "text": text,
@@ -112,6 +148,24 @@ def build_team_docs(teams: pd.DataFrame) -> list[dict]:
                 "team_image_url": image_url
             }
         })
+        
+        # Create a separate coaching document for better coach queries
+        if coach:
+            coach_text = f"The head coach of the {city} {full_name} ({abbr}) is {coach}. {coach} coaches the {abbr}."
+            docs.append({
+                "id": f"team_coach:{team_id}",
+                "text": coach_text,
+                "meta": {
+                    "doc_type": "team_coach",
+                    "team_id": team_id,
+                    "team_abbr": abbr,
+                    "team_name": f"{city} {full_name}".strip(),
+                    "head_coach": coach,
+                    "team_url": url,
+                    "team_image_url": image_url
+                }
+            })
+
     return docs
 
 
@@ -330,6 +384,101 @@ def build_player_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.Data
 
     return docs
 
+def build_roster_docs(players: pd.DataFrame, stats: pd.DataFrame, teams: pd.DataFrame) -> list[dict]:
+    """Build documents for team rosters by season."""
+    docs = []
+    
+    team_map = teams.set_index("id")[["name", "full_name", "city"]].to_dict("index")
+    
+    # Group stats by team and season
+    stats_with_names = stats.merge(
+        players[['id', 'first_name', 'last_name', 'position']], 
+        left_on='player_id', 
+        right_on='id', 
+        how='left'
+    )
+    
+    grouped = stats_with_names.groupby(['team_id', 'year'])
+    
+    for (team_id, season), group in grouped:
+        team_info = team_map.get(team_id, {})
+        team_abbr = clean(team_info.get("name")).upper()
+        team_full = clean(team_info.get("full_name")).title()
+        team_city = clean(team_info.get("city"))
+        team_name = f"{team_city} {team_full}".strip()
+        
+        if not team_name or not season:
+            continue
+        
+        # Sort by minutes played to get key players first
+        group = group.sort_values('min', ascending=False)
+        
+        # Build roster text with player names and key stats
+        player_lines = []
+        for _, row in group.iterrows():
+            first = clean(row.get('first_name'))
+            last = clean(row.get('last_name'))
+            player_name = f"{first} {last}".strip()
+            pos = clean(row.get('position'))
+            pts = clean(row.get('pts'))
+            reb = clean(row.get('reb'))
+            ast = clean(row.get('ast'))
+            gp = clean(row.get('gp'))
+            
+            # Create player entry
+            player_info = f"{player_name}"
+            if pos:
+                player_info += f" ({pos})"
+            if pts and reb and ast:
+                player_info += f": {pts} PPG, {reb} RPG, {ast} APG"
+            if gp:
+                player_info += f", {gp} GP"
+            
+            player_lines.append(player_info)
+        
+        # Create comprehensive roster text
+        roster_text = (
+            f"{team_name} ({team_abbr}) roster for the {season} season. "
+            f"Players: {', '.join([p.split(':')[0].strip() for p in player_lines[:15]])}. "  # Names only for searchability
+            f"\n\nDetailed stats:\n" + "\n".join(player_lines[:15])  # Top 15 players with stats
+        )
+        
+        # Also create a simpler version for better embedding
+        simple_roster = (
+            f"The {team_name} {team_abbr} {season} roster included: "
+            f"{', '.join([p.split('(')[0].strip() for p in player_lines])}. "
+            f"Team roster for {season} season."
+        )
+        
+        docs.append({
+            "id": f"roster:{team_id}:{season}",
+            "text": roster_text,
+            "meta": {
+                "doc_type": "roster",
+                "team_id": int(team_id),  # Ensure native int
+                "team_abbr": team_abbr,
+                "team_name": team_name,
+                "season": str(season),  # Ensure native str
+                "player_count": len(player_lines)
+            }
+        })
+        
+        # Add the simpler version as a separate doc for better retrieval
+        docs.append({
+            "id": f"roster_simple:{team_id}:{season}",
+            "text": simple_roster,
+            "meta": {
+                "doc_type": "roster_simple",
+                "team_id": int(team_id),  # Ensure native int
+                "team_abbr": team_abbr,
+                "team_name": team_name,
+                "season": str(season),  # Ensure native str
+                "player_count": len(player_lines)
+            }
+        })
+    
+    return docs
+
 
 def main():
     players = pd.read_csv(PLAYERS_CSV)
@@ -339,10 +488,13 @@ def main():
     docs = []
     docs.extend(build_team_docs(teams))
     docs.extend(build_player_docs(players, stats, teams))
+    docs.extend(build_roster_docs(players, stats, teams))
 
     with open(OUT_JSONL, "w", encoding="utf-8") as f:
         for d in docs:
-            f.write(json.dumps(d, ensure_ascii=False) + "\n")
+            # Convert numpy/pandas types to native Python types
+            d_converted = convert_to_native_types(d)
+            f.write(json.dumps(d_converted, ensure_ascii=False) + "\n")
 
     print(f"Created {OUT_JSONL} with {len(docs)} documents.")
     print("Each line is one doc with {id, text, meta}, this is the file used before embedding.")

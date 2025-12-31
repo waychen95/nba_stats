@@ -39,7 +39,7 @@ CHATBOT = NBAdleChatbot()
 
 # session_id -> deque of {"role": "...", "text": "..."}
 SESSION_HISTORY: dict[str, deque] = {}
-SESSION_TIMEOUT = timedelta(minutes=15)
+SESSION_TIMEOUT = timedelta(minutes=5)
 MAX_TURNS = 3
 MAX_HISTORY_CHARS = 2500
 
@@ -142,17 +142,17 @@ def chat():
     
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or "").strip()
-    session_id = (data.get("session_id") or "default").strip()
+    session_id = data.get("session_id")
+    if not session_id:
+        return jsonify({"error": "session_id is required"}), 400
 
     if not message:
         return jsonify({"error": "message is required"}), 400
 
     history = get_session_history(session_id)
 
-    # build history text BEFORE adding the current message
     history_text = format_history(history)
 
-    # store the user message
     history.append({"role": "user", "text": message})
 
     try:

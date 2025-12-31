@@ -1,3 +1,81 @@
+import re
+from pathlib import Path
+
+# Default paths for FAISS assets
+BASE_DIR = Path(__file__).resolve().parent  # backend/chatbot
+DEFAULT_INDEX_PATH = str(BASE_DIR / "nbadle.index")
+DEFAULT_DOCS_PATH  = str(BASE_DIR / "docs.pkl")
+DEFAULT_METAS_PATH = str(BASE_DIR / "metas.pkl")
+
+# Precompiled regex
+RE_SEASON_RANGE = re.compile(r"(19|20)\d{2}\s*-\s*\d{2}")
+RE_YEAR = re.compile(r"(19|20)\d{2}")
+RE_NON_ALNUM_SPACE = re.compile(r"[^a-z0-9\s]+")
+RE_MULTI_SPACE = re.compile(r"\s+")
+
+RE_POS = re.compile(r"Position:\s*([^\.]+)\.")
+RE_TEAM = re.compile(r"Current team:\s*([^\.]+)\.")
+
+# Keywords indicating user intent
+INTENT_WORDS = {
+    "height","weight","born","birth","age","position","college","school","country",
+    "coach","conference","team","city",
+    "season","year","stats","stat","career","overall","all","time","average","averages","totals",
+    "ppg","rpg","apg","mpg","points","rebounds","rebound","assists","assist","minutes","min",
+    "fg","fg%","3p","3p%","ft","ft%","+/-","plus","minus"
+}
+
+# Strong team indicators
+TEAM_INDICATORS = [
+    "lakers", "warriors", "celtics", "heat", "bulls", "knicks", 
+    "nets", "sixers", "bucks", "raptors", "cavaliers", "pistons",
+    "pacers", "hornets", "magic", "hawks", "wizards", "spurs",
+    "mavericks", "rockets", "grizzlies", "pelicans", "thunder",
+    "jazz", "nuggets", "timberwolves", "trail blazers", "suns",
+    "kings", "clippers",
+]
+
+TEAM_ABBREVIATIONS = [
+    "lal", "gsw", "bos", "mia", "chi", "nyk", 
+    "bkn", "phi", "mil", "tor", "cle", "det",
+    "ind", "cha", "orl", "atl", "was", "sas",
+    "dal", "hou", "mem", "nop", "okc", "uta", "den", "min", "por",
+    "phx", "sac", "lac"
+]
+
+# Minimum Jaccard similarity for strong name match
+MIN_JACCARD_NAME_MATCH = 0.6
+MAX_RETRIES = 3
+
+# Prompt for query classification
+CLASSIFICATION_PROMPT_TEMPLATE = """
+Classify this NBA query into ONE of these categories:
+
+Categories:
+- player_profile: Asking about a player's basic info (height, weight, position, team, college, etc.)
+- player_season: Asking about a player's stats for a specific season
+- player_career: Asking about a player's career stats or overall performance
+- team: Asking about team details (city, conference, coach)
+- roster: Asking about who played on a team in a season
+- comparison: Comparing multiple players or teams
+- other: None of the above
+
+Important:
+- If a season/year is mentioned with player stats → player_season
+- If "roster", "who played", "players on" → roster
+- If asking about a specific player by name only → player_profile
+- If "career", "all-time", "overall" → player_career
+- If asking about team details or coach → team
+- Response cannot be empty
+
+Reply with EXACTLY one of the categories above, nothing else.
+
+Query: {query}
+
+Category:
+"""
+
+# Prompt templates
 PROMPT_TEMPLATE = """
 You are an NBA stats assistant for a dataset-driven chatbot.
 
@@ -17,6 +95,10 @@ Player matching:
 - If the question mentions a player, only use snippets with that player's name in the snippet label or text.
 - If the question mentions a player but with a typo, use context snippets that best match the intended player.
 - If the question is too ambiguous (multiple players with same last name), respond: Sorry, I need more information to identify the player. Please provide the full name or team.
+
+Team Roster matching:
+- If the question indicates a specific team and season for roster, only use snippets with that team and season in the snippet label or text.
+- If no season or year is mentioned for roster, use the most recent season snippet available in context for that team.
 
 Season handling:
 - If the question mentions a season/year, only use snippets for that season.
@@ -43,6 +125,23 @@ Age: [Age or "N/A" if not available]
 
 *Source: [(URL if available in context, in anchor format)]*
 
+For team-related queries (e.g., "Tell me about the Los Angeles Lakers" or "Who coaches the Warriors?"):
+**[Team Name] ([Abbreviation])**
+Location: [City]
+Conference: [Conference]
+Head Coach: [Coach Name]
+
+*Team Overview*
+[1-2 sentence summary of the team based on context if available]
+
+*Source: [(URL if available in context, in anchor format)]*
+
+For roster queries (e.g., "Who played on the 2024-25 Lakers?" or "Lakers roster 2024"):
+**[Team Name] ([Abbreviation]) - [Season] Roster**
+- [Player 1 Name] (Position)
+- [Player 2 Name] (Position)
+- ...
+
 For specific stat queries (e.g., "What were LeBron's stats in 2023-24?"):
 **[Player Name]** - *[Season]*
 - **PPG:** [value]
@@ -56,6 +155,9 @@ For specific stat queries (e.g., "What were LeBron's stats in 2023-24?"):
 *Source: [(URL if available in context, in anchor format)]*
 
 For other questions, just answer concisely using the context provided.
+For example:
+- If asked about a player's height/weight/age/college, provide that info in bold.
+- If asked about whether a player is active/retired, answer directly with a sentence.
 
 FORMATTING GUIDELINES:
 - Use **bold** for player names, team names, and stat labels
@@ -75,6 +177,7 @@ Question:
 Answer:
 """
 
+# Prompt for rewriting user queries to standalone form
 REWRITE_PROMPT_TEMPLATE = """
 You are an NBA stats assistant for a dataset-driven chatbot.
 
@@ -88,11 +191,28 @@ Use the conversation history to resolve:
 
 Rules:
 - If the latest message is already standalone, return it unchanged.
-- Do NOT add any additional context or information beyond what is necessary to make the query standalone.
-- Output ONLY the rewritten query, no extra words.
-- Keep it short.
+- Do NOT remove team names, player names, abbreviations, seasons, or years that appear in the latest message. If you add a team from history, include the full team name.
+- If the latest message is a follow-up that contains a year/season (or mostly just a year/season), rewrite it to include:
+  1) the same subject from history (player or team),
+  2) the same intent from history (what the user was asking about),
+  3) the specified year/season.
+  Examples:
+    History: "Show me LeBron James stats for 2024-25."
+    Latest: "How about 2023?"
+    Rewritten: "LeBron James stats for 2023-24"
+
+    History: "Who is on the LA Clippers roster?"
+    Latest: "How about 2023?"
+    Rewritten: "LA Clippers roster for 2023-24"
+- Only edit words that are ambiguous references (pronouns, "that season", etc).
 - Do NOT invent facts, seasons, teams, or players not clearly implied by history.
-- If the player is ambiguous, keep the ambiguity (do not guess). Prefer adding a minimal clarifier from history.
+- Output ONLY the rewritten query, no extra words.
+
+Hard Constraints:
+- Your output MUST contain the latest user message EXACTLY as written (verbatim substring).
+- You are ONLY allowed to add extra context words before and/or after the latest user message.
+- You are NOT allowed to delete, reorder, or rewrite any part of the latest user message.
+- If you cannot determine the subject from history, output the latest user message unchanged.
 
 Conversation history:
 {history}
@@ -100,5 +220,5 @@ Conversation history:
 Latest user message:
 {message}
 
-Rewritten standalone query:
+Rewritten query:
 """
