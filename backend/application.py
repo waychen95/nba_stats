@@ -18,12 +18,6 @@ CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})
 # Load environment variables
 load_dotenv()
 
-hostname = os.getenv('HOSTNAME')
-username = os.getenv('USER')
-password = os.getenv('PASSWORD')
-database = os.getenv('DATABASE')
-port = os.getenv('PORT', 5432)
-
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -89,6 +83,12 @@ def get_db_connection():
             # Use single DATABASE_URL if available
             connection = psycopg2.connect(db_url)
         else:
+            hostname = os.getenv('HOSTNAME')
+            username = os.getenv('USER')
+            password = os.getenv('PASSWORD')
+            database = os.getenv('DATABASE')
+            port = os.getenv('PORT', 5432)
+            
             # Fall back to individual environment variables
             if not all([hostname, username, password, database]):
                 raise ValueError("Database connection variables are not fully set")
