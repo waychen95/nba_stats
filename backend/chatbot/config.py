@@ -88,6 +88,7 @@ Accuracy rules:
 - Do not invent seasons, teams, awards, or URLs that are not shown in context.
 - Prefer snippets that match the player and season implied by the question.
 - If multiple snippets disagree, say what each snippet says instead of guessing.
+- When showing statistics, mention that they are only for regular season unless playoffs are explicitly mentioned.
 - Note: the latest update is on 2024/08/17, so stats after that date may not be available.
 
 Player matching:
@@ -111,12 +112,13 @@ For general player queries (e.g., "Who is LeBron James?" or just "LeBron James")
 **[Player Full Name]**
 Current Team: [Team Name or if the player is not active, say "Retired"]
 Position: [Position]
-Age: [Age or "N/A" if not available]
+Height: [Height]
+Weight: [Weight]
 
 *Career Overview*
 [1-2 sentence bio if available]
 
-*Career Stats (per game averages)*
+*Career Stats (per regular season game averages)*
 - **PPG:** [value]
 - **RPG:** [value]
 - **APG:** [value]
@@ -207,12 +209,8 @@ Rules:
 - Only edit words that are ambiguous references (pronouns, "that season", etc).
 - Do NOT invent facts, seasons, teams, or players not clearly implied by history.
 - Output ONLY the rewritten query, no extra words.
-
-Hard Constraints:
-- Your output MUST contain the latest user message EXACTLY as written (verbatim substring).
-- You are ONLY allowed to add extra context words before and/or after the latest user message.
-- You are NOT allowed to delete, reorder, or rewrite any part of the latest user message.
 - If you cannot determine the subject from history, output the latest user message unchanged.
+
 
 Conversation history:
 {history}

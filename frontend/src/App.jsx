@@ -38,7 +38,7 @@ function App() {
               <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
             </li>
             <li>
-              <Link to="/chatbot" onClick={() => setMenuOpen(false)}>Chatbot</Link>
+              <Link to="/chatbot" onClick={() => setMenuOpen(false)}>NBAdle AI</Link>
             </li>
             <li>
               <Link to="/games" onClick={() => setMenuOpen(false)}>Games</Link>

@@ -40,21 +40,21 @@ class QueryRewriter:
                 res = self.client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=prompt,
-                    config={"max_output_tokens": 100, "temperature": 0.0},
+                    config={"max_output_tokens": 500, "temperature": 0.0},
                 )
                 rewritten = (res.text or "").strip()
-                print(f"[original message] '{message}'")
-                if not rewritten:
-                    return message
-
-                if rewrite_is_valid(message, rewritten):
-                    print(f"[rewrite] '{message}' → '{rewritten}'")
+                if rewritten:
+                    print(f"[rewritten message] '{message}' → '{rewritten}'")
                     return rewritten
 
-                repaired = repair_rewrite(message, rewritten)
-                if rewrite_is_valid(message, repaired):
-                    print(f"[rewrite] repaired '{rewritten}' → '{repaired}'")
-                    return repaired
+                # if rewrite_is_valid(message, rewritten):
+                #     print(f"[rewrite] '{message}' → '{rewritten}'")
+                #     return rewritten
+
+                # repaired = repair_rewrite(message, rewritten)
+                # if rewrite_is_valid(message, repaired):
+                #     print(f"[rewrite] repaired '{rewritten}' → '{repaired}'")
+                #     return repaired
 
                 return message
 

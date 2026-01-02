@@ -18,12 +18,10 @@ function Chatbot() {
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, loading]);
 
-  // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -94,7 +92,7 @@ function Chatbot() {
   return (
     <div id="chatbot-container">
       <div id="chatbot-header">
-        <h1>NBAdle Assistant</h1>
+        <h1>NBAdle AI</h1>
       </div>
 
       <div id="chat-window">
@@ -143,6 +141,7 @@ function Chatbot() {
           onKeyDown={onKeyDown}
           placeholder='Ask about players, stats, teams...'
           rows={1}
+          maxLength={200}
           disabled={loading}
         />
         <button 

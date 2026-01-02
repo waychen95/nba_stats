@@ -59,7 +59,8 @@ class NBAdleChatbot:
         roster_signals = [
             "roster", "who played", "players on", "team members",
             "lineup", "squad", "who plays", "on the team",
-            "who is on", "who are on", "members of",
+            "who is on", "who are on", "members of", "team mates", "teammates",
+            "teammate", "playing for", "played for", "team roster"
         ]
         if any(sig in q for sig in roster_signals):
             print(f"[classify] '{query}' → roster (fast path)")

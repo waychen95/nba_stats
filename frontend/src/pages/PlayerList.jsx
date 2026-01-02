@@ -38,7 +38,7 @@ function PlayerList() {
       const data = await response.json();
       const fetchedPlayers = data?.players || [];
       setPlayers(fetchedPlayers);
-      setTotalPages(Math.ceil(data.total / playersPerPage)); // Assuming API returns `total` count
+      setTotalPages(Math.ceil(data.total / playersPerPage));
       setLoading(false);
     }
 
