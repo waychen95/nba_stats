@@ -29,13 +29,19 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
 
 # Initialize the chatbot
-CHATBOT = NBAdleChatbot()
+CHATBOT = None
 
-# session_id -> deque of {"role": "...", "text": "..."}
 SESSION_HISTORY: dict[str, deque] = {}
 SESSION_TIMEOUT = timedelta(minutes=5)
 MAX_TURNS = 3
 MAX_HISTORY_CHARS = 2500
+
+def initialize_chatbot():
+    global CHATBOT
+    if CHATBOT is None:
+        print("Initializing NBAdleChatbot...")
+        CHATBOT = NBAdleChatbot()
+        print("NBAdleChatbot initialized.")
 
 def get_session_history(session_id: str) -> deque:
     cleanup_old_sessions()
@@ -72,41 +78,48 @@ def format_history(history: deque, max_chars: int = MAX_HISTORY_CHARS) -> str:
             s = s[cut + 1 :]
     return s
 
+# def get_db_connection():
+#     """
+#     Connect to PostgreSQL using either DATABASE_URL or individual environment variables.
+#     """
+#     db_url = os.getenv('DATABASE_URL')
+
+#     try:
+#         if db_url:
+#             # Use single DATABASE_URL if available
+#             connection = psycopg2.connect(db_url)
+#         else:
+#             hostname = os.getenv('HOSTNAME')
+#             username = os.getenv('USER')
+#             password = os.getenv('PASSWORD')
+#             database = os.getenv('DATABASE')
+#             port = os.getenv('PORT', 5432)
+
+#             # Fall back to individual environment variables
+#             if not all([hostname, username, password, database]):
+#                 raise ValueError("Database connection variables are not fully set")
+
+#             connection = psycopg2.connect(
+#                 host=hostname,
+#                 user=username,
+#                 password=password,
+#                 dbname=database,
+#                 port=port
+#             )
+
+#         print("Connected to the database")
+#         return connection
+
+#     except Exception as e:
+#         print(f"Database connection error: {str(e)}")
+#         return None
+
 def get_db_connection():
-    """
-    Connect to PostgreSQL using either DATABASE_URL or individual environment variables.
-    """
-    db_url = os.getenv('DATABASE_URL')
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise ValueError("DATABASE_URL is not set")
 
-    try:
-        if db_url:
-            # Use single DATABASE_URL if available
-            connection = psycopg2.connect(db_url)
-        else:
-            hostname = os.getenv('HOSTNAME')
-            username = os.getenv('USER')
-            password = os.getenv('PASSWORD')
-            database = os.getenv('DATABASE')
-            port = os.getenv('PORT', 5432)
-
-            # Fall back to individual environment variables
-            if not all([hostname, username, password, database]):
-                raise ValueError("Database connection variables are not fully set")
-
-            connection = psycopg2.connect(
-                host=hostname,
-                user=username,
-                password=password,
-                dbname=database,
-                port=port
-            )
-
-        print("Connected to the database")
-        return connection
-
-    except Exception as e:
-        print(f"Database connection error: {str(e)}")
-        return None
+    return psycopg2.connect(db_url)
 
 
 @app.route('/')
@@ -605,7 +618,7 @@ def contact():
     
 
 def run_app():
-    app.run(debug=True, host='0.0.0.0', port=3000)
+    app.run(host='0.0.0.0', port=3000)
 
 if __name__ == '__main__':
     run_app()
