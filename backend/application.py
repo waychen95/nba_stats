@@ -13,7 +13,7 @@ from chatbot.nbadle_chatbot import NBAdleChatbot
 
 app = Flask(__name__)
 application = app
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://nba-stats-ecru.vercel.app"]}})
 
 # Load environment variables
 load_dotenv()
@@ -88,7 +88,7 @@ def get_db_connection():
             password = os.getenv('PASSWORD')
             database = os.getenv('DATABASE')
             port = os.getenv('PORT', 5432)
-            
+
             # Fall back to individual environment variables
             if not all([hostname, username, password, database]):
                 raise ValueError("Database connection variables are not fully set")
