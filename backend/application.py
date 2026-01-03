@@ -29,19 +29,20 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
 
 # Initialize the chatbot
-CHATBOT = None
+CHATBOT = NBAdleChatbot()
 
 SESSION_HISTORY: dict[str, deque] = {}
 SESSION_TIMEOUT = timedelta(minutes=5)
 MAX_TURNS = 3
 MAX_HISTORY_CHARS = 2500
 
-def initialize_chatbot():
-    global CHATBOT
-    if CHATBOT is None:
-        print("Initializing NBAdleChatbot...")
-        CHATBOT = NBAdleChatbot()
-        print("NBAdleChatbot initialized.")
+# @app.before_first_request
+# def initialize_chatbot():
+#     global CHATBOT
+#     if CHATBOT is None:
+#         print("Initializing NBAdleChatbot...")
+#         CHATBOT = NBAdleChatbot()
+#         print("NBAdleChatbot initialized.")
 
 def get_session_history(session_id: str) -> deque:
     cleanup_old_sessions()
