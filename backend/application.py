@@ -13,7 +13,7 @@ from chatbot.nbadle_chatbot import NBAdleChatbot
 
 app = Flask(__name__)
 application = app
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://nba-stats-ecru.vercel.app"]}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", r"https://.*\.vercel\.app",]}})
 
 # Load environment variables
 load_dotenv()
