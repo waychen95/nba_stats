@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 python -m py_compile application.py
 
-sudo systemctl restart gunicorn
+sudo systemctl restart nbadle
 sudo nginx -t
 sudo systemctl reload nginx
 
