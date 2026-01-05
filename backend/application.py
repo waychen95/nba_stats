@@ -11,12 +11,37 @@ from datetime import datetime, timedelta
 from collections import deque
 from chatbot.nbadle_chatbot import NBAdleChatbot
 
+from flask_limiter import Limiter
+from flask_limiter.errors import RateLimitExceeded
+
 app = Flask(__name__)
 application = app
 CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", r"https://.*\.vercel\.app",]}})
 
 # Load environment variables
 load_dotenv()
+
+# Rate limiting (Redis-backed so it works across multiple Gunicorn workers)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+def rate_limit_key():
+    """
+    Key function used by Flask-Limiter to decide "who" is being limited.
+    We rate limit the chatbot by session_id (sent from your frontend).
+    If session_id is missing, fall back to IP.
+    """
+    data = request.get_json(silent=True) or {}
+    session_id = (data.get("session_id") or "").strip()
+    if session_id:
+        return f"sess:{session_id}"
+    return request.headers.get("X-Real-IP") or request.remote_addr or "unknown"
+
+limiter = Limiter(
+    key_func=rate_limit_key,
+    storage_uri=REDIS_URL,
+    default_limits=[]
+)
+limiter.init_app(app)
 
 # Flask-Mail configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -79,42 +104,6 @@ def format_history(history: deque, max_chars: int = MAX_HISTORY_CHARS) -> str:
             s = s[cut + 1 :]
     return s
 
-# def get_db_connection():
-#     """
-#     Connect to PostgreSQL using either DATABASE_URL or individual environment variables.
-#     """
-#     db_url = os.getenv('DATABASE_URL')
-
-#     try:
-#         if db_url:
-#             # Use single DATABASE_URL if available
-#             connection = psycopg2.connect(db_url)
-#         else:
-#             hostname = os.getenv('HOSTNAME')
-#             username = os.getenv('USER')
-#             password = os.getenv('PASSWORD')
-#             database = os.getenv('DATABASE')
-#             port = os.getenv('PORT', 5432)
-
-#             # Fall back to individual environment variables
-#             if not all([hostname, username, password, database]):
-#                 raise ValueError("Database connection variables are not fully set")
-
-#             connection = psycopg2.connect(
-#                 host=hostname,
-#                 user=username,
-#                 password=password,
-#                 dbname=database,
-#                 port=port
-#             )
-
-#         print("Connected to the database")
-#         return connection
-
-#     except Exception as e:
-#         print(f"Database connection error: {str(e)}")
-#         return None
-
 def get_db_connection():
     db_url = os.getenv("DATABASE_URL")
     if not db_url:
@@ -122,6 +111,13 @@ def get_db_connection():
 
     return psycopg2.connect(db_url)
 
+
+@app.errorhandler(RateLimitExceeded)
+def handle_rate_limit(e):
+    return jsonify({
+        "error": "rate_limited",
+        "message": "Too many chat requests. Please wait a moment and try again."
+    }), 429
 
 @app.route('/')
 def home():
@@ -149,6 +145,7 @@ def chat_health():
     })
     
 @app.route("/chat", methods=["POST"])
+@limiter.limit("10 per minute; 30 per hour")
 def chat():
 
     if CHATBOT is None:
