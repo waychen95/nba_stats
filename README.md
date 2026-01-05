@@ -1,6 +1,8 @@
-# NBAdle
+# NBAdle 🏀
 
 NBAdle is a Wordle-inspired web application for NBA enthusiasts. The goal of the game is to guess an NBA player within a limited number of attempts based on various clues.
+
+Live site: https://nba-stats-ecru.vercel.app/
 
 ![NBAdle Home Page](./images/nbadle_home.png)
 
