@@ -174,7 +174,7 @@ function PlayerList() {
             <p className='updated-time'>Last Updated: 2024/08/17</p>
             {renderDropdownPagination()}
           </div>
-          <ul className='player-list'>
+          <ul className={`player-list ${players.length < 4 ? 'few-players' : ''}`}>
             {players.map((player) => (
               <Link to={`/players/${player.id}`} key={player.id} className='player-card'>
                 <img src={player.image_url} alt={`${player.first_name} ${player.last_name}`} />

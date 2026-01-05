@@ -27,15 +27,19 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 2rem; /* spacing between cards */
-    padding: 0; /* remove padding so it aligns with dropdowns */
+    gap: 2rem;
+    padding: 0;
     min-height: 300px;
     height: 100%;
     flex: 1;
 }
 
+.few-players {
+    justify-content: flex-start;
+}
+
 .pagination-wrapper {
-    margin-top: auto; /* pushes pagination to bottom of container */
+    margin-top: auto;
 }
 
 .player-card img {

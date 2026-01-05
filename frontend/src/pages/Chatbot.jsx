@@ -74,8 +74,6 @@ function Chatbot() {
             }
         }
 
-        console.log(data.metadata);
-
         setChat((prev) => [...prev, { role: "assistant", text: answerText, metadata: data.metadata || null }]);
       }
     } catch (e) {

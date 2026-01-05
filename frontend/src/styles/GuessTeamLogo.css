@@ -5,7 +5,6 @@
     margin: auto;
     padding: 1rem;
     width: 70%;
-    /* Center content in each grid cell */
     place-items: center;
 }
 
@@ -14,11 +13,13 @@
     padding: 0.5rem;
     border-radius: 50%;
     width: 30%;
+    max-width: 150px;
 }
 
 .player h2 {
     font-size: 2rem;
     margin: 1rem 0;
+    text-align: center;
 }
 
 .guees-team-logo-hint {
@@ -35,27 +36,56 @@
     overflow: auto;
 }
 
+.guees-team-logo-hint p {
+    margin: 0.5rem 0;
+}
+
 .guess-team-logo-hint-button {
     margin-top: 2rem;
+    padding: 1rem 2rem;
+    background-color: #496880;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: "Bebas Neue", sans-serif;
+}
+
+.guess-team-logo-hint-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .hover-effect:hover {
-    transition: transform 0.3s;
     background-color: #304758;
-    cursor: pointer;
 }
 
-.hint.button.disabled {
-    pointer-events: none; /* Disable clicks */
-    opacity: 0.8;         /* Dim the appearance */
-    cursor: not-allowed;  /* Show a disabled cursor */
+.hint {
+    display: inline-block;
 }
 
+@media screen and (max-width: 1200px) {
+    .past-teams {
+        width: 80%;
+    }
+
+    .guees-team-logo-hint {
+        width: 70%;
+        font-size: 1.1rem;
+    }
+
+    .player h2 {
+        font-size: 1.8rem;
+    }
+}
 
 @media screen and (max-width: 768px) {
     .past-teams {
         grid-template-columns: 1fr 1fr;
         width: 90%;
+        row-gap: 1.5rem;
     }
 
     .past-teams img {
@@ -63,7 +93,64 @@
     }
 
     .guees-team-logo-hint {
-        width: 80%;
+        width: 85%;
+        font-size: 1rem;
+        padding: 1.5rem;
     }
-    
+
+    .player h2 {
+        font-size: 1.5rem;
+    }
+
+    .guess-team-logo-hint-button {
+        font-size: 1.1rem;
+        padding: 0.9rem 1.8rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .past-teams {
+        width: 95%;
+        row-gap: 1rem;
+    }
+
+    .past-teams img {
+        width: 50%;
+    }
+
+    .guees-team-logo-hint {
+        width: 90%;
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    .player h2 {
+        font-size: 1.3rem;
+    }
+
+    .guess-team-logo-hint-button {
+        font-size: 1rem;
+        padding: 0.8rem 1.5rem;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .past-teams img {
+        width: 55%;
+    }
+
+    .guees-team-logo-hint {
+        width: 95%;
+        font-size: 0.8rem;
+        padding: 0.8rem;
+    }
+
+    .player h2 {
+        font-size: 1.1rem;
+    }
+
+    .guess-team-logo-hint-button {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.2rem;
+    }
 }

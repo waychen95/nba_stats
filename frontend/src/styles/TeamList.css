@@ -5,6 +5,7 @@
     margin: 2rem auto 0 auto; /* center container */
     max-width: 1300px; /* set a max width */
     width: 100%;
+    flex: 1;
 }
 
 .team-list-loading {
@@ -15,7 +16,6 @@
     width: 100%;
 }
 
-
 .team-list-container h1 {
     color: white;
     font-size: 5rem;
@@ -25,24 +25,26 @@
 
 .team-list {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
-    gap: 2rem; /* spacing between cards */
-    padding: 0; /* remove padding so it aligns with dropdowns */
-    margin-top: 2rem; /* optional spacing */
+    gap: 2rem;
+    padding: 0;
     min-height: 300px;
+    height: 100%;
+    flex: 1;
 }
 
 .team-list-dropdowns {
     font-size: 1.5rem;
+    padding: 2rem;
     border-radius: 1rem;
     background-color: #496880;
     color: white;
     display: flex;
-    justify-content: space-between;
-    width: 100%; /* already same as container */
+    width: 100%;
+    justify-content: space-around;
+    gap: 1rem;
     box-sizing: border-box; /* include padding in width */
-    padding: 2rem;
 }
 
 .team-card img {
@@ -84,48 +86,77 @@
 
 .team-list-dropdowns label {
     flex-wrap: nowrap;
-    width: 100%;
 }
 
 .team-list-dropdowns select {
     font-size: 1.5rem;
     padding: 1rem;
-    margin: 1rem 1rem 1rem 0;
+    margin: 1rem 0 1rem 0;
     border-radius: 1rem;
     background-color: #496880;
     color: white;
-    width: 100%;
+}
+
+.team-dropdown-name label {
+    width: 100px;
+}
+
+.dropdown-conference label {
+    width: 100px;
 }
 
 @media (max-width: 1600px) {
 
+    .team-list-dropdowns {
+        gap: 0;
+        width: 100%;
+    }
+
+    .team-list-dropdowns select {
+        width: 100%;
+    }
+
     .team-dropdown-name label {
-        width: 20%;
-        margin-right: 1rem;
+        width: 90px;
+        margin-right: 0.5rem;
     }
     
     .dropdown-conference label {
-        width: 20%;
-        margin-right: 1rem;
+        width: 90px;
+        margin-right: 0.5rem;
+    }
+
+    .team-list-container h1 {
+        font-size: 3rem;
+    }
+
+    .team-card {
+        width: 200px;
+        height: 200px;
+        padding: 0.75rem;
+    }
+
+    .team-card p {
+        font-size: 1.2rem;
     }
 
     .team-list-dropdowns {
         flex-direction: column;
-        padding: 1.5rem;
         font-size: 1.2rem;
+        padding: 1.5rem;
     }
 
+    .team-list-dropdowns select {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+    }
 }
 
 @media (max-height: 1200px) {
 
-    .team-list-dropdowns label {
-        max-width: 100px;
+    .team-list-container h1 {
+        font-size: 3rem;
     }
-
-    /* .team-list {
-        padding: 0.5rem;
-    } */
     
     .team-card {
         width: 200px;
@@ -137,25 +168,19 @@
         font-size: 1.2rem;
     }
 
-    .team-list-container h1 {
-        font-size: 3rem;
-    }
-
     .team-list-dropdowns {
         flex-direction: column;
-        font-size: 1.2rem;
+        font-size: 1rem;
         padding: 1.5rem;
     }
 
-    .team-list-dropdowns select,
-    .team-list-dropdowns input {
-        font-size: 1.2rem;
+    .team-list-dropdowns select {
+        font-size: 1rem;
         padding: 0.75rem;
-        max-width: 1200px;
     }
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1400px) {
 
     .team-list-container {
         max-width: 900px; /* set a max width */
@@ -166,8 +191,6 @@
     }
 
     .team-card {
-        width: 200px;
-        height: 200px;
         padding: 0.75rem;
     }
 
@@ -179,19 +202,16 @@
         font-size: 3rem;
     }
 
-    .team-list-dropdowns {
-        flex-direction: column;
-        font-size: 1rem;
-        padding: 1.5rem;
+    .team-dropdown-name label {
+        width: 80px;
+        margin-right: 1rem;
     }
 
-    .team-list-dropdowns select,
-    .team-list-dropdowns input {
-        font-size: 1rem;
-        padding: 0.75rem;
+    .dropdown-conference label {
+        width: 80px;
+        margin-right: 1rem;
     }
 }
-
 
 @media (max-width: 1000px) {
 
@@ -205,9 +225,18 @@
     }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 850px) {
+
+    .team-card {
+        width: 165px;
+        height: 165px;
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 680px) {
     .team-list-container h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
 
     .team-card {
@@ -226,17 +255,11 @@
 
     .team-list-dropdowns {
         padding: 1rem;
+        font-size: 1rem;
     }
 
-    .team-list-dropdowns select,
-    .team-list-dropdowns input {
+    .team-list-dropdowns select {
         font-size: 1rem;
         padding: 0.5rem;
-        width: 220px;
-    }
-
-    .team-list-container {
-        max-width:min-content; /* set a max width */
-
     }
 }

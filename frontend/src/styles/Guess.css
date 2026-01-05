@@ -6,8 +6,8 @@
 }
 
 .guess-button {
-    padding: 0.5rem 1rem;
-    margin: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    margin: 0;
     text-align: center;
     text-decoration: none;
     background-color: #000000;
@@ -17,63 +17,80 @@
     border-radius: 50px;
     font-family: "Bebas Neue", sans-serif;
     transition: background-color 0.3s ease;
-    font-size: 1rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .guess-button:hover {
     background-color: #2b2b2b;
 }
 
+.guess-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .search-bar {
-    font-size: 18px;
-    padding: 0.5rem;
-    border-radius: 1rem;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-radius: 50px;
     background-color: #496880;
     margin: 2rem auto;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     z-index: 10;
-    position:relative;
+    position: relative;
 }
 
 .guess-search-bar {
-    max-width: 350px;
+    width: auto;
+    max-width: 600px;
 }
 
 .search-bar input {
-    font-size: 18px;
-    padding: 0.5rem;
-    border-radius: 1rem;
+    font-size: 1.2rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
     background-color: #ffffff;
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 0;
 }
 
 .search-dropdown-div {
     position: relative;
+    flex: 1;
+    min-width: 0;
 }
 
 .player {
     padding: 1rem;
     margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .search-dropdown {
     position: absolute;
-    top: 50%;
+    top: calc(100% + 0.5rem);
     left: 0;
     width: 100%;
-    max-width: 400px;
     border: 1px solid #ccc;
     border-radius: 20px;
     background-color: #496880;
     max-height: 400px;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 100;
     display: flex;
     flex-direction: column;
-    margin-left: auto;
-    margin-right: auto;
     padding: 0;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .search-dropdown li {
@@ -85,10 +102,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: background-color 0.2s ease;
 }
 
 .search-dropdown li:hover {
     background-color: #304758;
+}
+
+.search-dropdown li:first-child {
+    border-radius: 20px 20px 0 0;
+}
+
+.search-dropdown li:last-child {
+    border-radius: 0 0 20px 20px;
 }
 
 .incorrect-players {
@@ -139,37 +165,58 @@
 
 @media screen and (max-width: 1200px) {
     .guess-button {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
 
     .search-bar {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
+        padding: 0.9rem;
     }
 
     .search-bar input {
-        width: 90%;
+        font-size: 1.1rem;
+        padding: 0.7rem 0.9rem;
     }
 
     .player-info h2 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
 
     .incorrect-players {
-        padding: 1rem;
-        width: 100%; 
+        padding: 1.5rem;
+        width: 80%; 
+    }
+
+    .search-dropdown li {
+        font-size: 1.1rem;
+        padding: 0.9rem;
     }
 }
 
 @media screen and (max-width: 768px) {
+    .guess-button {
+        font-size: 1rem;
+    }
 
+    .search-bar {
+        font-size: 1rem;
+        padding: 0.8rem;
+        max-width: 90%;
+    }
+
+    .search-bar input {
+        font-size: 1rem;
+        padding: 0.6rem 0.8rem;
+    }
 
     .player-info h2 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
     }
 
     .incorrect-players {
         padding: 1rem;
         margin-bottom: 0;
+        width: 90%;
     }
 
     .next-button {
@@ -177,17 +224,38 @@
         width: 80%;
         padding: 1rem 2rem;
     }
+
+    .search-dropdown li {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
 }
 
 @media screen and (max-width: 480px) {
+    .guess-button {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .search-bar {
+        font-size: 0.9rem;
+        padding: 0.7rem;
+    }
+
+    .search-bar input {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.7rem;
+        min-width: 150px;
+    }
 
     .player-info h2 {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
 
     .incorrect-players {
-        padding: 1rem;
+        padding: 0.8rem;
         margin-bottom: 0;
+        width: 95%;
     }
 
     .next-button {
@@ -196,19 +264,33 @@
         padding: 1rem 2rem;
     }
 
-    .search-bar {
-        transform: scale(0.9);
+    .search-dropdown li {
+        font-size: 0.9rem;
+        padding: 0.7rem;
     }
 }
 
-@media screen and (max-width: 375px) { /* Target small screen sizes like iPhone 5 */
+@media screen and (max-width: 375px) {
+    .guess-button {
+        font-size: 0.8rem;
+    }
+
+    .search-bar {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+    }
+
+    .search-bar input {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.6rem;
+    }
 
     .player-info h2 {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
 
     .incorrect-players {
-        padding: 1rem;
+        padding: 0.5rem;
         margin-bottom: 0;
     }
 
@@ -217,5 +299,9 @@
         width: 100%;
         padding: 1rem 1.5rem;
     }
-    
+
+    .search-dropdown li {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+    }
 }
