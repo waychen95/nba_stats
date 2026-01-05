@@ -54,6 +54,15 @@ function Chatbot() {
             text: data?.error || "Something went wrong. Please try again." 
           },
         ]);
+      } else if (res.status === 429) {
+        setChat((prev) => [
+          ...prev,
+          { 
+            role: "assistant", 
+            text: "You're sending messages too quickly. Please slow down and try again later." 
+          },
+        ]);
+        console.warn("Rate limit exceeded:", data.message);
       } else {
         let answerText = data.answer;
       
